@@ -6,15 +6,16 @@ Why: Keep authentication and configurable network contracts separate from the UI
 export const config = {
   dataMode: 'mock', // Switch to 'live' after configuring Auth0 and the HTTP or custom adapter.
   transport: 'http', // 'custom' uses window.PlanITCrewAPI; 'http' uses crew-http.js.
+  features: {briefingPreferences: false, archivedReports: false},
   api: {
     baseURL: '', // For example https://api.your-domain.example; public URL, never secrets.
     timeoutMs: 20000,
     heartbeatMs: 45000,
     routes: {
       sites: '/sites', site: '/sites/{id}',
-      reports: '/reports', briefings: '/sites/{id}/briefings',
-      briefing: '/sites/{id}/briefings/{briefing_id}',
-      preferences: '/sites/{id}/briefing-preferences', events: '/events'
+      alerts: '/alerts', reports: '/reports',
+      photos: '/photos', photo: '/photos/{photo_key}',
+      briefing: '/briefings/{id}'
     }
   },
   // UI access is convenience only; the API must independently enforce permissions.

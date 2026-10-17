@@ -1,23 +1,32 @@
-import {test} from 'node:test';
+import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createHTTPAPI,createSSEDecoder} from '../crew-http.js';
-const settings={baseURL:'https://example.test/api',routes:{sites:'/sites',site:'/sites/{id}',reports:'/reports',preferences:'/sites/{id}/briefing-preferences'}};
-const json=value=>new Response(JSON.stringify(value),{status:200,headers:{'Content-Type':'application/json'}});
-test('HTTP adapter preserves API prefix, bearer token, and paginated site coverage',async()=>{
-  const seen=[];const api=createHTTPAPI(settings,async()=>'test-token',async(url,options)=>{seen.push([url.href,options]);return json(url.searchParams.has('cursor')?{items:[{id:'2'}]}:{items:[{id:'1'}],next_cursor:'page-two'});});
-  assert.equal((await api.listSites()).length,2);assert.equal(seen[0][0],'https://example.test/api/sites?limit=1000');assert.equal(seen[0][1].headers.Authorization,'Bearer test-token');assert.match(seen[1][0],/cursor=page-two/);
+import fs from 'node:fs/promises';
+import {createHTTPAPI} from '../crew-http.js';
+const fixture=JSON.parse(await fs.readFile(new URL('./fixtures/contract-v1.1.json',import.meta.url)));
+const settings={baseURL:'https://example.test/api'};
+const json=(value,status=200)=>new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json'}});
+
+test('HTTP reads contract arrays without invented pagination and preserves prefix and authentication',async()=>{
+  const seen=[];const api=createHTTPAPI(settings,async()=>'test-token',async(url,options)=>{seen.push([url.href,options]);return json(fixture.sites);});
+  const sites=await api.listSites();assert.equal(sites[0].id,'9001');assert.equal(sites.length,3);
+  assert.equal(seen[0][0],'https://example.test/api/sites');assert.equal(seen[0][1].headers.Authorization,'Bearer test-token');
 });
-test('reports use multipart binary photo plus a stable request ID',async()=>{
-  let sent;const api=createHTTPAPI(settings,async()=>'token',async(url,options)=>{sent=options;return json({id:'receipt',site_id:'621'});});
-  await api.submitReport({site_id:'621',request_id:'stable-id',photo:new File(['test photo'],'hazard.png',{type:'image/png'}),latitude:25.4,longitude:-80.3});
-  assert.equal(sent.method,'POST');assert.equal(sent.headers['Content-Type'],undefined);assert.equal(sent.body.get('request_id'),'stable-id');assert.equal(sent.body.get('photo').type,'image/png');assert.equal(await sent.body.get('photo').text(),'test photo');
+test('site detail requests validate identity and map the full nested score',async()=>{
+  const api=createHTTPAPI(settings,async()=>'token',async()=>json(fixture.details['9001']));
+  assert.equal((await api.readSite('9001')).score,8.2);
+  await assert.rejects(api.readSite('9002'),/different site_id/);
+  await assert.rejects(api.readSite('invalid'),/site_id/);
 });
-test('failed live requests throw; no synthetic success or sample fallback',async()=>{
-  const api=createHTTPAPI(settings,async()=>'token',async()=>new Response('',{status:403}));await assert.rejects(api.readSite('621'),/permission/);
+test('out-of-order HTTP responses cannot overwrite a later request',async()=>{
+  let release;let calls=0;
+  const api=createHTTPAPI(settings,async()=>'token',async()=>++calls===1?new Promise(resolve=>{release=()=>resolve(json(fixture.details['9001']));}):json({...fixture.details['9001'],name:'Latest response'}));
+  const older=api.readSite('9001');await new Promise(resolve=>setImmediate(resolve));
+  const latest=await api.readSite('9001');release();
+  assert.equal((await older).name,latest.name);assert.equal(latest.name,'Latest response');
+});
+test('contract error code and message survive; live failures do not use sample data',async()=>{
+  const api=createHTTPAPI(settings,async()=>'token',async()=>json({error:{code:'not_found',message:'Site 9001 not found'}},404));
+  await assert.rejects(api.readSite('9001'),error=>error.code==='not_found'&&error.status===404&&error.message==='Site 9001 not found');
+  const forbidden=createHTTPAPI(settings,async()=>'token',async()=>new Response('',{status:403}));await assert.rejects(forbidden.listSites(),/permission/);
   const invalid=createHTTPAPI({...settings,baseURL:''},async()=>'token');await assert.rejects(invalid.listSites(),/baseURL/);
 });
-test('SSE decoder handles fragmented CRLF, multiple events and multiline JSON',()=>{
-  const events=[],parse=createSSEDecoder(event=>events.push(event));parse('event: alert\r');parse('\ndata: {"site_id":"621",\r\ndata: "alert":{"version":2}}\r\n\r');parse('\nevent: heartbeat\ndata: {"server_time":"now"}\n\n');
-  assert.equal(events.length,2);assert.equal(events[0].type,'alert');assert.equal(events[0].alert.version,2);assert.equal(events[1].type,'heartbeat');
-});
-test('repeated pagination cursor fails instead of silently omitting sites',async()=>{const api=createHTTPAPI(settings,async()=>'token',async()=>json({items:[],next_cursor:'same'}));await assert.rejects(api.listSites(),/repeated/);});
