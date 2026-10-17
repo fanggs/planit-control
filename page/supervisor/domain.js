@@ -76,9 +76,12 @@ export function countdown(clearAt, now = Date.now()) {
   if (seconds <= 0) return 'Awaiting server clearance';
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')} until scheduled clearance`;
 }
-const EVENT_TYPES = new Set(['alert.started', 'alert.updated', 'alert.cleared', 'report.created', 'report.resolved']);
+const EVENT_TYPES = new Set(['alert.started', 'alert.updated', 'alert.cleared', 'report.created', 'report.resolved', 'scores.updated']);
 export function validNotice(notice) {
-  if (!notice || !EVENT_TYPES.has(notice.type) || !validSiteId(notice.site_id)) return false;
+  if (!notice || !EVENT_TYPES.has(notice.type)) return false;
+  if (notice.type === 'scores.updated') return Array.isArray(notice.site_ids)
+    && notice.site_ids.length > 0 && notice.site_ids.every(validSiteId);
+  if (!validSiteId(notice.site_id)) return false;
   return notice.type.startsWith('report.') ? typeof notice.report_id === 'string' && notice.report_id.length > 0
     : validSiteId(notice.alert_id);
 }

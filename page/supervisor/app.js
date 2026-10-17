@@ -2,6 +2,7 @@ import {config} from './config.js';
 import {createAuth} from './auth.js';
 import {createAPI, createSampleAPI} from './api.js';
 import {connectRealtime} from './realtime.js';
+import {createDeepSpaceSource} from '../realtime/deepspace-source.js';
 import {createRefreshQueue} from './refresh.js';
 import {bindPageLifecycle, changeSelectedSite} from './lifecycle.js';
 import {assessScore, coordinates, countdown, finite, freshness, hasSupervisorRole, label, points,
@@ -340,7 +341,7 @@ async function start() {
   await refresh().catch(showError); fitMap();
   countdownTimer = setInterval(() => document.querySelectorAll('[data-clear-at]').forEach(node => { node.textContent = countdown(node.dataset.clearAt); }), 1000);
   if (!sample) {
-    stopRealtime = connectRealtime({getSource: () => window.PlanITCrewRealtime, getToken: auth.token,
+    stopRealtime = connectRealtime({getSource: () => createDeepSpaceSource(config.realtime), getToken: auth.token,
       onInvalidate: refresh, onStatus(connected) {
         $('connection').dataset.connected = String(connected);
         $('connection').textContent = connected ? 'Live events connected' : 'Polling · live events unavailable';
