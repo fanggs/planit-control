@@ -272,13 +272,26 @@ fetch details from the API (so private info isn't broadcast).
 
 | Event | Payload | When |
 | --- | --- | --- |
-| `alert.started` | `{alert_id, site_id}` | Lightning within 10 mi, or a flood/other warning |
-| `alert.updated` | `{alert_id, site_id, clear_at}` | New strike, countdown resets to 30:00 |
-| `alert.cleared` | `{alert_id, site_id}` | Countdown reaches zero |
-| `report.created` | `{report_id, site_id, created_at}` | Crew submits a report |
-| `report.resolved` | `{report_id, site_id}` | Supervisor resolves a report |
+| `alert.started` | `{site_id, alert_id}` | Lightning within 10 mi, or a flood/other warning |
+| `alert.updated` | `{site_id, alert_id, clear_at}` | New strike, countdown resets to 30:00 |
+| `alert.cleared` | `{site_id, alert_id}` | Countdown reaches zero |
+| `report.created` | `{site_id, report_id}` | Crew submits a report |
+| `report.resolved` | `{site_id, report_id}` | Supervisor resolves a report |
+| `scores.updated` | `{site_ids: [...]}` | New hazard scores were calculated for these sites |
 
-DeepSpace is used for real-time only. Photos do **not** go through DeepSpace.
+Every notice also carries `sent_at` (UTC). Screens should ignore event types they
+don't know yet.
+
+**How it works:** a small DeepSpace app (`planit-realtime`, live at
+`https://planit-realtime.app.space`) holds an `events` collection.
+- **Publishing (API only):** `api/realtime.py` → `POST /api/notify` with
+  `Authorization: Bearer <PLANIT_NOTIFY_SECRET>`. Anything without the secret gets 401.
+- **Listening (any screen):** `page/realtime/deepspace-source.js` opens an anonymous
+  WebSocket to `/ws/app:<DEEPSPACE_APP_ID>` and subscribes to `events`. Notices are
+  IDs only, so anonymous read is safe; real data still comes from the API with Auth0.
+- App ID: `app_01M557EC8CQY7VDN5253P86ZBN`.
+
+Photos do **not** go through DeepSpace.
 
 ## 7. Crew reports and the score
 
