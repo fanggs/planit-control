@@ -1,9 +1,11 @@
 # Aryan's PlanIT Control implementation
 
 Built against `api/CONTRACT.md` v1.1 and `docs/TEAM.md`, inspected at `5b87c34`.
-These files are already in the local checkout. Nothing was staged, committed,
-pushed, deployed, or applied to a database. Shared `api/main.py`, the root
-requirements, the contract, and Isaiah's crew files were not changed.
+These files are already in the local checkout. The first delivery was
+uncommitted; Aryan subsequently authorized local feature commits and tested
+improvement commits. Nothing was pushed, deployed, or applied to a database.
+Shared `api/main.py`, the root requirements, the contract, and Isaiah's crew
+files were not changed.
 
 Important contract correction: photos now go **through our API into private
 server storage**. DeepSpace transports real-time notifications, not photos.
@@ -25,6 +27,7 @@ other files are additions.
 | `api/routes/hazard_reports.py` | GET/POST `/reports`, PATCH `/reports/{id}`; authentication, transactions, and post-commit notifications. |
 | `api/routes/hazard_photos.py` | POST `/photos` and authenticated GET `/photos/{photo_key}`. |
 | `api/routes/hazard_errors.py` | Contract-shaped validation/auth/database errors, scoped to these routers. |
+| `api/routes/hazard_upload_limit.py` | Reusable streamed request-size guard before JSON buffering or multipart spooling. |
 | `api/hazard_reporting.py` | One registration function Alan calls from the team's existing app. |
 | `api/requirements-hazard.txt` | Necessary backend additions while retaining the root requirements. |
 | `api/requirements-hazard-dev.txt` | HTTP test client and PostgreSQL SQL-parser test dependencies. |
@@ -34,6 +37,7 @@ other files are additions.
 | `page/supervisor/api.js` | Sample/live API adapter, bearer authentication, errors, photo blobs. |
 | `page/supervisor/auth.js`, `config.js` | Auth0 browser login and public deployment settings. No client secret belongs here. |
 | `page/supervisor/realtime.js` | Authenticated real-time adapter, refresh on events/reconnect, honest disconnected state. |
+| `page/supervisor/refresh.js`, `lifecycle.js` | Coalesce refresh bursts, clear old selected-site data, and restart cached browser-history visits safely. |
 | `page/supervisor/sample-data/` | Copies of the team's three sample sites and related fixtures, explicitly labeled as samples. |
 | `page/supervisor/tests/`, `package.json`, `dev/` | Dependency-free JavaScript tests and local preview tooling. |
 | `page/supervisor/README.md` | Frontend-specific configuration, ownership, and deployment handoff. |
@@ -41,6 +45,9 @@ other files are additions.
 | `tests/test_hazard_auth_photos.py` | Signed-token verification and private-photo tests. |
 | `tests/test_hazard_registration.py` | Registration guards and report-photo attachment checks. |
 | `tests/test_hazard_sql.py` | PostgreSQL grammar and SQLAlchemy PostgreSQL query compilation checks. |
+| `tests/test_hazard_errors.py` | Parser-error envelopes, private response headers, and authentication-header preservation. |
+| `tests/test_hazard_photo_directory.py` | Safe directory setup without modifying unrelated directory permissions. |
+| `tests/test_hazard_upload_limits.py`, `test_hazard_report_limits.py` | Streamed body limits, spoofed/missing size headers, temporary-file cleanup, and valid maximum-size inputs. |
 | `docs/aryan_implementation.md` | This handoff and setup guide. |
 
 ## 2. How the backend works
@@ -67,6 +74,11 @@ returns the existing result without sending duplicate change events.
 
 The service layer does not prove authentication itself. Internal callers must
 supply an already verified subject and enforce role checks before calling it.
+POST/PATCH report JSON is limited to 64 KiB before parsing or database access;
+this accommodates every allowed field, including a fully escaped 2,000-character
+Unicode description. Oversized bodies return a contract-shaped 413 response.
+Handled report/photo responses, including errors, use `private, no-store` and
+`nosniff` headers so report text and upload references are not cached either.
 
 ### Direct service imports
 
@@ -223,6 +235,9 @@ not used. JPEG/PNG decoding, 5 MiB byte limit, 20-megapixel limit, maximum
 10,000-pixel side, and single-frame checks reject unsafe/unsupported input.
 HEIC is not accepted. Images are stored as submitted; EXIF metadata is not
 stripped, so do not claim anonymization.
+Existing storage directories must already be owned by the API process user
+and have mode 0700. Setup rejects unsafe paths instead of changing their
+permissions; explicitly provision the intended private volume before startup.
 
 Before report attachment, only its uploader may preview a photo. After it is
 referenced by a report, either authenticated role can view it, matching the
@@ -231,10 +246,13 @@ a new report. Upload carries no site ID; the report row establishes that link.
 Keys are references, not credentials or public URLs.
 
 Set a reverse-proxy request-body limit (about 6 MiB to allow multipart overhead)
-and suitable rate limits. The endpoint bounds its byte read, but multipart
-parsing may spool incoming data before the route executes. Unattached uploads
-are not automatically deleted; agree on a retention/cleanup policy before
-production, without removing files still referenced by reports.
+and suitable rate limits as defense in depth. The application independently
+caps the total photo request at 5 MiB + 64 KiB multipart overhead, while retaining
+the strict 5 MiB image-byte cap. It checks actual streamed bytes, not just
+Content-Length. Overflow closes parser temporary files, and oversized unused
+multipart parts cannot bypass the request limit. Unattached uploads are not
+automatically deleted; agree on a retention/cleanup policy before production,
+without removing files still referenced by reports.
 
 ## 7. Supervisor dashboard and shared design system
 
@@ -294,6 +312,12 @@ Pass normalized event objects, not private report/photo contents. No imaginary
 shows real-time unavailable and uses periodic API refresh. Events/reconnects
 refresh the ranked list and selected detail/reports. Alan must make `/sites`
 return current `open_report_count` and active alerts after report writes.
+Refresh requests are coalesced into one active fetch and at most one pending
+fetch, so event bursts do not create a long backlog. JSON timeouts remain active
+until the response body finishes. Replacing a removed selected site clears its
+old reports, images, and pins before loading the replacement. Returning from
+the browser's Back/Forward Cache reloads the workspace to restart authentication
+checks and live updates instead of retaining stopped timers.
 
 Isaiah can import `../shared/planit.css` before his screen-specific CSS and
 adopt its tokens/components deliberately. His crew files were not restyled.
@@ -365,14 +389,16 @@ is not ready until these shared dependencies are connected and tested together.
 
 ### Verified in this checkout
 
-- 53 backend tests passed with Python 3.13, FastAPI 0.143.3, Pydantic 2.14.1,
+- 74 backend tests passed with Python 3.13, FastAPI 0.143.3, Pydantic 2.14.1,
   and SQLAlchemy 2.1.5 in an isolated virtual environment.
-- 16 JavaScript tests passed, including Auth0 browser configuration and the loopback-only preview server's
+- 25 JavaScript tests passed, including Auth0 browser configuration and the loopback-only preview server's
   direct path, trailing-slash redirects, and required static assets.
 - Browser preview verified search, selecting a different site, empty filters,
   positive/negative score contributions, and disabled sample write controls.
   At 390px and 1440px viewport widths, the document had no horizontal overflow.
   No browser console errors were observed during those interactions.
+- After the reliability fixes, browser checks reconfirmed site selection,
+  refresh, the crew link, and returning to the dashboard through browser history.
 - PostgreSQL SQL parsed and queries compiled. Live PostgreSQL transactions,
   concurrency, Auth0 tenant login, DeepSpace delivery, and Gemini were **not**
   exercised. Those require the team's real configuration and acceptance pass.

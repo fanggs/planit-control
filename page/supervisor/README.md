@@ -40,6 +40,8 @@ Use that executable in place of `node`, or install Node locally.
 | `api.js` | Authenticated requests using exact contract paths; separate read-only sample adapter. |
 | `domain.js` | Pure score/ranking/freshness/coordinate/event validation functions. |
 | `realtime.js` | Alan's DeepSpace adapter boundary, reconnect and authorized refetch. |
+| `refresh.js` | One active refresh plus one pending refresh, shared across burst callers. |
+| `lifecycle.js` | Clear old selection state and reload cached history restores before restarting live work. |
 | `app.js` | Page interactions, Leaflet markers, waterfall, reports and private-photo rendering. |
 | `sample-data/*.json` | Exact sample sites/details/reports/alerts copied from `api/samples/`. |
 | `dev/serve.mjs` | Loopback-only static preview server, including trailing-slash handling. |
@@ -127,6 +129,16 @@ never comes from the event payload.
 
 Without the provider, the dashboard honestly says live events are unavailable
 and polls every 30 seconds. Polling does not count as a live connection.
+Refresh bursts are coalesced, not added to an unbounded request queue. A notice
+received during a fetch still requests one follow-up fetch. A stalled JSON body
+remains subject to the configured API timeout even after headers arrive.
+
+If refresh removes the selected site, its old details, photos, reports and pins
+are cleared before loading a replacement. A failed replacement load shows an
+unavailable message rather than another site's data. A browser Back/Forward
+Cache restore reloads the page, reruns the Auth0 session check and restarts
+updates; the paused page never claims an active connection while its timers
+are stopped.
 
 ## Shared design handoff to Isaiah
 
