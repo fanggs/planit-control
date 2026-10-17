@@ -3,6 +3,7 @@ Commit: feat(crew): assemble crew workspace and supervisor preview
 Why: Assemble previously tested modules into simple crew navigation and an isolated supervisor handoff, retaining alerts across views.
 */
 import {config} from './crew-config.js';
+import {userRoles} from './crew-routing.js';
 import {initAuth,session,signIn,signOut,enterDemo,authConfigured} from './crew-auth.js';
 import {services,demoAction} from './crew-services.js';
 import {acceptAlert,alertView} from './crew-state.js';
@@ -17,11 +18,15 @@ let messageTimer,searchTimer;
 function message(text){$('#crew-message').textContent=text;$('#crew-message').classList.add('visible');clearTimeout(messageTimer);messageTimer=setTimeout(()=>$('#crew-message').classList.remove('visible'),7000);}
 function cleanupView(){state.viewVersion++;state.viewCleanup?.();state.viewCleanup=null;state.reports=null;}
 function loginScreen(error=''){
-  cleanupView();$('#crew-root').innerHTML=`<main class="crew-login" id="crew-main">${brandMark()}${contourArt()}<p class="crew-eyebrow">PLANIT CONTROL · CREW</p><h1>Know the conditions.<br>Look out for your crew.</h1><p>One site. Every hazard. Check conditions, report what you see, and plan tomorrow’s work.</p>${error?`<p class="crew-error" role="alert">${esc(error)}</p>`:''}<button class="crew-button" data-action="sign-in" ${authConfigured()?'':'disabled'}>Sign in with Auth0</button>${!authConfigured()?'<small>Auth0 application settings are not configured yet.</small>':''}${config.dataMode==='mock'?'<button class="crew-button secondary" data-action="preview">Open sample crew preview</button><a href="crew-supervisor.html?demo=1">Open supervisor preview ↗</a><small>Real national plant reference. Synthetic conditions. Sample preview does not sign you in through Auth0.</small>':''}</main>`;
+  cleanupView();
+  const loginURL=new URL('login.html',location.href);loginURL.searchParams.set('start','1');
+  const siteId=new URLSearchParams(location.search).get('site');if(siteId)loginURL.searchParams.set('site',siteId);
+  $('#crew-root').innerHTML=`<main class="crew-login" id="crew-main">${brandMark()}<p class="crew-eyebrow">PLANIT CONTROL / CREW ACCESS</p><h1>A clearer picture.<br>A safer shift.</h1><p>Sign in to see your site, share observations, and plan your next shift.</p>${error?`<p class="crew-error" role="alert">${esc(error)}</p>`:''}<a class="crew-button" href="${esc(loginURL.href)}">Log in with Auth0 ↗</a><a href="index.html">← Back to PlanIT</a>${config.dataMode==='mock'?'<button class="crew-button secondary" data-action="preview">Open sample crew preview</button><small>Sample conditions. No Auth0 sign-in or live alerts.</small>':''}</main>`;
 }
 function unavailable(error){$('#crew-root').innerHTML=`<main class="crew-login" id="crew-main"><h1>Site data is unavailable.</h1><p>${esc(error.message)}</p><button class="crew-button" data-action="reload">Try again</button><button class="crew-button secondary" data-action="logout">Sign out</button></main>`;}
 async function openWorkspace(){
   state.user=await session();if(!state.user)return loginScreen();
+  if(!state.user.demo&&!userRoles(state.user,config.authRoleClaim).length)return loginScreen('Your account needs a crew or supervisor role. Ask your administrator for access.');
   $('#crew-root').innerHTML='<main class="crew-login" id="crew-main"><h1>Loading your sites…</h1></main>';
   try{state.sites=await services.listSites();if(!Array.isArray(state.sites)||!state.sites.length)throw new Error('No assigned sites returned. Ask your supervisor to check access.');
     const requested=new URLSearchParams(location.search).get('site'),preferred=state.sites.find(s=>String(s.id)===(requested||'621'))||state.sites[0];
@@ -62,7 +67,7 @@ async function refreshSite(version=state.loadVersion,incoming){
 }
 function renderWorkspace(){
   const p=state.site;cleanupView();
-  $('#crew-root').innerHTML=`<header class="crew-header"><a href="crew.html" class="crew-brand">${brandMark()}PlanIT <span>Control</span></a><div class="crew-header-actions"><a class="crew-link" href="crew-supervisor.html${config.dataMode==='mock'?'?demo=1':''}">Supervisor view ↗</a><button class="crew-link" data-action="logout">Sign out</button></div></header><main id="crew-main" class="crew-main">
+  $('#crew-root').innerHTML=`<header class="crew-header"><a href="index.html" class="crew-brand">${brandMark()}PlanIT <span>Control</span></a><div class="crew-header-actions">${state.user?.demo||userRoles(state.user,config.authRoleClaim).includes('supervisor')?`<a class="crew-link" href="crew-supervisor.html${state.user?.demo?'?demo=1':''}">Supervisor view ↗</a>`:''}<button class="crew-link" data-action="logout">Sign out</button></div></header><main id="crew-main" class="crew-main">
     ${config.dataMode==='mock'?'<p class="crew-demo"><strong>SAMPLE DATA</strong> · Real plant locations. Synthetic conditions and scores. Reports stay on this browser; no live alerts or delivery.</p>':''}
     <section class="crew-section-heading crew-site-hero"><div class="crew-hero-copy"><p class="crew-eyebrow">YOUR JOB SITE</p><h1 id="crew-site-name">${esc(p.name)}</h1><p class="crew-muted">${esc(p.state)} · Plant ${esc(p.id)} · ${state.sites.length.toLocaleString()} available sites</p></div><div class="crew-hero-end">${contourArt()}<button class="crew-button secondary" data-action="change-site">Change site ${icon("switch")}</button></div></section>
     <section id="crew-site-picker" class="crew-card" hidden><div class="crew-coordinate-row"><div><label for="crew-site-query">Search plants</label><input id="crew-site-query" type="search" placeholder="Plant, operator, state or ID" autocomplete="off"></div><div><label for="crew-site-region">State / territory</label><select id="crew-site-region"><option value="">All states & territories</option>${[...new Set(state.sites.map(s=>s.state))].sort().map(s=>`<option>${esc(s)}</option>`).join('')}</select></div></div><p id="crew-search-count" class="crew-muted" role="status"></p><div id="crew-site-results" class="crew-site-results"></div></section>

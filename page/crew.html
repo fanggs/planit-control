@@ -1,4 +1,4 @@
 <!doctype html>
 <!-- Frontend part 6. Commit: feat(crew): assemble crew workspace and supervisor preview.
 The isolated crew folder keeps module/package settings out of the shared page root. -->
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PlanIT Control · Crew</title><script type="module">location.replace(new URL("crew/crew.html"+location.search+location.hash,location.href));</script></head><body><a href="crew/crew.html">Open the crew workspace</a></body></html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PlanIT Control</title><script type="module">const query=new URLSearchParams(location.search);const target=query.has('site')||query.get('demo')==='1'?'crew/crew.html':'crew/index.html';location.replace(new URL(target+location.search+location.hash,location.href));</script></head><body><a href="crew/index.html">Open PlanIT Control</a></body></html>

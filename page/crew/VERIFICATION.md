@@ -37,3 +37,13 @@ Screenshots are delivered beside the package: `planit-complete-preview.png`, `pl
 ## Not verified against a live team backend
 
 Auth0 login/role claims, API CORS, actual feeds/10-mile server decisions, DeepSpace cross-device updates/storage, real trained model/evaluation, real flood detection, actual scheduled/email/background-push delivery, physical-phone camera behavior, production hosting/domain/HTTPS and team repository integration. These need the team's services/configuration. The local sample is not evidence that these backend functions are operating.
+
+
+## Dark welcome and role routing — October 17, 2026
+
+- 28 behavior tests pass, including role selection, rejected arbitrary redirect parameters, single-use callback handling, in-memory SDK reuse, and expired-session login. The Auth0 cases use an SDK double; no real tenant verification is claimed.
+- JavaScript syntax checks pass.
+- Browser checked: welcome → login; unconfigured sign-in state; sample crew and supervisor access; report form/map controls; briefing navigation; home links. No console errors in the exercised crew flow.
+- Dark surfaces checked on both workspaces and form controls. Existing stop-work, warning and unavailable states remain distinct.
+- Welcome verified at desktop, 390 × 844 and 320 × 740. Supervisor, report form and briefing verified at 390 px. No horizontal overflow in these checks.
+- Hosted Auth0 branding and real login remain pending team-provided public application settings. Live API adapter alignment with CONTRACT v1.1 is still required.

@@ -5,6 +5,7 @@ Why: Assemble previously tested modules into simple crew navigation and an isola
 // Separate integration preview. This does not replace Aryan's owned dashboard files.
 import {icon,brandMark,contourArt} from './crew-visuals.js';
 import {config} from './crew-config.js';
+import {userRoles} from './crew-routing.js';
 import {initAuth,session,signIn,signOut,enterDemo,authConfigured} from './crew-auth.js';
 import {services} from './crew-services.js';
 import {rankSites,validScore,riskLabel} from './crew-domain.js';
@@ -14,17 +15,17 @@ const state={sites:[],filtered:[],map:null,layer:null,reportLayer:null,photoURLs
 let noticeTimer,filterTimer;
 function message(text){const box=document.getElementById('crew-message');box.textContent=text;box.classList.add('visible');clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>box.classList.remove('visible'),7000);}
 function login(error=''){
-  root.innerHTML=`<main class="crew-login" id="crew-main">${brandMark()}${contourArt()}<p class="crew-eyebrow">PLANIT CONTROL · SUPERVISOR</p><h1>Focus on the sites that need you.</h1><p>Compare risk, inspect reports, and open a crew’s site view.</p>${error?`<p class="crew-error">${esc(error)}</p>`:''}<button class="crew-button" id="supervisor-login" ${authConfigured()?'':'disabled'}>Sign in with Auth0</button>${config.dataMode==='mock'?'<button class="crew-button secondary" id="supervisor-demo">Open sample supervisor preview</button>':''}<a href="crew.html">Crew sign-in ↗</a></main>`;
-  document.getElementById('supervisor-login').onclick=()=>signIn().catch(e=>message(e.message));document.getElementById('supervisor-demo')?.addEventListener('click',()=>{enterDemo();open();});
+  root.innerHTML=`<main class="crew-login" id="crew-main">${brandMark()}<p class="crew-eyebrow">PLANIT CONTROL / SUPERVISOR ACCESS</p><h1>Know where<br>to focus.</h1><p>One secure login opens the workspace assigned to your account.</p>${error?`<p class="crew-error" role="alert">${esc(error)}</p>`:''}<a class="crew-button" href="login.html?start=1">Log in with Auth0 ↗</a><a href="index.html">← Back to PlanIT</a>${config.dataMode==='mock'?'<button class="crew-button secondary" id="supervisor-demo">Open sample supervisor preview</button>':''}</main>`;
+  document.getElementById('supervisor-demo')?.addEventListener('click',()=>{enterDemo();open();});
 }
 function filters(){return {query:document.getElementById('supervisor-query').value,region:document.getElementById('supervisor-region').value,minimum:Number(document.getElementById('supervisor-minimum').value)};}
 async function open(){
   const user=await session();if(!user)return login();
-  if(config.dataMode==='live'&&(!Array.isArray(user[config.authRoleClaim])||!user[config.authRoleClaim].includes('supervisor')))return login('Supervisor access is required. Ask your administrator to assign the supervisor role. The backend must also enforce this permission.');
+  if(!user.demo&&!userRoles(user,config.authRoleClaim).includes('supervisor'))return login('Supervisor access is required. Ask your administrator to assign the supervisor role. The backend must also enforce this permission.');
   root.innerHTML='<main class="crew-login"><h1>Loading the national site picture…</h1></main>';
   try{
     state.sites=await services.listSites();if(!Array.isArray(state.sites))throw new Error('Site service must return a list.');
-    root.innerHTML=`<header class="crew-header"><a class="crew-brand" href="crew-supervisor.html">${brandMark()}PlanIT <span>Control</span></a><div class="crew-header-actions"><a class="crew-link" href="crew.html${config.dataMode==='mock'?'?demo=1':''}">Crew workspace ↗</a><button id="supervisor-logout" class="crew-link">Sign out</button></div></header><main id="crew-main" class="crew-main crew-dashboard">
+    root.innerHTML=`<header class="crew-header"><a class="crew-brand" href="index.html">${brandMark()}PlanIT <span>Control</span></a><div class="crew-header-actions"><a class="crew-link" href="crew.html${config.dataMode==='mock'?'?demo=1':''}">Crew workspace ↗</a><button id="supervisor-logout" class="crew-link">Sign out</button></div></header><main id="crew-main" class="crew-main crew-dashboard">
       ${config.dataMode==='mock'?'<p class="crew-demo"><strong>SAMPLE DATA</strong> · 13,446 real plant reference locations. Risk scores and conditions are synthetic. Reports are shared between tabs on this browser only.</p>':''}
       <div class="crew-section-heading crew-site-hero crew-supervisor-hero">${contourArt()}<div class="crew-hero-copy"><p class="crew-eyebrow">SUPERVISOR WORKSPACE</p><h1>Know where to focus.</h1><p class="crew-muted" id="supervisor-updated"></p></div><button class="crew-button secondary" id="supervisor-refresh">Refresh sites</button></div>
       <div class="crew-dashboard-stats" id="supervisor-stats"></div><section class="crew-card crew-dashboard-filters"><div><label for="supervisor-query">Find a site</label><input id="supervisor-query" type="search" placeholder="Plant, state, operator or ID"></div><div><label for="supervisor-region">State / territory</label><select id="supervisor-region"><option value="">All states & territories</option>${[...new Set(state.sites.map(s=>s.state))].sort().map(s=>`<option>${esc(s)}</option>`).join('')}</select></div><div><label for="supervisor-minimum">Risk focus</label><select id="supervisor-minimum"><option value="0">All scores</option><option value="4">Elevated & high · 4+</option><option value="7">High · 7+</option></select></div></section>
@@ -54,7 +55,7 @@ function applyFilters(reset=false){
   document.getElementById('supervisor-updated').textContent='Site list fetched '+new Date().toLocaleTimeString()+'. Read each site’s score timestamp for freshness.';
   document.getElementById('supervisor-match-count').textContent=state.filtered.length.toLocaleString()+' matches';renderRanking();
   state.layer?.clearLayers();
-  for(const s of state.filtered){if(!state.map||![s.latitude,s.longitude].every(Number.isFinite))continue;const color=!validScore(s.score)?'#829087':s.score>=7?'#a44532':s.score>=4?'#b8872d':'#31684c';L.circleMarker([s.latitude,s.longitude],{radius:4,color,weight:1,fillColor:color,fillOpacity:.8}).on('click',()=>selectSite(s.id)).addTo(state.layer);}
+  for(const s of state.filtered){if(!state.map||![s.latitude,s.longitude].every(Number.isFinite))continue;const color=!validScore(s.score)?'#829087':s.score>=7?'#f6997b':s.score>=4?'#e8bd6c':'#8dd1a2';L.circleMarker([s.latitude,s.longitude],{radius:4,color,weight:1,fillColor:color,fillOpacity:.8}).on('click',()=>selectSite(s.id)).addTo(state.layer);}
   if(reset&&state.map){const points=state.filtered.filter(s=>[s.latitude,s.longitude].every(Number.isFinite)).map(s=>[s.latitude,s.longitude]);if(points.length)state.map.fitBounds(points,{padding:[25,25],maxZoom:11});}
 }
 function renderRanking(){

@@ -24,6 +24,8 @@ export const config = {
     domain: '',
     clientId: '',
     audience: '', // Alan/Aryan's API identifier, required for API access tokens.
-    redirectUri: new URL(location.pathname.endsWith('crew-supervisor.html')?'crew-supervisor.html':'crew.html', location.href).href.split('#')[0].split('?')[0]
+    // Register this exact callback and the home logout URL in the Auth0 application.
+    redirectUri: new URL('login.html', location.href).href,
+    logoutReturnTo: new URL('index.html', location.href).href
   }
 };

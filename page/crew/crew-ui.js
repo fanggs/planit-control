@@ -12,7 +12,7 @@ export function dateLabel(value,zone){if(!Number.isFinite(Date.parse(value)))ret
 export function scoreHTML(score){
   const valid=validScore(score);
   // The ring depicts the supplied score; it never estimates missing data.
-  const color=!valid?'#a0aaa2':score>=7?'#b36343':score>=4?'#bb923c':'#47734c';
+  const color=!valid?'#a0aaa2':score>=7?'#efab87':score>=4?'#e8bf72':'#9bdbac';
   return `<div class="crew-score-ring" style="--score-sweep:${valid?score*36:0}deg;--score-color:${color}"><strong class="crew-score">${valid?score.toFixed(1):'—'}<small>/ 10</small></strong></div>`;
 }
 export function hazardHTML(site){

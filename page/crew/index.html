@@ -1,4 +1,61 @@
 <!doctype html>
-<!-- Frontend part 6
-Commit: feat(crew): assemble crew workspace and supervisor preview
-Why: Assemble previously tested modules into simple crew navigation and an isolated supervisor handoff, retaining alerts across views. --><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PlanIT Control</title><script type="module">location.replace(new URL('crew.html'+location.search+location.hash,location.href));</script></head><body><p><a href="crew.html">Open PlanIT Control</a></p></body></html>
+<!-- Commit: feat(crew): introduce a dark PlanIT welcome experience
+     Why: Give crews one clear entry before Auth0, with a separate, honest demo. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#080b0c">
+    <meta name="description" content="Site conditions, crew alerts, and field observations in one clear workspace.">
+    <title>PlanIT Control — A clearer picture. A safer shift.</title>
+    <link rel="stylesheet" href="crew.css">
+    <link rel="stylesheet" href="crew-theme.css">
+    <link rel="stylesheet" href="crew-dark.css">
+    <link rel="stylesheet" href="crew-welcome.css">
+    <script type="module" src="crew-welcome.js"></script>
+  </head>
+  <body class="planit-crew planit-welcome">
+    <a class="crew-skip" href="#welcome-main">Skip to content</a>
+    <header class="welcome-header">
+      <a class="crew-brand" href="index.html" aria-label="PlanIT Control home"><span class="welcome-mark" aria-hidden="true">P<span></span></span>PlanIT <span>Control</span></a>
+      <nav aria-label="Main navigation"><a class="welcome-nav-link" href="#how-it-works">How it works</a><a class="welcome-login-link" href="login.html?start=1">Log in <span aria-hidden="true">↗</span></a></nav>
+    </header>
+    <main id="welcome-main">
+      <section class="welcome-hero" aria-labelledby="welcome-title">
+        <p class="welcome-kicker"><span></span> SITUATIONAL AWARENESS FOR FIELD TEAMS</p>
+        <h1 id="welcome-title">A clearer picture.<br><span>A safer shift.</span></h1>
+        <p class="welcome-intro">The conditions change. Stay a step ahead.<br>Site risks, crew alerts, and tomorrow’s outlook.<br class="welcome-mobile-break"> All in one place.</p>
+        <div class="welcome-actions"><a class="crew-button welcome-primary" href="login.html?start=1">Log in to PlanIT <span aria-hidden="true">↗</span></a><a class="welcome-secondary" id="welcome-demo-link" href="#explore-demo">Explore the demo <span aria-hidden="true">↓</span></a></div>
+        <p class="welcome-auth-note">One secure sign-in. The right workspace for your role.</p>
+        <div class="welcome-scene" aria-hidden="true">
+          <div class="scene-horizon"></div><div class="scene-grid"></div>
+          <svg class="scene-network" viewBox="0 0 1100 330" fill="none">
+            <defs><linearGradient id="network-line"><stop stop-color="#79e0bc" stop-opacity="0"/><stop offset=".5" stop-color="#79e0bc"/><stop offset="1" stop-color="#6ab7e6" stop-opacity="0"/></linearGradient></defs>
+            <path d="M60 237 270 185 425 230 570 130 755 187 1040 88" stroke="url(#network-line)" stroke-width="1.5"/>
+            <path d="m270 185 30 90m270-145 25 145m160-88 30 87" stroke="#79e0bc" stroke-opacity=".22" stroke-dasharray="3 7"/>
+            <g stroke="#81e6c0"><circle cx="270" cy="185" r="5" fill="#81e6c0"/><circle cx="270" cy="185" r="24" opacity=".24"/><circle cx="570" cy="130" r="5" fill="#81e6c0"/><circle cx="570" cy="130" r="36" opacity=".2"/></g>
+            <g stroke="#e6b466"><circle cx="755" cy="187" r="5" fill="#e6b466"/><circle cx="755" cy="187" r="22" opacity=".3"/></g>
+          </svg>
+          <div class="scene-label scene-label-one"><span></span> SITE CONDITIONS</div><div class="scene-label scene-label-two"><span></span> CREW CONNECTED</div><div class="scene-label scene-label-three"><span></span> STAY AWARE</div>
+        </div>
+        <div class="welcome-hero-footer"><span>BUILT AROUND THE PEOPLE IN THE FIELD</span><span>01 / KNOW BEFORE YOU GO</span></div>
+      </section>
+      <section class="welcome-workflow" id="how-it-works" aria-labelledby="workflow-title">
+        <div class="welcome-section-intro"><p class="welcome-kicker">FROM AWARENESS TO ACTION</p><h2 id="workflow-title">Less noise.<br>More clarity.</h2><p>One shared picture, from the control room to the job site.</p></div>
+        <ol>
+          <li><span class="workflow-number">01</span><div><h3>Know your site.</h3><p>See environmental conditions and understand the factors behind the hazard score.</p></div></li>
+          <li><span class="workflow-number">02</span><div><h3>Keep your crew informed.</h3><p>Follow stop-work alerts. Share a photo and a map pin when you spot a hazard.</p></div></li>
+          <li><span class="workflow-number">03</span><div><h3>Look ahead.</h3><p>Review tomorrow’s briefing and help the next crew arrive prepared.</p></div></li>
+        </ol>
+      </section>
+      <section class="welcome-demo" id="explore-demo" aria-labelledby="demo-title" hidden>
+        <div><p class="welcome-kicker">TAKE A LOOK AROUND</p><h2 id="demo-title">Two perspectives.<br>One site picture.</h2><p>Explore real plant locations with sample conditions.<br>This preview does not sign you in or send live alerts.</p></div>
+        <div class="welcome-demo-options">
+          <a href="crew.html?demo=1&site=621"><span class="demo-option-icon" aria-hidden="true">↗</span><strong>Crew workspace</strong><span>Conditions, alerts, reports, and briefings</span><b aria-hidden="true">→</b></a>
+          <a href="crew-supervisor.html?demo=1"><span class="demo-option-icon" aria-hidden="true">⌖</span><strong>Supervisor workspace</strong><span>A national map and sites ranked by risk</span><b aria-hidden="true">→</b></a>
+        </div>
+      </section>
+    </main>
+    <footer class="welcome-footer"><span>PlanIT Control</span><span>Know the conditions. Look out for your crew.</span><a href="login.html?start=1">Log in ↗</a></footer>
+  </body>
+</html>

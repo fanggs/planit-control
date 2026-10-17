@@ -1,0 +1,91 @@
+.planit-welcome { background: #080b0c; }
+.planit-crew .welcome-header { max-width: 1440px; margin: auto; padding: 24px 6%; display: flex; justify-content: space-between; align-items: center; gap: 22px; border-bottom: 1px solid #ffffff0d; }
+.planit-crew .welcome-header nav { display: flex; align-items: center; gap: 32px; }
+.planit-crew .welcome-header a { text-decoration: none; }
+.planit-crew .welcome-header .crew-brand { font-size: 22px; gap: 9px; }
+.planit-crew .welcome-mark { display: inline-grid; position: relative; place-items: center; width: 30px; height: 33px; background: #a7edc9; border-radius: 7px 7px 15px 7px; color: #0a1710 !important; font-size: 23px; font-weight: 800; margin-right: 3px; }
+.planit-crew .welcome-mark span { position: absolute; width: 5px; height: 5px; background: #080b0c; right: 4px; bottom: 5px; }
+.planit-crew .welcome-nav-link { color: #9eaba7; font-size: 13px; }
+.planit-crew .welcome-login-link { display: inline-flex; gap: 22px; align-items: center; color: #eef4f0; font-size: 13px; border: 1px solid #ffffff2e; padding: 9px 17px; border-radius: 7px; min-height: 44px; }
+.planit-crew .welcome-login-link:hover { border-color: #a7edc9; background: #a7edc90a; }
+.planit-crew .welcome-hero { min-height: 710px; height: min(850px, calc(100svh - 85px)); position: relative; isolation: isolate; overflow: hidden; display: flex; align-items: center; flex-direction: column; text-align: center; padding: 100px 24px 185px; }
+.planit-crew .welcome-kicker { font: 10px/1.8 ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: 1.7px; color: #aabbb2; }
+.planit-crew .welcome-kicker > span { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #a7edc9; box-shadow: 0 0 12px #a7edc94d; margin-right: 8px; vertical-align: 1px; }
+.planit-crew .welcome-hero h1 { font-size: clamp(50px, 6.6vw, 94px); line-height: 1.04; font-weight: 540; letter-spacing: -.065em; color: #edf4ef; margin: 20px 0 24px; }
+.planit-crew .welcome-hero h1 > span { color: #a7edc9; }
+.planit-crew .welcome-intro { color: #9faea7; font-size: 16px; line-height: 1.8; margin-bottom: 28px; }
+.planit-crew .welcome-mobile-break { display: none; }
+.planit-crew .welcome-actions { display: flex; justify-content: center; align-items: center; gap: 25px; }
+.planit-crew .welcome-primary { border-radius: 7px; padding: 11px 20px; font-size: 13px; gap: 24px; }
+.planit-crew .welcome-secondary { display: inline-flex; align-items: center; gap: 15px; text-decoration: none; color: #d7e1db; font-size: 13px; min-height: 44px; }
+.planit-crew .welcome-secondary:hover { color: #a7edc9; }
+.planit-crew .welcome-auth-note { color: #82968b; font-size: 11px; margin: 18px 0 0; }
+.planit-crew .welcome-scene { position: absolute; z-index: -1; height: 360px; bottom: 0; left: 0; right: 0; pointer-events: none; opacity: .8; mask-image: linear-gradient(transparent, #000 20%, #000 70%, transparent 98%); }
+.planit-crew .scene-horizon { position: absolute; width: 110%; height: 190px; bottom: 20px; left: -5%; background: radial-gradient(ellipse at center, #337a5a24, transparent 65%); filter: blur(10px); }
+.planit-crew .scene-grid { position: absolute; inset: -80px -20% -180px; background-image: linear-gradient(#6caa891c 1px, transparent 1px), linear-gradient(90deg, #6caa891c 1px, transparent 1px); background-size: 74px 65px; transform: perspective(550px) rotateX(58deg) rotateZ(-12deg); transform-origin: center; mask-image: radial-gradient(ellipse, #000, transparent 65%); }
+.planit-crew .scene-network { position: absolute; width: min(1100px, 100%); height: 330px; bottom: 0; left: 50%; transform: translateX(-50%); }
+.planit-crew .scene-label { position: absolute; font: 9px ui-monospace, monospace; letter-spacing: 1.2px; color: #8bc9aa; padding: 7px 10px; border: 1px solid #70bc8f2b; background: #09140ed9; border-radius: 3px; }
+.planit-crew .scene-label span { display: inline-block; width: 4px; height: 4px; background: currentColor; margin-right: 5px; border-radius: 50%; }
+.planit-crew .scene-label-one { left: 17%; bottom: 115px; transform: rotate(-7deg); }
+.planit-crew .scene-label-two { left: 49%; bottom: 140px; transform: rotate(-7deg); }
+.planit-crew .scene-label-three { right: 15%; bottom: 72px; color: #dbbd81; transform: rotate(-7deg); }
+.planit-crew .welcome-hero-footer { position: absolute; bottom: 25px; left: 6%; right: 6%; display: flex; justify-content: space-between; gap: 20px; font: 9px/1.6 ui-monospace, monospace; letter-spacing: 1.3px; color: #80998b; }
+.planit-crew .welcome-workflow, .planit-crew .welcome-demo { max-width: 1180px; margin: auto; border-top: 1px solid #26352d; padding: 90px 35px; display: grid; grid-template-columns: 1fr 1fr; gap: 85px; scroll-margin-top: 24px; }
+.planit-crew .welcome-workflow h2, .planit-crew .welcome-demo h2 { font-size: clamp(32px, 4vw, 48px); line-height: 1.1; letter-spacing: -.045em; font-weight: 500; margin: 18px 0; }
+.planit-crew .welcome-section-intro > p:last-child, .planit-crew .welcome-demo > div > p:last-child { color: #9dafa3; font-size: 14px; max-width: 300px; line-height: 1.8; }
+.planit-crew .welcome-workflow ol { padding: 0; margin: 0; list-style: none; }
+.planit-crew .welcome-workflow li { display: flex; gap: 26px; padding: 24px 0; border-top: 1px solid #26352d; }
+.planit-crew .welcome-workflow li:first-child { padding-top: 8px; border-top: 0; }
+.planit-crew .workflow-number { font: 11px/1.8 ui-monospace, monospace; color: #8de3bf; }
+.planit-crew .welcome-workflow h3 { font-size: 17px; letter-spacing: -.3px; font-weight: 500; margin-bottom: 8px; }
+.planit-crew .welcome-workflow li p { color: #a3b3a9; font-size: 13px; line-height: 1.8; margin: 0; }
+.planit-crew .welcome-demo-options { display: grid; gap: 12px; }
+.planit-crew .welcome-demo-options > a { display: grid; grid-template-columns: 35px 1fr 20px; column-gap: 12px; align-items: center; padding: 23px 20px; border: 1px solid #34483b; border-radius: 9px; background: #111a15; text-decoration: none; color: #e4f0e7; }
+.planit-crew .welcome-demo-options > a:hover { background: #192b20; border-color: #7dbd94; }
+.planit-crew .demo-option-icon { grid-row: 1 / 3; font-size: 24px; color: #a7edc9; }
+.planit-crew .welcome-demo-options strong { font-size: 15px; font-weight: 550; }
+.planit-crew .welcome-demo-options a > span:not(.demo-option-icon) { grid-column: 2; color: #9eb5a6; font-size: 11px; margin-top: 4px; }
+.planit-crew .welcome-demo-options b { grid-column: 3; grid-row: 1 / 3; color: #8de3bf; }
+.planit-crew .welcome-footer { padding: 28px 6%; border-top: 1px solid #27372e; display: flex; justify-content: space-between; align-items: center; gap: 25px; color: #9aafa0; font-size: 11px; }
+.planit-crew .welcome-footer > span:first-child { font-size: 14px; color: #e1eee5; }
+.planit-crew .welcome-footer a { text-decoration: none; }
+.planit-crew .crew-auth-card { margin: max(35px, 8vh) auto; width: min(500px, calc(100% - 32px)); max-width: 500px; min-height: 0; padding: 42px; }
+.planit-crew .crew-auth-card .auth-back { display: inline-block; text-decoration: none; font-size: 12px; margin-bottom: 42px; color: #afc1b5; }
+.planit-crew .crew-auth-card h1 { font-size: 42px; letter-spacing: -1.8px; line-height: 1.15; margin-bottom: 22px; }
+.planit-crew .crew-auth-card .crew-button { display: flex; width: 100%; justify-content: center; margin: 24px 0 14px; }
+.planit-crew .auth-security-note { font-size: 11px; color: #9bafa1; }
+.planit-crew .auth-demo-options { border-top: 1px solid #3c4f40; margin-top: 28px; padding-top: 22px; display: grid; gap: 12px; }
+.planit-crew .auth-demo-options > span { font: 9px/1.7 ui-monospace, monospace; letter-spacing: 1.2px; color: #c7bd92; }
+.planit-crew .auth-demo-options a { text-decoration: none; font-size: 13px; color: #b9e9cb; }
+@media (max-width: 760px) {
+  .planit-crew .welcome-header { padding: 18px 22px; }
+  .planit-crew .welcome-header nav { gap: 18px; }
+  .planit-crew .welcome-hero { padding-top: 80px; height: auto; min-height: 700px; }
+  .planit-crew .welcome-workflow, .planit-crew .welcome-demo { margin: 0 22px; grid-template-columns: 1fr; gap: 40px; padding: 60px 0; }
+  .planit-crew .welcome-section-intro > p:last-child { max-width: 420px; }
+  .planit-crew .welcome-footer > span:nth-child(2) { display: none; }
+}
+@media (max-width: 480px) {
+  .planit-crew .welcome-header { padding: 17px 19px; }
+  .planit-crew .welcome-header .crew-brand { font-size: 19px; gap: 7px; }
+  .planit-crew .welcome-nav-link { display: none; }
+  .planit-crew .welcome-login-link { padding: 7px 12px; gap: 13px; }
+  .planit-crew .welcome-hero { padding: 64px 18px 185px; min-height: 690px; }
+  .planit-crew .welcome-kicker { font-size: 8px; letter-spacing: 1.2px; }
+  .planit-crew .welcome-hero h1 { font-size: clamp(42px, 12vw, 59px); letter-spacing: -.065em; margin: 23px 0; }
+  .planit-crew .welcome-intro { font-size: 13px; line-height: 1.9; }
+  .planit-crew .welcome-mobile-break { display: initial; }
+  .planit-crew .welcome-actions { flex-direction: column; gap: 6px; }
+  .planit-crew .welcome-auth-note { max-width: 230px; font-size: 10px; margin-top: 9px; }
+  .planit-crew .welcome-scene { height: 255px; opacity: .6; }
+  .planit-crew .scene-network { width: 700px; max-width: none; height: 235px; }
+  .planit-crew .scene-label { font-size: 7px; letter-spacing: .5px; }
+  .planit-crew .scene-label-one { left: 4%; bottom: 94px; }
+  .planit-crew .scene-label-two { left: 44%; bottom: 130px; }
+  .planit-crew .scene-label-three { right: 2%; bottom: 55px; }
+  .planit-crew .welcome-hero-footer { bottom: 20px; text-align: left; font-size: 8px; max-width: 190px; }
+  .planit-crew .welcome-hero-footer > span:last-child { display: none; }
+  .planit-crew .crew-auth-card { padding: 30px; margin: 25px auto; }
+  .planit-crew .crew-auth-card h1 { font-size: 36px; }
+  .planit-crew .welcome-demo-options > a { padding: 20px 14px; }
+}

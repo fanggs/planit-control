@@ -1,3 +1,5 @@
+> **Integration status:** This original adapter proposal predates `api/CONTRACT.md` v1.1. The contract is authoritative. In particular, photos use `POST /photos` (JPEG/PNG, max 5 MB), followed by `POST /reports`; alert deadlines use `clear_at`. Do not connect the legacy multipart/report or briefing-history shapes unchanged. See `AUTH0-HANDOFF.md` for the new login flow.
+
 # Connecting PlanIT Control's frontend
 
 ## Current repository report schema

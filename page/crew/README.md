@@ -1,8 +1,8 @@
 # PlanIT Control — complete frontend package
 
-Light-mode crew workspace with forest-green accents and a separate supervisor integration preview. All six challenge capabilities have frontend screens and service connections. Actual environmental feeds, trained ML, shared storage, Auth0 tenant configuration, notification delivery and 6 PM background jobs must be provided by the backend.
+Dark welcome page, role-aware Auth0 entry, crew workspace, and separate supervisor integration preview. All six challenge capabilities have frontend screens and service connections. Actual environmental feeds, trained ML, shared storage, Auth0 tenant configuration, notification delivery and 6 PM background jobs must be provided by the backend.
 
-The visual theme adds soft sky, amber, lavender, terracotta, moss and teal hazard cards, original contour-line artwork, a PlanIT mark, icon navigation and a score ring. Category tints are independent from risk: the labeled severity badges and alert colors retain a consistent vocabulary. `crew-theme.css` keeps these changes scoped, and `crew-visuals.js` contains the original inline SVG artwork without external asset dependencies.
+The visual theme uses near-black surfaces, mint/cyan accents, restrained hazard tints, original grid/contour artwork, icon navigation and a score ring. `crew-dark.css` supplies the shared dark palette inside Isaiah’s package. Category tints are independent from risk: the labeled severity badges and alert colors retain a consistent vocabulary. `crew-theme.css` keeps these changes scoped, and `crew-visuals.js` contains the original inline SVG artwork without external asset dependencies.
 
 ## Run locally
 
@@ -12,7 +12,7 @@ Install Node.js 20 or newer. No package installation or build is required.
 node dev/serve.mjs
 ```
 
-Open http://127.0.0.1:4174/crew.html and choose **Open sample crew preview**. Supervisor preview: http://127.0.0.1:4174/crew-supervisor.html?demo=1. If port 4174 is already serving this package, reload it. To use a different port set the `PORT` environment variable first. Serve over HTTP/HTTPS; opening HTML directly as a file will not load modules or the plant catalog correctly.
+Open http://127.0.0.1:4174/ for the welcome page. **Log in** starts the Auth0 handoff; **Explore the demo** offers separate crew and supervisor previews. Read **AUTH0-HANDOFF.md** for callback URLs, role configuration, hosted-login colors, and the remaining contract v1.1 integration work. Supervisor preview: http://127.0.0.1:4174/crew-supervisor.html?demo=1. If port 4174 is already serving this package, reload it. To use a different port set the `PORT` environment variable first. Serve over HTTP/HTTPS; opening HTML directly as a file will not load modules or the plant catalog correctly.
 
 ## Included
 
