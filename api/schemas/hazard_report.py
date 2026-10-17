@@ -26,3 +26,29 @@ class HazardType(str, Enum):
     SOIL_SATURATION = "soil_saturation"
     WILDLIFE = "wildlife"
     OTHER = "other"
+
+
+class Severity(str, Enum):
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+
+
+class ReportStatus(str, Enum):
+    PENDING = "pending"
+    REVIEWED = "reviewed"
+    RESOLVED = "resolved"
+
+
+def validate_reporter_id(value: str) -> str:
+    """Validate the verified Auth0 subject supplied by backend code."""
+    if not isinstance(value, str) or not 1 <= len(value) <= 255:
+        raise ValueError("reporter_id must contain 1 to 255 characters")
+    if any(character.isspace() or ord(character) < 32 or ord(character) == 127
+           for character in value):
+        raise ValueError("reporter_id cannot contain whitespace or control characters")
+    return value
+
+
+class HazardReportCreate(BaseModel):
+    """The JSON body a crew member may submit. Authorization happens separately."""
