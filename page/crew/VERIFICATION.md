@@ -121,3 +121,24 @@ Auth0 login/role claims, API CORS, actual feeds/10-mile server decisions, DeepSp
   still require the team’s tenant setup. No supervisor/shared/API files changed.
 - Restart old preview processes to enable the sibling routes; the process that
   was already on port 4176 still has its original routing until restarted.
+
+
+## Original supervisor preview restored · October 17, 2026
+
+- Restored Isaiah’s original crew-owned supervisor HTML and dashboard logic
+  from the version before the Atlas replacement. Kept the current 60-site
+  roster, provenance, sample labels and a separate 2D/3D Atlas link.
+- The normal Supervisor links now open `crew-supervisor.html`. Crew and
+  supervisor Auth0 callbacks mount in the existing document and reuse the
+  memory-only SDK client. A URL role cannot choose a privileged workspace.
+- `node dev/check.mjs`: passed. `node --test`: 60 passed, none failed.
+- Desktop browser: 60 available plants; 18 high sample scores; high-risk
+  filtering returned 18, search found Grand Gulf, selection loaded score,
+  flood and observation panels, and pagination switched 1/2 → 2/2 → 1/2.
+- Atlas link preserved selected Grand Gulf and opened the full 60-site map;
+  its Supervisor link returned to the restored dashboard. The home-page
+  Supervisor link also opened this dashboard directly in sample mode.
+- Checked 390 × 844 phone layout; filters and colored cards remain visible.
+  Final desktop preview had no horizontal overflow or browser console errors.
+- Aryan’s independent `page/supervisor/` files remain unchanged. Live Auth0
+  and backend operation were not exercised; current conditions are samples.

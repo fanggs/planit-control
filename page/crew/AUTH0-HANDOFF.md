@@ -28,22 +28,23 @@ Example, when publishing `page/crew/` as the website root:
 
 Use HTTPS for the deployed site. A plain HTTP LAN IP preview is for UI testing;
 Auth0's SPA SDK requires a secure browser context (HTTPS or loopback localhost).
-The callback imports the crew workspace in the same document so its SDK token
-remains in memory. A verified supervisor role navigates to
-`../supervisor/index.html`; that independent application initializes its own
-Auth0 client and validates the supervisor role again. Tokens, authorization
-codes and arbitrary return URLs are never forwarded between the pages.
+The callback mounts the chosen crew-owned workspace in the same document:
+`crew.html` for crew, `crew-supervisor.html` for supervisor. The existing SDK
+client and its memory-only token are reused; no access token, authorization
+code or arbitrary return URL is passed between pages. The verified namespaced
+role claim chooses the workspace. A public link never grants a live role.
 
-Alan/Aryan must configure `page/supervisor/config.js` for live mode, the agreed
-tenant/application, audience and role claim. Register its own callback and
-logout URLs too (for example `http://localhost:4174/supervisor/index.html`).
-The existing Auth0 session can support single sign-on; browser cookie
-restrictions may require another explicit sign-in. The frontend cannot promise
-a seamless live handoff until both workspace configurations are tested together.
+The original supervisor preview uses the crew config and adapters, including
+Auth0. A reload uses the SDK’s session check; cookie restrictions may require
+another explicit Universal Login. Live sign-in still needs the team’s tenant
+settings and deployment checks.
 
-Serve the complete `page/` structure in production. The crew local preview
-server now also serves `/supervisor/`, `/shared/` and `/realtime/`, so both
-workspaces run on one origin. Restart older preview processes after this change.
+Aryan’s separate `page/supervisor/` application is unchanged and keeps its own
+config and Auth0 session. Main crew navigation now opens the restored original
+crew-owned supervisor preview rather than that separate application.
+
+The crew local preview server also serves `/supervisor/`, `/shared/` and
+`/realtime/` for integrated testing; those existing routes remain available.
 
 ## Match Auth0's hosted page to the app
 
@@ -66,10 +67,10 @@ Verify sign-in, any verification/MFA prompt, and sign-out on the deployed domain
 
 ## Demo and integration limits
 
-The demo chooser is visible only when crew `dataMode` is `mock`. Crew and atlas
-demo scores are synthetic. The separate supervisor application keeps its own
-mode: by default it shows three read-only contract sample plants. Its ordinary
-navigation link does not grant a role or change its sample/live configuration. Actual
+The demo chooser is visible only when crew `dataMode` is `mock`. The crew,
+atlas and restored supervisor preview share the same 60 real plant locations
+and synthetic sample scores. `?demo=1` opens the sample supervisor directly in
+mock mode; it cannot bypass live Auth0 checks. Actual
 Auth0 verification cannot be tested until the team supplies its application settings.
 Auth0's API calls are not simulated as successful in the preview.
 

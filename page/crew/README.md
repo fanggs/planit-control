@@ -12,7 +12,7 @@ Install Node.js 20 or newer. No package installation or build is required.
 node dev/serve.mjs
 ```
 
-Open http://127.0.0.1:4174/ for the welcome page. **Log in** starts the Auth0 handoff; **Site map** opens the primary 2D/3D map; **Supervisor** opens Aryan’s separate dashboard; **Explore the demo** offers both workspaces and the site map. Read **AUTH0-HANDOFF.md** for callback URLs, role configuration and hosted-login colors, and **BACKEND-CONNECTION.md** for the contract v1.1 adapter. Primary map: http://127.0.0.1:4174/crew-atlas.html. Supervisor: http://127.0.0.1:4174/supervisor/index.html. The preview serves both frontend folders and their shared assets; restart the server after upgrading its routing. If port 4174 is already serving this package, reload it. To use a different port set the `PORT` environment variable first. Serve over HTTP/HTTPS; opening HTML directly as a file will not load modules or the plant catalog correctly.
+Open http://127.0.0.1:4174/ for the welcome page. **Log in** starts the Auth0 handoff; **Site map** opens the primary 2D/3D map; **Supervisor** opens the original crew-owned supervisor preview; **Explore the demo** offers both workspaces and the site map. Read **AUTH0-HANDOFF.md** for callback URLs, role configuration and hosted-login colors, and **BACKEND-CONNECTION.md** for the contract v1.1 adapter. Primary map: http://127.0.0.1:4174/crew-atlas.html. Supervisor: http://127.0.0.1:4174/crew-supervisor.html?demo=1. The preview serves both frontend folders and their shared assets; restart the server after upgrading its routing. If port 4174 is already serving this package, reload it. To use a different port set the `PORT` environment variable first. Serve over HTTP/HTTPS; opening HTML directly as a file will not load modules or the plant catalog correctly.
 
 ## Included
 
@@ -28,7 +28,7 @@ See **CREW-ATLAS.md** for roster refresh, controls and integration.
 4. **Flood warnings:** river proximity, overnight rain, observation window, rule explanation and a warning banner across crew views. Grand Gulf (6072) has a Mississippi River demonstration scenario. Real flood criteria remain backend-owned.
 5. **Briefing:** latest next-day text, date, generation time, available input evidence and print view. History, delivery preferences and email controls remain hidden pending a team contract update. The backend owns the 18:00 site-local job.
 6. **Photo reports:** optional JPEG/PNG up to 5 MB, preview, map click or draggable pin, accessible paired coordinates, validation, two-step upload/report state, stored receipt, open/all/resolved filters and report-map pins. Archived controls remain hidden.
-7. **Supervisor workspace:** navigation opens Aryan’s existing dashboard for rankings, alerts, waterfall explanations and crew reports. Its default read-only preview uses three contract sample plants; it is separate from the 60-real-plant site map. Live mode and Auth0 configuration remain owned by Aryan.
+7. **Supervisor workspace:** the original dark dashboard with colored summary cards, search/state/risk filters, risk ranking, site overview, selected-site score/flood details and crew observations. It uses the same 60-plant roster and demo storage as the crew screen. **Open 2D / 3D map** opens the separate Atlas with the selected plant. Aryan’s dashboard files remain unchanged.
 8. **Explainable 0–10 model display:** validated score, signed contributions in score points, baseline, model version, score time and forecast horizon. Mismatched totals show an unavailable explanation; missing values never become zero. Training/evaluation fields render only when supplied.
 9. **Backend adapters:** authenticated contract REST requests, separate photo upload and JSON report creation, protected image reads, and an ID-notice bridge for Alan's DeepSpace source with refetch, reconnect and cleanup. No legacy `/events` request or invented pagination.
 10. **Auth0 entry points:** Universal Login, callback handling and sign-out. Sample access is available only in mock mode. Supervisor live entry checks a configurable roles claim; the API must independently enforce authorization.
@@ -53,14 +53,14 @@ Auth0 needs its configured tenant and internet connection. Map tiles need OpenSt
 
 ## File ownership and integration
 
-The package stays under `crew-*` and does not edit Aryan's dashboard or shared stylesheet. `crew-supervisor.html/js` is a compatibility entry for Aryan’s separate dashboard; the former national preview and catalog have been retired. Aryan’s separate dashboard is unchanged. Shared theme tokens are inherited when `themeStylesheet` is configured; the temporary fallback styles stay inside `.planit-crew`.
+The package stays under `crew-*` and does not edit Aryan's dashboard or shared stylesheet. `crew-supervisor.html/js` restores the original crew-owned preview layout. The old national plant catalog remains retired; all crew-owned demo screens use the same 60 monitored plants. Aryan’s separate dashboard is unchanged. Shared theme tokens are inherited when `themeStylesheet` is configured; the temporary fallback styles stay inside `.planit-crew`.
 
 Keep `crew-data/` and `crew-vendor/` with the pages when copying them into `page/crew/`. The root `dev/` scripts are development tools, not backend services. See CREW-DEVELOPMENT.md for the staged Git integration and implementation rationale. Deployment and backend connection are separate steps.
 
 For integrated static hosting, preserve the `page/` structure: `/crew/`,
 `/supervisor/`, `/shared/` and `/realtime/` must be served on the same origin.
-Open `/crew/index.html` for the welcome page. Publishing only crew files leaves
-the supervisor link unavailable. The local crew preview keeps root aliases
+Open `/crew/index.html` for the welcome page. The original supervisor preview is included inside `/crew/`; Aryan’s separate
+dashboard remains available at `/supervisor/index.html`. The local crew preview keeps root aliases
 (`/index.html`, `/crew.html`, `/crew-atlas.html`) working alongside those folders.
 Configure HTTPS and each workspace’s Auth0 callback/logout URLs for production.
 Keep API URLs in their public configuration files.

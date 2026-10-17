@@ -88,4 +88,4 @@ The last command is a read-only check against Alan's local API at `http://localh
 
 At verification, the sample server served sites, detail, alerts, briefings and reports. It did not yet register photo upload/view or report creation routes. Those flows are covered by simulated HTTP tests, pending real endpoint integration. Auth0 settings and Alan's SDK bridge are still needed for live browser testing. Test two devices, a new-strike reset, disconnect/reconnect, explicit clear, protected photo visibility and a persisted report once those services are ready. Briefing scheduling and 6 PM delivery remain backend responsibilities.
 
-Aryan owns the supervisor dashboard. `crew-supervisor.html/js` now links to Aryan’s separate `page/supervisor/index.html` dashboard. The primary site map remains `crew-atlas.html`. Aryan’s files and sample/live configuration are unchanged.
+Aryan owns the supervisor dashboard. `crew-supervisor.html/js` restores the original crew-owned supervisor preview, sharing crew Auth0, adapters, demo scores and the 60 monitored plants. It links to the separate `crew-atlas.html` 2D/3D map. Aryan’s dashboard files remain unchanged.

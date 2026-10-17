@@ -1,6 +1,7 @@
 import {config} from './crew-config.js';
 import {initAuth, session, signIn, signOut, authConfigured} from './crew-auth.js';
-import {workspaceForUser, siteParameter, workspaceURL} from './crew-routing.js';
+import {workspaceForUser, siteParameter} from './crew-routing.js';
+import {mountWorkspace} from './crew-workspaces.js';
 const query = new URLSearchParams(location.search);
 const status = document.getElementById('login-status');
 const errorBox = document.getElementById('login-error');
@@ -37,19 +38,7 @@ async function boot() {
         return;
       }
       const siteId = siteParameter(callback.siteId ?? query.get('site'));
-      const url = workspaceURL(workspace,location.href);
-      if(workspace==='supervisor'){
-        // The independent dashboard initializes its own Auth0 session and checks
-        // the verified role. Never pass an access token between pages in a URL.
-        location.replace(url.href);
-        return;
-      }
-      if(siteId)url.searchParams.set('site',siteId);
-      document.title='PlanIT Control · Crew';
-      document.getElementById('crew-access-root').id='crew-root';
-      history.replaceState({},document.title,url);
-      // Crew keeps the SDK's memory-only token by loading in this document.
-      await import('./crew.js');
+      await mountWorkspace(workspace,{baseURL:location.href,siteId,document,history});
       return;
     }
     status.textContent = 'Use your work account to continue securely.';

@@ -24,7 +24,7 @@ test('fixed workspace destinations stay separate in root and nested crew deploym
   for(const base of ['http://127.0.0.1:4176/crew-routing.js','https://planit.example/crew/crew-routing.js','https://planit.example/demo/crew/crew-routing.js']){
     const supervisor=workspaceURL('supervisor',base),crew=workspaceURL('crew',base);
     assert.equal(supervisor.origin,new URL(base).origin);
-    assert.ok(supervisor.pathname.endsWith('/supervisor/index.html'));assert.ok(crew.pathname.endsWith('/crew.html'));
+    assert.ok(supervisor.pathname.endsWith('/crew-supervisor.html'));assert.ok(crew.pathname.endsWith('/crew.html'));
     assert.equal(supervisor.search,'');assert.equal(supervisor.hash,'');assert.notEqual(supervisor.href,crew.href);
     assert.ok(!supervisor.pathname.includes('atlas'));
   }

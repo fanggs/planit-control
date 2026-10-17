@@ -1,12 +1,11 @@
 # PlanIT primary site map
 
 Open **Site map** in the welcome page navigation or crew header. The main map
-is `crew-atlas.html`. **Supervisor** opens Aryan’s separate dashboard through
-the crew-owned `crew-supervisor.html` compatibility entry. The welcome page,
-login demo links and map distinguish the two workspaces from the shared map.
-Crew demo users and signed-in supervisors also see a supervisor link in the
-crew header. Aryan’s application and its sample/live configuration are unchanged.
-The old national renderer and catalog remain removed.
+is `crew-atlas.html`. **Supervisor** opens the restored original crew-owned
+`crew-supervisor.html` dashboard. It keeps the earlier summary cards, filters,
+risk ranking and selected-site details, with a compact 60-site overview map.
+**Open 2D / 3D map** opens this Atlas and preserves the selected site. The old
+national catalog remains removed. Aryan’s separate dashboard is unchanged.
 
 ## Locations and scores
 
