@@ -1,10 +1,18 @@
 import {validNotice} from './domain.js';
+import {createRefreshQueue} from './refresh.js';
 
 // Alan supplies an authenticated DeepSpace adapter. There is no contract /events endpoint.
 // Treat every valid event as an invalidation notice: fetch authorized API data.
 export function connectRealtime({getSource, getToken, onInvalidate, onStatus, timers = globalThis}) {
-  let stopped = false, cleanup, retry, opening, generation = 0, work = Promise.resolve();
+  let stopped = false, cleanup, retry, opening, generation = 0, connected = false;
   const active = gen => !stopped && gen === generation;
+  const invalidate = createRefreshQueue(async () => {
+    const gen = generation;
+    if (!active(gen)) return;
+    await onInvalidate();
+    if (active(gen) && connected) onStatus(true);
+  });
+  function requestRefresh(gen) { void invalidate().catch(() => schedule(gen)); }
   function disconnect() {
     timers.clearTimeout(opening);
     try { cleanup?.(); } catch { /* An already-closed provider is harmless. */ }
@@ -12,13 +20,14 @@ export function connectRealtime({getSource, getToken, onInvalidate, onStatus, ti
   }
   function schedule(gen) {
     if (!active(gen)) return;
-    generation++; disconnect(); onStatus(false);
+    generation++; connected = false; disconnect(); onStatus(false);
     timers.clearTimeout(retry);
     retry = timers.setTimeout(connect, 10000);
   }
   async function connect() {
     if (stopped) return;
     const gen = ++generation;
+    connected = false;
     onStatus(false);
     try {
       const source = getSource();
@@ -29,18 +38,15 @@ export function connectRealtime({getSource, getToken, onInvalidate, onStatus, ti
       const close = await source.subscribe({site_id: null, accessToken,
         onEvent(notice) {
           if (!active(gen) || !validNotice(notice)) return;
-          work = work.then(() => active(gen) ? onInvalidate() : undefined).catch(() => schedule(gen));
+          requestRefresh(gen);
         },
-        onConnection(connected) {
+        onConnection(providerConnected) {
           if (!active(gen)) return;
-          if (connected !== true) { schedule(gen); return; }
+          if (providerConnected !== true) { schedule(gen); return; }
           timers.clearTimeout(opening);
           // Refresh after every reconnect to recover events missed while disconnected.
-          work = work.then(async () => {
-            if (!active(gen)) return;
-            await onInvalidate();
-            if (active(gen)) onStatus(true);
-          }).catch(() => schedule(gen));
+          connected = true;
+          requestRefresh(gen);
         },
         onError() { schedule(gen); }
       });
