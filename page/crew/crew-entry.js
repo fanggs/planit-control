@@ -1,6 +1,6 @@
 import {config} from './crew-config.js';
 import {initAuth, session, signIn, signOut, authConfigured} from './crew-auth.js';
-import {workspaceForUser, siteParameter} from './crew-routing.js';
+import {workspaceForUser, siteParameter, supervisorDashboardURL} from './crew-routing.js';
 import {mountWorkspace} from './crew-workspaces.js';
 const query = new URLSearchParams(location.search);
 const status = document.getElementById('login-status');
@@ -38,6 +38,13 @@ async function boot() {
         return;
       }
       const siteId = siteParameter(callback.siteId ?? query.get('site'));
+      if (workspace === 'supervisor') {
+        status.textContent = 'Opening the supervisor operations dashboard…';
+        // Auth0 tokens stay in memory and never travel in this URL. The
+        // destination resumes the tenant session or offers its own sign-in.
+        location.replace(supervisorDashboardURL(location.href).href);
+        return;
+      }
       await mountWorkspace(workspace,{baseURL:location.href,siteId,document,history});
       return;
     }

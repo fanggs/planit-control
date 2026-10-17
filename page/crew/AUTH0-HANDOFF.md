@@ -26,22 +26,27 @@ Example, when publishing `page/crew/` as the website root:
 | Logout | `http://127.0.0.1:4174/index.html` |
 | Web origin | `http://127.0.0.1:4174` |
 
-Use HTTPS for the deployed site. A plain HTTP LAN IP preview is for UI testing;
+The same preview server also hosts Aryan’s dashboard at
+`http://127.0.0.1:4174/supervisor/index.html`. Add that exact URL to the
+Allowed Callback and Logout URLs for the dashboard’s separate Auth0 SDK
+session. If using Aryan’s standalone preview on port 4175, allow its exact
+callback/logout URL and web origin as well.
+
+Use HTTPS for the deployed site. Keep local previews on `127.0.0.1` only;
 Auth0's SPA SDK requires a secure browser context (HTTPS or loopback 127.0.0.1).
-The callback mounts the chosen crew-owned workspace in the same document:
-`crew.html` for crew, `crew-supervisor.html` for supervisor. The existing SDK
-client and its memory-only token are reused; no access token, authorization
-code or arbitrary return URL is passed between pages. The verified namespaced
-role claim chooses the workspace. A public link never grants a live role.
+The callback keeps crew users in the same document, preserving their
+memory-only access token. A verified `supervisor` role opens Aryan’s canonical
+`/supervisor/index.html` dashboard instead. The fixed same-origin handoff URL
+never carries an access token, authorization code, role, or arbitrary return
+URL. Aryan’s dashboard establishes its own Auth0 SDK session; if browser
+cookie restrictions prevent silent renewal, the user may need to click its
+Sign in button once more. Never work around this by putting tokens in URLs or
+browser storage.
 
-The original supervisor preview uses the crew config and adapters, including
-Auth0. A reload uses the SDK’s session check; cookie restrictions may require
-another explicit Universal Login. Live sign-in still needs the team’s tenant
-settings and deployment checks.
-
-Aryan’s separate `page/supervisor/` application is unchanged and keeps its own
-config and Auth0 session. Main crew navigation now opens the restored original
-crew-owned supervisor preview rather than that separate application.
+Isaiah’s `crew-supervisor.html` remains a labeled sample preview for the
+offline demo and direct development checks. The welcome page’s Supervisor
+navigation opens Aryan’s live dashboard. `crew-config.js` now imports the
+shared `page/shared/planit.css` design tokens without replacing crew styles.
 
 The crew local preview server also serves `/supervisor/`, `/shared/` and
 `/realtime/` for integrated testing; those existing routes remain available.
@@ -78,8 +83,10 @@ Auth0's API calls are not simulated as successful in the preview.
 The HTTP adapter now maps `api/CONTRACT.md` v1.1, including numeric site IDs,
 nested score explanations, two-step photo/report creation, protected photo reads
 and the latest briefing endpoint. See `BACKEND-CONNECTION.md` for the default
-shared DeepSpace listener and optional provider overrides. Live browser integration still requires
-Auth0 settings and the backend’s photo/report routes. The shared DeepSpace provider is already connected in the default adapter.
+shared DeepSpace listener and optional provider overrides. The backend's
+photo/report routes are registered in database mode; a real-tenant,
+cross-device browser test is still required. The shared DeepSpace provider is
+already connected in the default adapter.
 Contract v1.1 remains authoritative.
 
 References:

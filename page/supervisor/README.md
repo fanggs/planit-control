@@ -1,9 +1,10 @@
 # Aryan's supervisor workspace
 
 This is Aryan's dashboard, separate from Isaiah's files in `page/crew/`. It follows
-`api/CONTRACT.md` v1.1. The default is an explicitly labeled, read-only sample
-preview containing **3 sample plants**, copied from the team's `api/samples/`.
-Sample timestamps are preserved; they are not made to appear fresh.
+`api/CONTRACT.md` v1.1. The default is now **live API mode**: a supervisor
+must sign in before site data is requested. The separate sample adapter and
+its **3 labeled sample plants** remain in the code for offline development,
+but are never substituted when a live request fails.
 
 ## Start and test
 
@@ -70,12 +71,12 @@ reports. It never adjusts the score after a report event.
 
 ## Connect live data and Auth0
 
-1. Alan must register the report/photo router and supply authenticated API
-   access to sites, site details, alerts and reports. Sid's database and the
-   report table must be ready. The existing sample API is not a production
-   integration and must not be presented as one.
-2. Edit `config.js`: choose `mode: 'live'`, set the API base, and set the Auth0
-   public `domain`, `clientId`, API `audience` and agreed namespaced `rolesClaim`.
+1. Run the API with `DATABASE_URL`, `PGPASSWORD`, and valid Auth0 settings.
+   Leave `PLANIT_DATA` unset or set it to `database`; `sample` still serves
+   fixtures and intentionally does not register report/photo writes. The
+   report table and private photo directory must be ready.
+2. `config.js` already selects `mode: 'live'` and has the public local API/Auth0
+   identifiers. Confirm the tenant's agreed role claim before browser testing.
    Never add a client secret. Local API URLs must use `http://127.0.0.1`; deployed
    API URLs must use HTTPS. Configure the API's CORS allowlist for the exact
    frontend origin and allow the Authorization header. The public `realtime`
@@ -85,7 +86,9 @@ reports. It never adjusts the score after a report event.
    in `config.auth`, and the frontend origin in Allowed Web Origins. Locally
    the default callback/logout URL is
    `http://127.0.0.1:4175/supervisor/index.html`, with origin
-   `http://127.0.0.1:4175`. For deployment these derive from the deployed module
+   `http://127.0.0.1:4175`. Isaiah’s shared preview serves this dashboard at
+   `http://127.0.0.1:4174/supervisor/index.html`; allow that exact callback and
+   origin too when following the crew-to-supervisor navigation. For deployment these derive from the deployed module
    URL. Auth0 must allow the chosen development callback; use an HTTPS local
    proxy on 127.0.0.1 if the tenant's settings require it.
 4. Auth0 must add the agreed role array to the ID token for UI gating, and to

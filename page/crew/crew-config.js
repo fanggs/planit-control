@@ -19,7 +19,7 @@ export const config = {
   },
   // UI access is convenience only; the API must independently enforce permissions.
   authRoleClaim: 'https://planit-control/roles',
-  themeStylesheet: null, // Aryan supplies the actual shared stylesheet URL; do not edit his file.
+  themeStylesheet: '../shared/planit.css', // Shared tokens; crew components remain scoped.
   auth: {
     domain: 'dev-qtlneoet2ty1xxbc.us.auth0.com',
     clientId: 'HsFNjn2AmnjYmXW8XcTXVWrhJDvxrjQd',

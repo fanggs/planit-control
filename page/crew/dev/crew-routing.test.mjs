@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {workspaceForUser, userRoles, siteParameter, workspaceURL} from '../crew-routing.js';
+import {workspaceForUser, userRoles, siteParameter, workspaceURL, supervisorDashboardURL} from '../crew-routing.js';
 const claim = 'https://planit-control/roles';
 
 test('verified role claims choose the workspace; unknown roles fail closed', () => {
@@ -29,4 +29,15 @@ test('fixed workspace destinations stay separate in root and nested crew deploym
     assert.ok(!supervisor.pathname.includes('atlas'));
   }
   assert.throws(()=>workspaceURL('https://outside.example','https://planit.example/crew/crew-routing.js'),/Unknown/);
+});
+
+test('supervisor handoff uses Aryan dashboard on the same origin without callback secrets',()=>{
+  for(const base of ['http://127.0.0.1:4174/login.html?code=one-use&state=checked',
+    'https://planit.example/crew/login.html?code=one-use&state=checked',
+    'https://planit.example/demo/crew/login.html?returnTo=https://outside.example']){
+    const target=supervisorDashboardURL(base);
+    assert.equal(target.origin,new URL(base).origin);
+    assert.ok(target.pathname.endsWith('/supervisor/index.html'));
+    assert.equal(target.search,'');assert.equal(target.hash,'');
+  }
 });

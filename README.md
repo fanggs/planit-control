@@ -39,5 +39,9 @@ Then open http://127.0.0.1:8010/docs to see the endpoints. `/health` is public;
 data routes require a valid Auth0 API access token with the `crew` or
 `supervisor` role. Set `AUTH0_DOMAIN` and `AUTH0_AUDIENCE` in `.env` before
 testing them. If either setting is missing or invalid, data routes return 503
-instead of becoming public. Set `PLANIT_DATA=sample` to use the fixtures in
-`api/samples/` while the database-backed endpoints are being integrated.
+instead of becoming public. With `DATABASE_URL` and `PGPASSWORD` set, leave
+`PLANIT_DATA` unset or set it to `database` to read Tiger Data and register the
+authenticated report/photo routes. Set `PLANIT_DATA=sample` only for the
+labeled offline fixtures. Photos are kept under the private, Git-ignored
+`data/private_photos/` directory locally; set `PLANIT_PRIVATE_PHOTOS_DIR` to a
+dedicated persistent 0700 directory outside any public static root on a server.

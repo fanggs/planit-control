@@ -24,3 +24,9 @@ export function workspaceURL(workspace,baseURL){
   if(workspace==='crew')return new URL('crew.html',baseURL);
   throw new Error('Unknown workspace.');
 }
+
+// Aryan's dashboard is the canonical live supervisor destination. The
+// crew-owned supervisor page remains an explicitly labeled sample preview.
+export function supervisorDashboardURL(baseURL){
+  return new URL('../supervisor/index.html',baseURL);
+}

@@ -52,12 +52,12 @@ private keys, or a client secret.
 - The supervisor page uses Auth0 Universal Login, keeps tokens in memory, and
   sends the access token in a bearer header for live API requests.
 
-**Still a team integration step:** `api/main.py` now requires Auth0 for its
-data GETs and restricts CORS to exact configured origins, but it still serves
-sample data and does not register the report/photo routers. Alan must replace
-the conflicting sample `/reports` route and provide the shared database/alert
-callbacks; Sid must provide the database and report table. Until then, do not
-present the sample preview as a complete live service.
+In database mode, `api/main.py` now registers the protected report/photo
+routers using `api/db.py`'s request-scoped session. High-severity reports
+start and clear database warning alerts in the same transaction; report and
+alert notices are attempted after commit. Sample mode keeps a read-only
+fixture route and does not enable report uploads. This wiring is covered by
+offline integration tests, but a real-tenant browser test is still required.
 
 ## Acceptance check with a configured tenant and API
 
