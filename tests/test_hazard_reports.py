@@ -6,8 +6,10 @@ validate the PostgreSQL migration, foreign keys, or concurrent row locking.
 
 from __future__ import annotations
 
+import json
 import unittest
 from datetime import datetime, timedelta, timezone
+from unittest.mock import patch
 from uuid import UUID, uuid4
 
 from fastapi import FastAPI, HTTPException, Request
@@ -95,8 +97,8 @@ class HazardReportTests(unittest.TestCase):
             self.warnings.c.report_id == str(report.id),
         ).values(active=False).returning(self.warnings.c.id)).scalar_one()
 
-    def publish_event(self, event, payload):
-        self.events.append((event, payload))
+    def publish_event(self, event, **ids):
+        self.events.append((event, ids))
         # StaticPool sessions share one SQLite connection. A separate SELECT
         # alone cannot prove commit order; observe the real session event too.
         self.published_commit_counts.append(self.request_commits)
@@ -157,10 +159,29 @@ class HazardReportTests(unittest.TestCase):
         self.assertIsNotNone(datetime.fromisoformat(report["created_at"].replace("Z", "+00:00")).tzinfo)
         self.assertEqual(self.count_reports(), 1)
         self.assertEqual(self.events, [("report.created", {
-            "report_id": report["id"], "site_id": 6045, "created_at": report["created_at"],
+            "site_id": 6045, "report_id": report["id"],
         })])
         self.assertEqual(self.committed_report_counts, [1])
         self.assertEqual(self.published_commit_counts, [1])
+
+    def test_report_notice_uses_realtime_publish_format(self):
+        from api.realtime import publish
+
+        with patch.dict("os.environ", {
+            "DEEPSPACE_URL": "https://example.app.space",
+            "PLANIT_NOTIFY_SECRET": "test-secret",
+        }), patch("api.realtime.urllib.request.urlopen") as urlopen:
+            urlopen.return_value.__enter__.return_value.status = 200
+            with self.make_client(publish_event=publish) as client:
+                response = self.create(client=client)
+
+        self.assertEqual(response.status_code, 201, response.text)
+        urlopen.assert_called_once()
+        request = urlopen.call_args.args[0]
+        self.assertEqual(json.loads(request.data), {
+            "type": "report.created", "site_id": 6045,
+            "report_id": response.json()["id"],
+        })
 
     def test_both_roles_create_and_read(self):
         for role in ("crew", "supervisor"):
@@ -248,7 +269,7 @@ class HazardReportTests(unittest.TestCase):
         self.assertEqual(warnings[0]["report_id"], response.json()["id"])
         self.assertEqual({name for name, _ in self.events}, {"report.created", "alert.started"})
         for name, payload in self.events:
-            fields = {"report_id", "site_id", "created_at"} if name == "report.created" else {"alert_id", "site_id"}
+            fields = {"report_id", "site_id"} if name == "report.created" else {"alert_id", "site_id"}
             self.assertEqual(set(payload), fields)
             self.assertEqual(payload["site_id"], 6045)
         self.assertEqual(self.committed_report_counts, [1, 1])
@@ -402,7 +423,7 @@ class HazardReportTests(unittest.TestCase):
     def test_publisher_failure_keeps_successful_write_successful(self):
         observed_commits = []
 
-        def broken_publisher(event, payload):
+        def broken_publisher(event, **ids):
             observed_commits.append(self.request_commits)
             raise RuntimeError("Test event transport disconnected")
 
@@ -414,7 +435,7 @@ class HazardReportTests(unittest.TestCase):
 
     def test_async_callable_publisher_is_rejected_at_setup(self):
         class AsyncPublisher:
-            async def __call__(self, event, payload):
+            async def __call__(self, event, **ids):
                 return None
 
         with self.assertRaisesRegex(ValueError, "synchronous"):

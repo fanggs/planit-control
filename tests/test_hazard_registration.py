@@ -30,7 +30,7 @@ class HazardRegistrationTests(unittest.TestCase):
         dependencies = dict(
             get_db=lambda: None, start_warning=lambda db, report: 1,
             clear_warning=lambda db, report: 1,
-            publish_event=lambda name, payload: None,
+            publish_event=lambda name, **ids: None,
             photo_directory=self.photo_directory, auth_config=self.config,
         )
         dependencies.update(overrides)

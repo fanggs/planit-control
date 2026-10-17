@@ -69,7 +69,7 @@ class ReportRequestLimitTests(unittest.TestCase):
             get_db=session_dependency,
             get_principal=lambda: Principal("auth0|crew", frozenset({"crew"})),
             verify_photo=lambda *args: True, start_warning=lambda *args: 1,
-            clear_warning=lambda *args: 1, publish_event=lambda *args: None,
+            clear_warning=lambda *args: 1, publish_event=lambda name, **ids: None,
         ))
         with TestClient(app) as client:
             response = client.post("/reports", content=b" " * (HazardReportRoute.max_body_bytes + 1),
