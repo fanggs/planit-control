@@ -33,7 +33,8 @@ export function createAPI({base, token, timeoutMs = 20000, fetcher = fetch}) {
         }
         return blob;
       }
-      return response.json();
+      // Keep the timeout active until the body has finished, not just its headers.
+      return await response.json();
     } catch (error) {
       if (error.name === 'AbortError') throw new Error('The API request timed out. Data may be out of date.');
       throw error;

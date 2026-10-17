@@ -44,3 +44,16 @@ test('local API configuration permits only the requested loopback host', () => {
     assert.throws(() => createAPI({base, token: async () => 't'}), /API URL/);
   }
 });
+
+test('request timeout also aborts a JSON body stalled after successful headers', async () => {
+  let bodyAborted = false;
+  const api = createAPI({base: 'http://127.0.0.1:8000', token: async () => 'token', timeoutMs: 10,
+    fetcher: async (_url, {signal}) => ({ok: true, json: () => new Promise((resolve, reject) => {
+      signal.addEventListener('abort', () => {
+        bodyAborted = true;
+        reject(new DOMException('Body read aborted', 'AbortError'));
+      }, {once: true});
+    })})});
+  await assert.rejects(api.sites(), /request timed out/);
+  assert.equal(bodyAborted, true);
+});
