@@ -192,3 +192,40 @@ def resolve_report(
         )
         .returning(*_reports.c)
     )
+    updated = db.execute(statement).mappings().one_or_none()
+    if updated is None:
+        raise RuntimeError("report status changed during resolution; roll back and retry")
+    stored = HazardReportRead.model_validate(dict(updated))
+
+    alert_id = None
+    if stored.severity is Severity.HIGH:
+        if clear_warning is None:
+            raise WarningAlertIntegrationMissing("high-severity reports need clear_warning")
+        alert_id = clear_warning(db, stored)
+        if alert_id is None:
+            raise RuntimeError("clear_warning must return the cleared alert ID")
+    return ReportChange(report=stored, warning_alert_id=alert_id)
+
+
+def get_site_reports(
+        db: Session,
+        site_id: int,
+        *,
+        limit: int = 100,
+        offset: int = 0,
+) -> list[HazardReportRead]:
+    """Read a bounded page for one site after the route authorizes access."""
+    site_id = _site_id_validator.validate_python(site_id)
+    if type(limit) is not int or not 1 <= limit <= 200:
+        raise ValueError("limit must be an integer from 1 to 200")
+    if type(offset) is not int or not 0 <= offset <= 9223372036854775807:
+        raise ValueError("offset must be a nonnegative PostgreSQL BIGINT")
+
+    statement = (
+        select(_reports)
+        .where(_reports.c.site_id == site_id)
+        .order_by(_reports.c.created_at.desc(), _reports.c.id.desc())
+        .limit(limit)
+        .offset(offset)
+    )
+    return [HazardReportRead.model_validate(dict(row)) for row in db.execute(statement).mappings()]
