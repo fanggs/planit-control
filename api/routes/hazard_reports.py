@@ -82,6 +82,13 @@ def _publish_change(publish: EventPublisher, change: ReportChange, *, created: b
                 if inspect.iscoroutine(result):
                     result.close()
                 raise TypeError("publish_event must perform synchronous delivery or enqueueing")
+            if result is False:
+                # Alan's bridge publisher reports transport failures with False.
+                # The report is already committed, so keep the HTTP write successful.
+                logger.error(
+                    "Committed report event %s was not delivered (publisher returned false)",
+                    name,
+                )
         except Exception as exc:
             # The database transaction already committed. Returning a write
             # failure here could prompt a duplicate report on a client retry.
