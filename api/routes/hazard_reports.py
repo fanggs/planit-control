@@ -17,7 +17,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from api.auth.hazard_auth import Principal, require_roles
-from api.routes.hazard_errors import HazardRoute
+from api.routes.hazard_upload_limit import BodyLimitedHazardRoute
 from api.schemas.hazard_report import (
     HazardReportCreate, HazardReportRead, HazardReportResolve,
 )
@@ -34,6 +34,12 @@ _sites = Table(
     "sites", MetaData(), Column("site_id", BigInteger, primary_key=True),
     schema="public",
 )
+
+
+class HazardReportRoute(BodyLimitedHazardRoute):
+    # The longest valid description, even JSON-escaped Unicode, fits well
+    # below this cap. Reject oversized JSON before buffering or DB access.
+    max_body_bytes = 64 * 1024
 
 
 def _require_site(db: Session, site_id: int) -> None:
@@ -101,7 +107,7 @@ def create_report_router(
         or inspect.isasyncgenfunction(getattr(publish_event, "__call__", None))
     ):
         raise ValueError("publish_event must be a synchronous event publisher")
-    router = APIRouter(tags=["hazard reports"], route_class=HazardRoute)
+    router = APIRouter(tags=["hazard reports"], route_class=HazardReportRoute)
 
     @router.get("/reports", response_model=list[HazardReportRead])
     def list_reports(
