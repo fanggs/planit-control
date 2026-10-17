@@ -1,8 +1,10 @@
 # Interval 7: integration and handoff
 
-Sid's integration helpers are ready for review. They do not change Alan's API,
-the shared 8/2 contract or the model's research-only status. Cloud setup and
-deployment checks are deliberately left for the next phase.
+Contract v1.2 now adopts the screening response and separate wildlife context.
+Migration 003, the fresh 60-site database load and restricted login have been
+verified for issue 11. See [the operations handoff](handoffs/ISSUE-11-OPERATIONS.md)
+for the exact collector command and setup results. The guide below preserves
+the interval 7 replay checks; Alan's deployed integration remains separate.
 
 ## Verify the complete local path
 

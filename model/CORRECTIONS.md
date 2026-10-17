@@ -1,7 +1,8 @@
 # Forecast-based hazard screening: correction guide
 
-This bundle replaces the experimental method used in interval 5. It does not
-silently replace the team's shared API contract. Read the recorded results in
+This bundle replaces the experimental method used in interval 5. Contract v1.2
+now adopts it; [issue 11's operations handoff](handoffs/ISSUE-11-OPERATIONS.md)
+records the verified database setup and exact deployment command. Read the recorded results in
 `generated/forecast-v2/report.json` alongside this guide.
 
 ## What we calculate
@@ -163,7 +164,7 @@ new database objects on the team's service remains a user-terminal step.
 .venv/bin/python -m db.access --apply # private owner/new-login prompts
 ```
 
-The setup creates a managed `planit_ask` login, grants SELECT on six approved
+The setup creates a managed `planit_ask` login, grants SELECT on seven approved
 public tables, bounds query time, rejects inherited write/private-table access,
 and independently tests its connection. It does not change the owner's password
 or erase data. Keep the new login's password in the deployment's secret storage.

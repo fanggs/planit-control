@@ -1,0 +1,25 @@
+{
+  "artifact_sha256": "207c76d8ab9b0eb7387f17ce07c82fd348f70d667c9a5215aac737943e42b808",
+  "fresh_prediction_sites": 60,
+  "migration_003_applied": true,
+  "postload_verified": true,
+  "recorded_run": "data/raw/runtime/runs/20261017T235250075832Z",
+  "research_status": true,
+  "verified_at": "2026-10-17T23:56:48.617753+00:00",
+  "restricted_login_verified": true,
+  "approved_application_tables": [
+    "sites",
+    "weather_readings",
+    "weather_forecasts",
+    "hazard_scores",
+    "alerts",
+    "environmental_events",
+    "screening_predictions"
+  ],
+  "private_crew_reports_access": false,
+  "application_write_access": false,
+  "guarded_query_fresh_sites": 60,
+  "collector_command": "python -m get_data.monitor --load --allow-research --interval-seconds 3600",
+  "dependency_command": "python -m pip install -r model/requirements.txt -r db/requirements-ask.txt",
+  "credential_values_in_report": false
+}

@@ -33,8 +33,10 @@ when the connection URI omits the password.
 
 Sid confirmed a successful foundation migration and verified site/weather loads
 on October 17, 2026, using PostgreSQL 18.6 and TimescaleDB 2.30.2. Sid also
-reported applying migration 002. The new migration 003 and restricted Gemini
-login have not been executed against the service by this implementation.
+reported applying migration 002. Migration 003 and the restricted Gemini login
+were subsequently applied and independently verified on the shared service for
+issue 11. See `generated/issue11-verification.json` and
+`../model/handoffs/ISSUE-11-OPERATIONS.md` for the verified setup and worker flags.
 
 The runner records SHA-256 checksums, skips already applied migrations, rejects
 edited applied files, serializes migration processes with a database lock, and
@@ -89,7 +91,7 @@ Python, so every future score writer must call `validate_score`.
 
 The restricted Gemini login setup is implemented in `access.py`; it must be
 applied from an interactive terminal with the owner's connection configured.
-Its six-table allowlist excludes crew identities and photo references. Alan can
+Its seven-table application allowlist excludes crew identities and photo references. Alan can
 use `ask_query.py` to validate generated SELECT queries and execute them through
 the separate restricted login. Neither module silently uses the application's
 write account. See [the correction guide](../model/CORRECTIONS.md) for setup.

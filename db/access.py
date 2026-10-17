@@ -8,7 +8,7 @@ import getpass
 import os
 import sys
 
-ALLOWED=('sites','weather_readings','weather_forecasts','hazard_scores','alerts','environmental_events')
+ALLOWED=('sites','weather_readings','weather_forecasts','hazard_scores','alerts','environmental_events','screening_predictions')
 ROLE='planit_ask'
 MARKER='PlanIT managed restricted ask login v1'
 
@@ -47,10 +47,19 @@ def verify(connection):
     for table in ALLOWED:
         if not connection.execute('SELECT has_table_privilege(%s,%s,\'SELECT\')',(ROLE,'public.'+table)).fetchone()[0]:
             raise ValueError('Required SELECT missing')
+    # Tiger installs these two statistics views with PUBLIC SELECT. Treat only
+    # verified pg_stat_statements extension views as system metadata, like the
+    # readable PostgreSQL catalogs, rather than revoke shared diagnostics from
+    # every teammate. The generated-query guard still rejects both relations.
     exposed=connection.execute("""SELECT c.relname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
       WHERE n.nspname='public' AND c.relkind IN ('r','p','v','m','f') AND
       (has_table_privilege(%s,c.oid,'INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') OR
-       (NOT c.relname=ANY(%s) AND has_table_privilege(%s,c.oid,'SELECT')))""",(ROLE,list(ALLOWED),ROLE)).fetchall()
+       (NOT c.relname=ANY(%s) AND has_table_privilege(%s,c.oid,'SELECT') AND NOT
+        (c.relkind='v' AND c.relname IN ('pg_stat_statements','pg_stat_statements_info')
+         AND EXISTS (SELECT 1 FROM pg_depend d JOIN pg_extension e ON e.oid=d.refobjid
+          WHERE d.classid='pg_class'::regclass AND d.objid=c.oid
+            AND d.refclassid='pg_extension'::regclass AND d.deptype='e'
+            AND e.extname='pg_stat_statements'))))""",(ROLE,list(ALLOWED),ROLE)).fetchall()
     if exposed:raise ValueError('Unapproved table privileges inherited; owner must reconcile them')
 
 

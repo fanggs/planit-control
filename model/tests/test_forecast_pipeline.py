@@ -94,9 +94,10 @@ class QueryGuardTests(unittest.TestCase):
     def test_allowed_data_query(self):
         self.assertTrue(validate_query('SELECT site_id, MAX(temperature_f) FROM public.weather_readings GROUP BY site_id;'))
         self.assertTrue(validate_query('SELECT count(*) FROM sites WHERE is_monitored = true'))
+        self.assertTrue(validate_query("SELECT site_id, score, status FROM screening_predictions WHERE scored_at > now() - interval '2 hours'"))
 
     def test_private_tables_writes_functions_and_catalogs_rejected(self):
-        bad=['SELECT * FROM hazard_reports','SELECT * FROM pg_catalog.pg_roles','DELETE FROM sites',
+        bad=['SELECT * FROM hazard_reports','SELECT * FROM pg_stat_statements','SELECT * FROM pg_catalog.pg_roles','DELETE FROM sites',
              'SELECT 1; DELETE FROM sites','SELECT pg_sleep(5) FROM sites','SELECT * INTO x FROM sites',
              'WITH x AS (DELETE FROM sites RETURNING *) SELECT * FROM x','SELECT * FROM sites FOR UPDATE',
              'SELECT public.count(*) FROM sites','SELECT 1 FROM sites UNION SELECT 1 FROM hazard_reports']
