@@ -125,6 +125,15 @@ class HazardReportRead(HazardReportCreate):
             value = value.replace(tzinfo=timezone.utc)
         return value.astimezone(timezone.utc)
 
+    @model_validator(mode="after")
+    def require_consistent_resolution(self) -> HazardReportRead:
+        if self.status is ReportStatus.OPEN:
+            if self.resolved_at is not None or self.resolved_by is not None:
+                raise ValueError("open reports cannot have resolution metadata")
+        elif self.resolved_at is None or self.resolved_by is None:
+            raise ValueError("resolved reports need resolved_at and resolved_by")
+        return self
+
 
 
 
