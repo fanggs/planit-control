@@ -1,8 +1,11 @@
 # PlanIT Control: Contract v1
 
-**Status:** decided 2026-10-17 from Sid's and Aryan's AI reviews. Sid and Aryan
-have a 10-minute veto on decisions in their own areas. After that it's final, and
-any change gets announced in the team chat first.
+**Status:** v1.1, decided 2026-10-17 from Sid's and Aryan's AI reviews and the
+team's answers. Any change gets announced in the team chat first.
+
+**Build order:** everything here is in scope, but the core comes first:
+60 sites → live weather → score → lightning alert → map. Everything else is
+added once the core works.
 
 ---
 
@@ -54,6 +57,10 @@ Unique on (`site_id`, `observed_at`, `provider`) so reloads don't duplicate.
 `id`, `site_id`, `hazard_type`, `event_kind` (e.g. `nws_warning`), `title`,
 `severity`, `starts_at`, `ends_at`, `source_name`, `source_url`, `retrieved_at`
 
+**wildlife_observations** (training data for the wildlife model)
+`occurrence_id` (GBIF ID), `species`, `observed_at`, `latitude`, `longitude`,
+`source_name`, `source_url`, `retrieved_at`
+
 **lightning_strikes** (time-series, stored once, not per site)
 `strike_id` (provider-qualified), `struck_at`, `latitude`, `longitude`,
 `is_replay` (true if replayed historical data), `source_name`, `source_url`, `retrieved_at`
@@ -76,20 +83,39 @@ Unique on (`site_id`, `observed_at`, `provider`) so reloads don't duplicate.
 `id`, `site_id`, `for_date` (site-local calendar date), `generated_at`, `text`,
 `model`, `inputs` (jsonb: which forecast and score it was written from)
 
-Gemini's `/ask` queries run as a **read-only database user**.
+Gemini's `/ask` queries run as a **read-only database user** (Sid creates it when
+setting up the database).
+
+**Load order for Sid:** sites → weather readings → weather forecasts →
+wildlife observations → environmental events. Forecasts come before
+environmental events because the 6 PM briefing depends on them.
+
+**Site selection:** pick the 60 by a written rule (latest EIA-860M month,
+operating plants only, about 10 per hazard region), **plus these must-include
+demo sites**, even if the rule misses them:
+- a real Florida plant near the Everglades (demo opener: heat, lightning, wildlife)
+- at least 2 plants along the Mississippi River (flood warning example from the brief)
+- at least 2 plants in a California / Western wildfire area
 
 ## 4. Hazard score (model output)
 
-- **What it predicts:** how likely hazardous outdoor-work conditions are at the
-  site in the next 24 hours, on a 0 to 10 scale (10 × predicted probability).
-- **Training label:** whether a relevant NOAA Storm Event (thunderstorm, lightning,
-  heat, flood, flash flood, wildfire, high wind) occurred in the site's county
-  that day. Not an injury prediction.
-- **Model:** small decision tree (about 4 levels). Trained on older years,
-  tested on the most recent year.
-- **Explanation:** `score = baseline + sum of contributions`. Contributions can be
-  negative. Must match within 0.05. Round only for display.
-- **Wildlife is not in the model** (no historical data). It comes from crew reports.
+The 0 to 10 score has **two trained parts**, added together:
+
+| Part | Range | What it predicts | Trained on |
+| --- | --- | --- | --- |
+| **Weather** | 0 to 8 | How likely hazardous outdoor-work conditions are at the site in the next 24 hours (8 × predicted probability) | NOAA Storm Events: whether a relevant event (thunderstorm, lightning, heat, flood, flash flood, wildfire, high wind) occurred in the site's county that day, with that day's weather as inputs. Not an injury prediction. |
+| **Wildlife** | 0 to 2 | How likely dangerous wildlife is near the site this month (2 × predicted probability) | GBIF sighting records (includes iNaturalist) of American alligator, cottonmouth, rattlesnakes, and copperhead, by location and month |
+
+- **Models:** a small decision tree for each part (about 4 levels). Trained on
+  older years, tested on the most recent year.
+- **Explanation:** `score = baseline + sum of contributions`, where `wildlife` is
+  one of the contributions. Contributions can be negative. Must match within
+  0.05. Round only for display.
+- **Known limitation (say it if asked):** wildlife sightings cluster where people
+  are, so remote areas can look safer than they are.
+- **Fallback:** if a trained part isn't ready in time, ship a rules-based version
+  and label it **rules-based**, never "ML," until the trained one replaces it.
+- **Crew reports** do not change the score in v1 (see section 7).
 
 ```json
 {
@@ -98,17 +124,22 @@ Gemini's `/ask` queries run as a **read-only database user**.
   "baseline": 2.4,
   "scored_at": "2026-10-17T18:00:00Z",
   "horizon_hours": 24,
-  "model_version": "tree-v1",
+  "model_version": "weather-tree-v1+wildlife-tree-v1",
   "factors": [
     {"hazard_type": "heat", "contribution": 3.1},
-    {"hazard_type": "lightning", "contribution": 2.8},
-    {"hazard_type": "soil_saturation", "contribution": 1.4},
-    {"hazard_type": "flooding", "contribution": -1.5}
+    {"hazard_type": "lightning", "contribution": 2.6},
+    {"hazard_type": "soil_saturation", "contribution": 0.9},
+    {"hazard_type": "flooding", "contribution": -1.5},
+    {"hazard_type": "wildlife", "contribution": 1.7}
   ]
 }
 ```
 
 (Site IDs in examples are placeholders.)
+
+**Breakdown panel (UI):** show it as a waterfall: start at the baseline, then
+each factor as a bar going up (adds risk) or down (lowers risk), ending at the
+score. Label each bar with its hazard and value.
 
 ## 5. API endpoints
 
