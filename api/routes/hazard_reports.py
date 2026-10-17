@@ -8,7 +8,7 @@ work themselves; no module here creates an engine or a separate application.
 from collections.abc import Callable
 import inspect
 import logging
-from typing import Annotated
+from typing import Annotated, Protocol
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -29,7 +29,12 @@ from api.services.hazard_report_service import (
 
 
 logger = logging.getLogger(__name__)
-EventPublisher = Callable[[str, dict], None]
+class EventPublisher(Protocol):
+    """Alan's synchronous ``publish(type, **ids)`` bridge callback."""
+
+    def __call__(self, type: str, **ids: object) -> object: ...
+
+
 _sites = Table(
     "sites", MetaData(), Column("site_id", BigInteger, primary_key=True),
     schema="public",
@@ -61,9 +66,7 @@ def _publish_change(publish: EventPublisher, change: ReportChange, *, created: b
     if not change.changed:
         return
     report = change.report
-    payload = {"report_id": str(report.id), "site_id": report.site_id}
-    if created:
-        payload["created_at"] = report.created_at.isoformat().replace("+00:00", "Z")
+    payload = {"site_id": report.site_id, "report_id": str(report.id)}
     events = [("report.created" if created else "report.resolved", payload)]
     if change.warning_alert_id is not None:
         alert_id = change.warning_alert_id
@@ -74,7 +77,7 @@ def _publish_change(publish: EventPublisher, change: ReportChange, *, created: b
         }))
     for name, event_payload in events:
         try:
-            result = publish(name, event_payload)
+            result = publish(name, **event_payload)
             if inspect.isawaitable(result) or inspect.isasyncgen(result):
                 if inspect.iscoroutine(result):
                     result.close()
@@ -97,7 +100,8 @@ def create_report_router(
     """Build routes using real shared dependencies, or explicit test doubles.
 
     Warning writers use the passed Session and must never commit independently.
-    The publisher is synchronous; Alan can enqueue delivery in his adapter.
+    Pass ``api.realtime.publish`` as the synchronous publisher. Event notices
+    contain IDs only and are sent after the database transaction commits.
     """
     if (
         not callable(publish_event)

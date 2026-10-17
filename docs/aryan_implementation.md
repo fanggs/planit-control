@@ -36,7 +36,7 @@ other files are additions.
 | `page/supervisor/domain.js` | Pure ranking, validation, score arithmetic, freshness, and countdown rules. |
 | `page/supervisor/api.js` | Sample/live API adapter, bearer authentication, errors, photo blobs. |
 | `page/supervisor/auth.js`, `config.js` | Auth0 browser login and public deployment settings. No client secret belongs here. |
-| `page/supervisor/realtime.js` | Authenticated real-time adapter, refresh on events/reconnect, honest disconnected state. |
+| `page/supervisor/realtime.js` | Anonymous ID-only bridge notices, authenticated API refresh on events/reconnect, honest disconnected state. |
 | `page/supervisor/refresh.js`, `lifecycle.js` | Coalesce refresh bursts, clear old selected-site data, and restart cached browser-history visits safely. |
 | `page/supervisor/sample-data/` | Copies of the team's three sample sites and related fixtures, explicitly labeled as samples. |
 | `page/supervisor/tests/`, `package.json`, `dev/` | Dependency-free JavaScript tests and local preview tooling. |
@@ -134,9 +134,10 @@ Use this call in the **existing** application after its dependencies exist:
 
 ```python
 from api.hazard_reporting import register_hazard_reporting
+from api.realtime import publish as publish_event
 
-# These four names are integration dependencies supplied by Alan/Sid, not
-# modules invented by this implementation. See their signatures below.
+# Database and warning dependencies come from Sid/Alan. The event publisher is
+# Alan's existing DeepSpace bridge module. See their signatures below.
 private_photos = register_hazard_reporting(
     app,
     get_db=get_db,
@@ -164,8 +165,9 @@ Required adapters:
 # Both warning writers use the passed db, return a real alert ID, and never
 # commit, open another connection, or publish independently.
 
-# publish_event(event_name: str, payload: dict) -> None
-# Synchronous delivery or durable enqueueing to Alan's DeepSpace adapter.
+# publish_event(event_name: str, **ids) -> bool
+# Alan's api.realtime.publish sends ID-only notices to DeepSpace. It returns
+# False and logs when unavailable; it does not provide durable retry.
 # Do not pass an async function directly to this synchronous interface.
 ```
 
@@ -295,23 +297,17 @@ data as zero or lets a timer authorize resuming work. High-report warnings and
 live lightning alerts stay separate from the forecast score. Stale timestamps
 and sample status remain visible.
 
-Alan's real-time bridge must expose the same interface Isaiah documented:
-
-```javascript
-window.PlanITCrewRealtime.subscribe({
-  site_id: null,      // authorized all-site supervisor subscription
-  accessToken,
-  onEvent,           // {type: 'report.created', site_id, report_id, created_at}
-  onConnection,      // true only when actually subscribed; false on disconnect
-  onError
-});                  // returns an unsubscribe function (or a promise of one)
-```
-
-Pass normalized event objects, not private report/photo contents. No imaginary
-`/events` API endpoint was introduced. Until the bridge exists, the dashboard
-shows real-time unavailable and uses periodic API refresh. Events/reconnects
-refresh the ranked list and selected detail/reports. Alan must make `/sites`
-return current `open_report_count` and active alerts after report writes.
+Alan's `page/realtime/deepspace-source.js` now supplies the browser's anonymous
+WebSocket source. The supervisor dashboard uses its public bridge URL and app
+ID to listen for notices, then fetches report, alert, and score details from the
+API using Auth0. The bridge never receives access tokens or private report and
+photo contents. `report.created` contains `site_id` and `report_id` (no
+`created_at`); `scores.updated` contains `site_ids`. Each notice has `sent_at`.
+Unknown types are ignored. No `/events` API endpoint was introduced. When the
+bridge is disconnected, the dashboard shows that state and polls the API.
+Events/reconnects refresh the ranked list and selected detail/reports. Alan
+must make `/sites` return current `open_report_count` and active alerts after
+report writes.
 Refresh requests are coalesced into one active fetch and at most one pending
 fetch, so event bursts do not create a long backlog. JSON timeouts remain active
 until the response body finishes. Replacing a removed selected site clears its
@@ -379,8 +375,9 @@ After Sid/Alan configure the real integrations, run this acceptance pass:
 - **Alan + Aryan:** register routes, remove sample report route, connect warning
   writers and event publisher, Auth0 tenant roles/claim, CORS, private persistent
   photo volume, request limits, other-route authorization, and deployment.
-- **Alan:** actual DeepSpace browser bridge and event retry strategy; live
-  `/sites` aggregation; optional future Gemini photo tagging.
+- **Alan:** deploy/configure the DeepSpace bridge and decide whether durable
+  event retry is needed; live `/sites` aggregation; optional future Gemini
+  photo tagging.
 - **Isaiah + Aryan:** agreed design tokens, `file` multipart field, exact Auth0
   settings, and phone-to-map acceptance testing. Do not overwrite crew screens.
 
@@ -389,9 +386,9 @@ is not ready until these shared dependencies are connected and tested together.
 
 ### Verified in this checkout
 
-- 74 backend tests passed with Python 3.13, FastAPI 0.143.3, Pydantic 2.14.1,
+- 75 backend tests passed with Python 3.13, FastAPI 0.143.3, Pydantic 2.14.1,
   and SQLAlchemy 2.1.5 in an isolated virtual environment.
-- 25 JavaScript tests passed, including Auth0 browser configuration and the loopback-only preview server's
+- 26 JavaScript tests passed, including the bridge notice protocol, Auth0 browser configuration and the loopback-only preview server's
   direct path, trailing-slash redirects, and required static assets.
 - Browser preview verified search, selecting a different site, empty filters,
   positive/negative score contributions, and disabled sample write controls.

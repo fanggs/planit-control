@@ -17,7 +17,7 @@ test('preview serves direct and trailing-slash entries, modules, shared styles a
     server.stderr.on('data', data => { clearTimeout(timeout); reject(new Error(String(data))); });
   });
   for (const path of ['/', '/supervisor/index.html', '/supervisor/', '/supervisor/app.js', '/supervisor/config.js',
-    '/shared/planit.css', '/crew/crew-vendor/leaflet.js', '/supervisor/sample-data/sites.json']) {
+    '/shared/planit.css', '/crew/crew-vendor/leaflet.js', '/realtime/deepspace-source.js', '/supervisor/sample-data/sites.json']) {
     assert.equal((await fetch(base + path)).status, 200, path);
   }
   const redirect = await fetch(base + '/supervisor', {redirect: 'manual'});

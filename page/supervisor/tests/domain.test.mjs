@@ -52,6 +52,10 @@ test('reject invalid coordinates, unrecognized notices, forged role strings and 
   assert.equal(validNotice({type: 'score.safe', site_id: 1}), false);
   assert.equal(validNotice({type: 'report.created', site_id: '1', report_id: 'x'}), false);
   assert.equal(validNotice({type: 'report.created', site_id: 1, report_id: 'x'}), true);
+  assert.equal(validNotice({type: 'scores.updated', site_ids: [1, 6045], sent_at: '2026-10-17T18:00:00Z'}), true);
+  for (const site_ids of [[], ['1'], [0], [1, null], '1']) {
+    assert.equal(validNotice({type: 'scores.updated', site_ids}), false);
+  }
   assert.equal(hasSupervisorRole({roles: 'supervisor'}, 'roles'), false);
   assert.equal(hasSupervisorRole({roles: ['supervisor']}, 'roles'), true);
   assert.equal(safeSourceURL('javascript:alert(1)'), null);

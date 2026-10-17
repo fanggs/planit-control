@@ -1,8 +1,7 @@
 import {validNotice} from './domain.js';
 import {createRefreshQueue} from './refresh.js';
 
-// Alan supplies an authenticated DeepSpace adapter. There is no contract /events endpoint.
-// Treat every valid event as an invalidation notice: fetch authorized API data.
+// DeepSpace broadcasts public IDs only; fetch all details from the authorized API.
 export function connectRealtime({getSource, getToken, onInvalidate, onStatus, timers = globalThis}) {
   let stopped = false, cleanup, retry, opening, generation = 0, connected = false;
   const active = gen => !stopped && gen === generation;
@@ -32,10 +31,12 @@ export function connectRealtime({getSource, getToken, onInvalidate, onStatus, ti
     try {
       const source = getSource();
       if (typeof source?.subscribe !== 'function') { schedule(gen); return; }
-      const accessToken = await getToken();
+      // Check the Auth0 session before listening, but never send its token to
+      // the anonymous DeepSpace bridge. API refetches use their own bearer token.
+      await getToken();
       if (!active(gen)) return;
       opening = timers.setTimeout(() => schedule(gen), 20000);
-      const close = await source.subscribe({site_id: null, accessToken,
+      const close = await source.subscribe({
         onEvent(notice) {
           if (!active(gen) || !validNotice(notice)) return;
           requestRefresh(gen);

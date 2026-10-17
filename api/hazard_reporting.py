@@ -50,6 +50,8 @@ def register_hazard_reporting(
 
     The directory must be private persistent storage outside all static roots.
     This function does not create a database engine, tables, or an application.
+    Pass ``api.realtime.publish`` for ``publish_event``; it takes the event type
+    followed by keyword ID fields and sends notices after each report commit.
     """
     # A duplicate sample route could shadow authentication based on route order.
     conflicts = [
