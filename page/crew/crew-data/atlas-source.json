@@ -1,0 +1,19 @@
+{
+  "plants": {
+    "upstream_path": "get_data/generated/sites.json",
+    "owner": "Sid",
+    "count": 60,
+    "hazard_regions": 6,
+    "plants_per_region": 10,
+    "source_name": "EIA-860M",
+    "source_vintage": "2026-08",
+    "refresh": "Run node dev/sync-atlas-roster.mjs from page/crew after pulling an updated team roster. Validation refuses incomplete or unexpected rosters."
+  },
+  "geography": {
+    "source_name": "us-atlas 3 / U.S. Census Bureau cartographic boundaries",
+    "source_url": "https://github.com/topojson/us-atlas",
+    "processing": "Simplified state rings from the existing local map geometry asset. Display only; not suitable for distance or boundary decisions.",
+    "license_file": "ATLAS-GEOGRAPHY-LICENSE"
+  },
+  "scores": "Location-only by default. Existing authenticated API adapter can add scores for these 60 IDs in live mode. Unavailable scores remain null; no synthetic scores are generated."
+}
