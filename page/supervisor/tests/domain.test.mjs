@@ -16,8 +16,10 @@ test('all shipped sample scores reconcile and retain negative contributions', ()
   }
 });
 test('the contract tolerance uses original values, not rounded display values', () => {
-  const model = {site_id: 1, score: 4.05, baseline: 4, factors: [], scored_at: '2026-10-17T18:00:00Z'};
+  const model = {site_id: 1, score: 4.05, baseline: 4,
+    factors: [{hazard_type: 'heat', contribution: 0}], scored_at: '2026-10-17T18:00:00Z'};
   assert.equal(assessScore(model, 1).status, 'ready');
+  assert.equal(assessScore({...model, factors: []}, 1).status, 'invalid');
   assert.equal(assessScore({...model, score: 4.051}, 1).status, 'mismatch');
   assert.equal(assessScore({...model, site_id: 2}, 1).status, 'invalid');
 });
@@ -27,6 +29,7 @@ test('missing or malformed scores stay unknown; a real zero remains zero', () =>
   assert.equal(summaryScore({...good, score: 0}), 0);
   assert.equal(summaryScore({...good, scored_at: null}), null);
   assert.equal(summaryScore({...good, top_factors: null}), null);
+  assert.equal(summaryScore({...good, top_factors: []}), null);
   assert.equal(assessScore(null, 1).status, 'no_data');
 });
 test('rank/search/filter preserve no-data state and do not change site data', () => {
