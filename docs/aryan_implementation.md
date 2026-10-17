@@ -1,11 +1,11 @@
 # Aryan's PlanIT Control implementation
 
-Built against `api/CONTRACT.md` v1.1 and `docs/TEAM.md`, inspected at `5b87c34`.
-These files are already in the local checkout. The first delivery was
-uncommitted; Aryan subsequently authorized local feature commits and tested
-improvement commits. Nothing was pushed, deployed, or applied to a database.
-Shared `api/main.py`, the root requirements, the contract, and Isaiah's crew
-files were not changed.
+Built against `api/CONTRACT.md` v1.1 and `docs/TEAM.md`. These files are in
+the local checkout; verify the current contract before integrating. The
+report migration has not been applied to a team database, and the live
+Auth0/database/alert dependencies still need to be connected. Shared
+`api/main.py`, the root requirements, the contract, and Isaiah's crew files
+are outside Aryan's ownership and were not changed here.
 
 Important contract correction: photos now go **through our API into private
 server storage**. DeepSpace transports real-time notifications, not photos.
@@ -115,12 +115,14 @@ multipart uploads, and actual image decoding. No Gemini SDK changes are needed;
 the existing root requirements already include it. Do not put credentials in
 the requirements files.
 
-Sid must confirm the database URL, PostgreSQL driver, `public` schema, and the
-integer `public.sites(site_id)` primary key before applying
-`db/hazard_report.sql`. This is a **one-time CREATE migration**, not an ALTER
-migration or a repeatable seed script. If `hazard_reports` already exists,
-inspect its schema and agree on a migration; do not drop it or run this blindly.
-Sid owns creating the engine and request-scoped synchronous `Session` dependency.
+Sid's `db/migrations/001_foundation.sql` now defines `public.sites(site_id)`
+and `public.alerts(id)` with types compatible with this report contribution.
+That file is only checked in; its presence does not prove it was applied to
+the team's database. The migration runner scans `db/migrations/*.sql` and
+does **not** apply `db/hazard_report.sql`, which remains a separate one-time
+CREATE migration. Sid and Aryan must agree how to apply it after checking the
+actual database for an existing table; never drop or overwrite one blindly.
+Sid also owns the engine and request-scoped synchronous `Session` dependency.
 This implementation has not executed SQL against the team's database.
 
 ## 4. Alan: register the new routes
@@ -293,9 +295,10 @@ uvicorn api.main:app --host 127.0.0.1 --port 8000
 The dashboard ranks supplied site scores, shows the leading contributions next
 to each score, and renders the selected site's full baseline + signed-factor
 waterfall. It checks reconciliation within 0.05. It never fabricates missing
-data as zero or lets a timer authorize resuming work. High-report warnings and
-live lightning alerts stay separate from the forecast score. Stale timestamps
-and sample status remain visible.
+data as zero, displays a score without factor evidence, or lets a timer
+authorize resuming work. High-report warnings and live lightning alerts stay
+separate from the forecast score. Stale timestamps and sample status remain
+visible.
 
 Alan's `page/realtime/deepspace-source.js` now supplies the browser's anonymous
 WebSocket source. The supervisor dashboard uses its public bridge URL and app
@@ -314,6 +317,10 @@ until the response body finishes. Replacing a removed selected site clears its
 old reports, images, and pins before loading the replacement. Returning from
 the browser's Back/Forward Cache reloads the workspace to restart authentication
 checks and live updates instead of retaining stopped timers.
+An unavailable `/alerts` feed does not prevent healthy `/sites` data from
+rendering, but its count becomes **No data** with an explicit safety warning.
+When same-site detail or reports fail to refresh, retained results are labeled
+as last-known data until a successful refresh clears that warning.
 
 Isaiah can import `../shared/planit.css` before his screen-specific CSS and
 adopt its tokens/components deliberately. His crew files were not restyled.
@@ -370,8 +377,10 @@ After Sid/Alan configure the real integrations, run this acceptance pass:
 
 ### Still requires teammate configuration
 
-- **Sid:** real sites, report migration review/application, SQLAlchemy session,
-  alerts-table shape, DB privileges, read-only Gemini view, and real scores.
+- **Sid:** apply/verify the new foundation migration, load real sites, review and
+  apply the separate report SQL, provide a SQLAlchemy session, DB privileges,
+  read-only Gemini view, and real scores. The checked-in foundation schema is
+  compatible, but no database execution has been verified here.
 - **Alan + Aryan:** register routes, remove sample report route, connect warning
   writers and event publisher, Auth0 tenant roles/claim, CORS, private persistent
   photo volume, request limits, other-route authorization, and deployment.
@@ -386,9 +395,9 @@ is not ready until these shared dependencies are connected and tested together.
 
 ### Verified in this checkout
 
-- 75 backend tests passed with Python 3.13, FastAPI 0.143.3, Pydantic 2.14.1,
+- 77 backend tests passed with Python 3.13, FastAPI 0.143.3, Pydantic 2.14.1,
   and SQLAlchemy 2.1.5 in an isolated virtual environment.
-- 26 JavaScript tests passed, including the bridge notice protocol, Auth0 browser configuration and the loopback-only preview server's
+- 30 JavaScript tests passed, including the bridge notice protocol, Auth0 browser configuration and the loopback-only preview server's
   direct path, trailing-slash redirects, and required static assets.
 - Browser preview verified search, selecting a different site, empty filters,
   positive/negative score contributions, and disabled sample write controls.
@@ -396,6 +405,9 @@ is not ready until these shared dependencies are connected and tested together.
   No browser console errors were observed during those interactions.
 - After the reliability fixes, browser checks reconfirmed site selection,
   refresh, the crew link, and returning to the dashboard through browser history.
+- In a fresh loopback preview, the 319px-wide workspace had no horizontal
+  overflow, the crew-report filter narrowed the list to one site, and the
+  browser reported no console errors. These are sample-mode checks only.
 - PostgreSQL SQL parsed and queries compiled. Live PostgreSQL transactions,
   concurrency, Auth0 tenant login, DeepSpace delivery, and Gemini were **not**
   exercised. Those require the team's real configuration and acceptance pass.
