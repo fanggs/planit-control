@@ -10,6 +10,15 @@ export const validFactors = rows => Array.isArray(rows) && rows.every(row =>
 export const label = hazard => HAZARDS[hazard] || 'Unknown hazard';
 export const points = value => `${value > 0 ? '+' : ''}${value.toFixed(1)}`;
 
+export const isReplayAlert = alert => alert?.trigger?.is_replay === true;
+export function siteHasReplayAlert(site, alerts) {
+  // GET /sites has only an alert summary; match it to the full /alerts rows.
+  if (!site?.active_alert || !Array.isArray(alerts)) return false;
+  return alerts.some(alert => alert.site_id === site.site_id
+    && alert.hazard_type === site.active_alert.hazard_type
+    && alert.level === site.active_alert.level && isReplayAlert(alert));
+}
+
 export function summaryScore(site) {
   // The map/list only have top factors, not the full baseline. Never display
   // a numerical score there without at least one signed explanation.

@@ -7,7 +7,8 @@ import {createDeepSpaceSource} from '../realtime/deepspace-source.js';
 import {createRefreshQueue} from './refresh.js';
 import {bindPageLifecycle, changeSelectedSite, markDetailStale} from './lifecycle.js';
 import {assessScore, coordinates, countdown, finite, freshness, hasSupervisorRole, label, points,
-  rankSites, riskTone, safeSourceURL, siteTime, summaryScore, validFactors} from './domain.js';
+  isReplayAlert, rankSites, riskTone, safeSourceURL, siteHasReplayAlert, siteTime, summaryScore,
+  validFactors} from './domain.js';
 
 const $ = id => document.getElementById(id);
 const sample = config.mode === 'sample';
@@ -63,7 +64,10 @@ function sitePopup(site) {
   const score = summaryScore(site);
   node.append(el('p', score === null ? 'No score data' : `${score.toFixed(1)} / 10 · 24-hour outlook`));
   node.append(el('p', score === null ? 'Missing data never means safe.' : factorSummary(site.top_factors)));
-  if (site.active_alert) node.append(el('p', `${site.active_alert.level === 'stop_work' ? 'STOP WORK' : 'Warning'} · ${label(site.active_alert.hazard_type)}`));
+  if (site.active_alert) {
+    node.append(el('p', `${site.active_alert.level === 'stop_work' ? 'STOP WORK' : 'Warning'} · ${label(site.active_alert.hazard_type)}`));
+    if (siteHasReplayAlert(site, state.alerts)) node.append(chip('REPLAY · recorded lightning', 'medium'));
+  }
   const button = el('button', 'View site details', 'planit-button');
   button.addEventListener('click', () => void selectSite(site.site_id));
   node.append(button);
@@ -120,7 +124,10 @@ function renderList() {
     heading.append(copy, score);
     button.append(heading, el('p', value === null ? 'Score or explanation unavailable' : factorSummary(site.top_factors), 'site-factors'));
     const meta = el('div', null, 'site-meta');
-    if (site.active_alert) meta.append(chip(site.active_alert.level === 'stop_work' ? 'Stop work' : 'Warning', site.active_alert.level === 'stop_work' ? 'high' : 'medium'));
+    if (site.active_alert) {
+      meta.append(chip(site.active_alert.level === 'stop_work' ? 'Stop work' : 'Warning', site.active_alert.level === 'stop_work' ? 'high' : 'medium'));
+      if (siteHasReplayAlert(site, state.alerts)) meta.append(chip('REPLAY · recorded lightning', 'medium'));
+    }
     if (site.open_report_count > 0) meta.append(chip(`${site.open_report_count} open report${site.open_report_count === 1 ? '' : 's'}`));
     if (!site.active_alert && !(site.open_report_count > 0)) meta.append(chip('No active alerts supplied'));
     button.append(meta, el('span', `${ageText(site.scored_at)} · ${siteTime(site.scored_at, site.timezone)}`, 'site-age'));
@@ -180,10 +187,10 @@ function renderAlerts(detail) {
     const card = el('article', null, `alert-card${alert.level === 'stop_work' ? ' stop' : ''}`);
     card.append(chip(`${alert.level === 'stop_work' ? 'STOP WORK' : 'Warning'} · ${label(alert.hazard_type)}`,
       alert.level === 'stop_work' ? 'high' : 'medium'), el('p', alert.message));
+    if (isReplayAlert(alert)) card.append(chip('REPLAY · recorded lightning', 'medium'));
     if (alert.hazard_type === 'lightning' && alert.level === 'stop_work') {
       const clock = el('p', countdown(alert.clear_at), 'countdown');
       clock.dataset.clearAt = alert.clear_at || ''; card.append(clock);
-      if (String(alert.trigger?.strike_id || '').startsWith('replay-') || alert.trigger?.is_replay === true) card.append(chip('REPLAY · recorded lightning'));
       if (sample) card.append(chip('SAMPLE alert'));
       card.append(note('Continue the stop-work instruction until the server clears the alert.'));
     }

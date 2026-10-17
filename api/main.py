@@ -14,17 +14,69 @@ Response shapes follow api/CONTRACT.md. Open /docs while the server runs.
 from __future__ import annotations
 
 import json
+import os
+from urllib.parse import urlsplit
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from api import db, site_data
+from api.auth.hazard_auth import Auth0Config, Principal, create_auth_dependency, require_roles
 from api.schemas.alerts import Alert, Briefing
 from api.schemas.sites import SiteDetail, SiteSummary
 
 LIVE_ALERTS = site_data.ROOT / "data" / "live" / "alerts.json"
 LEVEL_RANK = {"stop_work": 2, "warning": 1}
+LOCAL_CORS_ORIGINS = (
+    "http://127.0.0.1:4174",
+    "http://127.0.0.1:4175",
+)
+
+
+def _cors_origins() -> list[str]:
+    """Allow only explicit browser origins; never widen CORS on bad input.
+
+    Production sets PLANIT_CORS_ORIGINS to its exact HTTPS frontend origin(s).
+    The two documented loopback preview origins are the only HTTP exceptions.
+    """
+    configured = os.environ.get("PLANIT_CORS_ORIGINS")
+    if configured is None:
+        return list(LOCAL_CORS_ORIGINS)
+    origins = configured.split(",")
+    if not origins or any(not origin or origin != origin.strip() for origin in origins):
+        raise ValueError("PLANIT_CORS_ORIGINS needs comma-separated exact origins")
+    for origin in origins:
+        parsed = urlsplit(origin)
+        try:
+            port = parsed.port
+        except ValueError as exc:
+            raise ValueError("PLANIT_CORS_ORIGINS contains an invalid port") from exc
+        if (
+            not parsed.hostname or not parsed.netloc
+            or parsed.username is not None or parsed.password is not None
+            or parsed.path or parsed.query or parsed.fragment
+            or any(ord(character) <= 32 or ord(character) == 127 or character in "*\\" for character in origin)
+            or (port is not None and port == 0)
+            or (origin not in LOCAL_CORS_ORIGINS and (
+                parsed.scheme != "https" or origin != f"https://{parsed.netloc}"
+            ))
+        ):
+            raise ValueError("PLANIT_CORS_ORIGINS allows only exact HTTPS origins or documented 127.0.0.1 previews")
+    return list(dict.fromkeys(origins))
+
+
+try:
+    _auth0_config = Auth0Config.from_env()
+except ValueError:
+    # The health check remains available, but no data route becomes public when
+    # tenant settings are missing or malformed. Its auth dependency returns 503.
+    _auth0_config = None
+_get_principal = create_auth_dependency(_auth0_config)
+
+
+def _require_data_viewer(principal: Principal = Depends(_get_principal)) -> None:
+    require_roles(principal, "crew", "supervisor")
 
 
 def _live_lightning() -> list[dict] | None:
@@ -87,9 +139,9 @@ app = FastAPI(
 )
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=_cors_origins(),
+    allow_methods=["GET", "POST", "PATCH"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 
 
@@ -100,6 +152,7 @@ async def _error_shape(request: Request, exc: HTTPException):
     return JSONResponse(
         status_code=exc.status_code,
         content={"error": {"code": code, "message": exc.detail}},
+        headers=exc.headers,
     )
 
 
@@ -110,13 +163,13 @@ def health():
     return {"ok": True, "data": site_data.mode(), "sites": len(site_data.load_sites())}
 
 
-@app.get("/sites", response_model=list[SiteSummary])
+@app.get("/sites", response_model=list[SiteSummary], dependencies=[Depends(_require_data_viewer)])
 def sites():
     alerts, reports = _alerts(), _reports()
     return [_summary(s, alerts, reports) for s in site_data.load_sites()]
 
 
-@app.get("/sites/{site_id}", response_model=SiteDetail)
+@app.get("/sites/{site_id}", response_model=SiteDetail, dependencies=[Depends(_require_data_viewer)])
 def site_detail(site_id: int):
     site = next((s for s in site_data.load_sites() if s["site_id"] == site_id), None)
     if site is None:
@@ -131,7 +184,7 @@ def site_detail(site_id: int):
     }
 
 
-@app.get("/alerts", response_model=list[Alert])
+@app.get("/alerts", response_model=list[Alert], dependencies=[Depends(_require_data_viewer)])
 def alerts():
     return _alerts()
 
@@ -154,7 +207,7 @@ def _briefings() -> dict:
         return {}
 
 
-@app.get("/briefings/{site_id}", response_model=Briefing)
+@app.get("/briefings/{site_id}", response_model=Briefing, dependencies=[Depends(_require_data_viewer)])
 def briefing(site_id: int):
     found = _briefings().get(str(site_id))
     if found is None:
@@ -163,6 +216,6 @@ def briefing(site_id: int):
 
 
 # Response model comes from Aryan's hazard report schema once it has one.
-@app.get("/reports")
+@app.get("/reports", dependencies=[Depends(_require_data_viewer)])
 def reports(site_id: int | None = None):
     return [r for r in _reports() if site_id is None or r["site_id"] == site_id]

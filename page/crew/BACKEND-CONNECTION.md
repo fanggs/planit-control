@@ -103,7 +103,7 @@ node --test
 node dev/check-api.mjs
 ```
 
-The last command is a read-only check against Alan's local API at `http://localhost:8010`. It requires `/health` to identify the server as sample data. Set `PLANIT_API_BASE_URL` for a different sample server. Its sample bearer value is not a real Auth0 token or a production authentication check.
+The last command is a read-only security smoke check against the local API at `http://127.0.0.1:8010`. It checks that `/health` responds and anonymous `GET /sites` returns 401, or fail-closed 503 when Auth0 is not configured. Set `PLANIT_API_BASE_URL` to another `http://127.0.0.1` port if needed. It never sends a bearer token and does not prove real Auth0 login.
 
 At verification, the sample server served sites, detail, alerts, briefings and reports. It did not yet register photo upload/view or report creation routes. Those flows are covered by simulated HTTP tests, pending real endpoint integration. The shared listener is now wired and its public subscription handshake was verified. Auth0 settings and the database-backed API are still needed for end-to-end live browser testing. Test two devices, a new-strike reset, disconnect/reconnect, explicit clear, protected photo visibility and a persisted report once those services are ready. Briefing scheduling and 6 PM delivery remain backend responsibilities.
 

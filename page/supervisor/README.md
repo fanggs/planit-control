@@ -146,11 +146,14 @@ incrementally without replacing his screens.
 
 - **Lightning feed health:** contract v1.1 does not expose it. The UI says health
   is unavailable; zero active alerts does not prove a live feed or safe weather.
-- **Replay metadata:** v1.1 omits a dedicated replay flag on alert responses.
-  Known `replay-` strike IDs or supplied `trigger.is_replay: true` are labeled.
-  Alan must supply an agreed explicit replay indication for every replayed
-  alert before demonstrating live/replay mode; the frontend cannot infer it
-  from opaque strike IDs. All fixture data remains labeled SAMPLE.
+- **Replay metadata:** the updated contract requires `trigger.is_replay: true`
+  on replayed alerts. The site detail, ranked list and map popup label matching
+  active alerts as REPLAY using the full `/alerts` response; opaque strike IDs
+  are not treated as proof. Replay speed changes the server's `clear_at`, which
+  the countdown displays without assuming a fixed 30 minutes. If `/alerts`
+  fails, an overview alert's replay status is unknown because `/sites` omits
+  that flag. All fixture data remains labeled SAMPLE. Live replay is visible
+  only after the dashboard is connected to the authenticated API.
 - **Freshness:** a reading's own timestamp is shown in the site's timezone.
   The 60-minute stale badge is a UI advisory, configurable in `config.js`, not
   a safety threshold. Reaching a countdown of zero says “Awaiting server

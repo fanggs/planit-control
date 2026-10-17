@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 // Exercise our callback behavior with an SDK double, without using a real tenant or token.
-globalThis.location = {href: 'http://localhost:4174/login.html?code=one-use&state=checked', search: '?code=one-use&state=checked'};
+globalThis.location = {href: 'http://127.0.0.1:4174/login.html?code=one-use&state=checked', search: '?code=one-use&state=checked'};
 globalThis.document = {title: 'PlanIT'};
 let replaced, options, instances = 0, callbacks = 0, loginOptions;
 globalThis.history = {replaceState(_state, _title, url) { replaced = url; }};
@@ -28,7 +28,7 @@ test('callback is consumed once and the same in-memory client serves the workspa
   assert.equal(instances, 1);
   assert.equal(callbacks, 1);
   assert.equal(options.cacheLocation, 'memory');
-  assert.equal(replaced, 'http://localhost:4174/login.html');
+  assert.equal(replaced, 'http://127.0.0.1:4174/login.html');
   assert.equal(await auth.session(), user);
 });
 
@@ -45,7 +45,7 @@ test('an unsuccessful callback removes its one-use parameters and does not creat
   };
   const failedAuth = await import('../crew-auth.js?failed-callback');
   await assert.rejects(failedAuth.initAuth(), /canceled/);
-  assert.equal(replaced, 'http://localhost:4174/login.html');
+  assert.equal(replaced, 'http://127.0.0.1:4174/login.html');
   assert.equal(await failedAuth.session(), null);
 });
 

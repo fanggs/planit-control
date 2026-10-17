@@ -32,9 +32,12 @@ Copy `.env.example` to `.env` and fill in keys. Never commit `.env`.
 ```bash
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
-.venv/bin/uvicorn api.main:app --reload --port 8010
+.venv/bin/uvicorn api.main:app --reload --env-file .env --host 127.0.0.1 --port 8010
 ```
 
-Then open http://localhost:8010/docs to see every endpoint and try it.
-Until the database is connected, endpoints serve the sample data in
-`api/samples/` (shaped exactly like `api/CONTRACT.md`).
+Then open http://127.0.0.1:8010/docs to see the endpoints. `/health` is public;
+data routes require a valid Auth0 API access token with the `crew` or
+`supervisor` role. Set `AUTH0_DOMAIN` and `AUTH0_AUDIENCE` in `.env` before
+testing them. If either setting is missing or invalid, data routes return 503
+instead of becoming public. Set `PLANIT_DATA=sample` to use the fixtures in
+`api/samples/` while the database-backed endpoints are being integrated.
