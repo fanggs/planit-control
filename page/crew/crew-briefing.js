@@ -14,7 +14,7 @@ export function mountBriefing(container,site,message){
       const [history,prefs]=await Promise.all([services.listBriefings(site.id),services.readPreferences(site.id)]);if(disposed)return;
       if(!Array.isArray(history)||String(prefs?.site_id)!==String(site.id))throw new Error('Briefing data did not match the selected site.');
       const zones=[...new Set(['',prefs.timezone||'',site.timezone||'','America/New_York','America/Chicago','America/Denver','America/Phoenix','America/Los_Angeles','America/Anchorage','Pacific/Honolulu','America/Puerto_Rico'])];
-      container.innerHTML=`<div class="crew-section-heading"><div><p class="crew-eyebrow">PLAN TOMORROW</p><h1>Next-day safety briefing</h1></div></div>
+      container.innerHTML=`<div class="crew-section-heading crew-briefing-heading"><div><p class="crew-eyebrow">PLAN TOMORROW</p><h1>Next-day safety briefing</h1></div></div>
         <section class="crew-card"><h2>Every evening, 6 PM at this site</h2><p class="crew-muted">The report covers tomorrow’s hazards. Delivery is handled by the backend, even when this browser is closed.</p>
         <form id="crew-briefing-settings"><label class="crew-checkbox"><input id="crew-briefing-enabled" type="checkbox" ${prefs.enabled?'checked':''}><span>Receive the daily briefing</span></label>
         <label for="crew-timezone">Site timezone</label><select id="crew-timezone" required>${zones.map(z=>`<option value="${esc(z)}" ${z===prefs.timezone?'selected':''}>${esc(z||'Choose the site timezone')}</option>`).join('')}</select><small>Use the site’s timezone, which may differ from your phone’s. The backend must validate it.</small>

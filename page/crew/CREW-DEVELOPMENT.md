@@ -16,6 +16,7 @@ Each first-party module starts with its part number, matching commit title and a
 | 6 | `feat(crew): assemble crew workspace and supervisor preview` | Crew entry/navigation, persistent alerts, separate supervisor map/ranking, root crew redirect | Expose the screens after their dependencies exist, keeping the app's navigation small. |
 | 7 | `docs(crew): document decisions and backend integration` | This walkthrough, setup, backend handoff and validation notes | A teammate can understand the choices and connect the actual backend without reading the chat. |
 | Follow-up | `fix(crew): match current photo storage key validation` | Report mapper, regression test and current-schema documentation | A team update tightened storage-key validation; the frontend rejects URLs and preserves opaque keys exactly. |
+| Visual update | `feat(crew): add a colorful field-inspired visual theme` | Scoped theme, original SVG icons/contours, hazard cards, score ring and navigation accents | Category colors help scanning while severity badges and alert colors stay consistent; no additional features or remote asset requests are needed. |
 
 ## Decisions worth explaining to a judge or teammate
 

@@ -1,5 +1,15 @@
 # Frontend verification — October 17, 2026
 
+## Color theme update
+
+- Browser checks at 1280 × 1000, 390 × 844 and 320 × 740 viewport settings; document widths matched scroll widths, with no horizontal overflow.
+- All seven hazard cards have distinct category tints and decorative icons. Their risk badges retain readable severity labels and consistent colors.
+- Checked hazard-card text against each category tint; minimum sampled contrast is 4.92:1 after darkening source captions.
+- Verified report navigation, photo/category/severity/pin controls and briefing navigation at phone size. Lightning and flood warnings remained visible across views; a sample strike reset the displayed countdown to 30:00.
+- Verified the supervisor's desktop map/ranking columns and its stacked phone layout. The original national preview received a matching palette as a separate local artifact.
+- Browser console reported no errors in the final crew view. Original SVG artwork requires no additional network requests. Temporary viewport overrides were reset.
+- Screenshots beside the package: `planit-colorful-desktop.png`, `planit-colorful-mobile.png`, `planit-colorful-supervisor.png` and `planit-colorful-preview.png`.
+
 ## Automated
 
 `node --test`: **22 passed, 0 failed** after report-schema alignment. `node dev/check.mjs`: all application JavaScript syntax checks passed.

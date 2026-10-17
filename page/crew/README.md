@@ -2,6 +2,8 @@
 
 Light-mode crew workspace with forest-green accents and a separate supervisor integration preview. All six challenge capabilities have frontend screens and service connections. Actual environmental feeds, trained ML, shared storage, Auth0 tenant configuration, notification delivery and 6 PM background jobs must be provided by the backend.
 
+The visual theme adds soft sky, amber, lavender, terracotta, moss and teal hazard cards, original contour-line artwork, a PlanIT mark, icon navigation and a score ring. Category tints are independent from risk: the labeled severity badges and alert colors retain a consistent vocabulary. `crew-theme.css` keeps these changes scoped, and `crew-visuals.js` contains the original inline SVG artwork without external asset dependencies.
+
 ## Run locally
 
 Install Node.js 20 or newer. No package installation or build is required.
