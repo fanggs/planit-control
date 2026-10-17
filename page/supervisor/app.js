@@ -2,13 +2,15 @@ import {config} from './config.js';
 import {createAuth} from './auth.js';
 import {createAPI, createSampleAPI} from './api.js';
 import {connectRealtime} from './realtime.js';
+import {createRefreshQueue} from './refresh.js';
+import {bindPageLifecycle, changeSelectedSite} from './lifecycle.js';
 import {assessScore, coordinates, countdown, finite, freshness, hasSupervisorRole, label, points,
   rankSites, riskTone, safeSourceURL, siteTime, summaryScore, validFactors} from './domain.js';
 
 const $ = id => document.getElementById(id);
 const sample = config.mode === 'sample';
 const state = {sites: [], alerts: [], selected: null, detail: null, reports: [], search: '', filter: 'all'};
-let api, auth, map, siteLayer, reportLayer, detailGeneration = 0, refreshChain = Promise.resolve();
+let api, auth, map, siteLayer, reportLayer, detailGeneration = 0;
 let stopRealtime, poll, countdownTimer, user, resolving = false;
 const photoURLs = new Set();
 const siteMarkers = new Map();
@@ -253,20 +255,26 @@ async function loadDetail(id) {
     const [detail, reports] = await Promise.all([api.detail(id), api.reports(id)]);
     if (generation !== detailGeneration || state.selected !== id) return;
     state.detail = detail; state.reports = reports; renderDetail();
+  } catch (error) {
+    if (generation === detailGeneration && state.selected === id && !state.detail) {
+      $('detail').replaceChildren(el('p', 'Site detail unavailable. Use Refresh to retry.', 'empty'));
+    }
+    throw error;
   } finally { if (generation === detailGeneration) $('detail').setAttribute('aria-busy', 'false'); }
 }
+function updateSelection(id) {
+  if (!changeSelectedSite(state, id)) return;
+  detailGeneration++; // Invalidate any response from the previous selection.
+  revokePhotos(); reportLayer?.clearLayers();
+  $('detail').replaceChildren(el('p', id === null ? 'The API returned no sites.' : 'Loading site details…', 'empty'));
+}
 async function selectSite(id, pan = true) {
-  const changed = state.selected !== id;
-  state.selected = id;
-  if (changed) {
-    state.detail = null; state.reports = []; revokePhotos(); reportLayer?.clearLayers();
-    $('detail').replaceChildren(el('p', 'Loading site details…', 'empty'));
-  }
+  updateSelection(id);
   renderList();
   if (pan && map) { const position = coordinates(state.sites.find(site => site.site_id === id)); if (position) map.panTo(position); }
   try { await loadDetail(id); }
   catch (error) {
-    if (state.selected === id) { showError(error); if (!state.detail) $('detail').replaceChildren(el('p', 'Site detail unavailable. Use Refresh to retry.', 'empty')); }
+    if (state.selected === id) showError(error);
   }
 }
 async function fetchData() {
@@ -274,7 +282,7 @@ async function fetchData() {
   try {
     const [sites, alerts] = await Promise.all([api.sites(), api.alerts()]);
     state.sites = sites; state.alerts = alerts;
-    if (!sites.some(site => site.site_id === state.selected)) state.selected = rankSites(sites)[0]?.site_id ?? null;
+    if (!sites.some(site => site.site_id === state.selected)) updateSelection(rankSites(sites)[0]?.site_id ?? null);
     renderMetrics(); renderList();
     if (state.selected !== null) await loadDetail(state.selected);
     else { state.detail = null; state.reports = []; revokePhotos(); reportLayer?.clearLayers(); $('detail').replaceChildren(el('p', 'The API returned no sites.', 'empty')); }
@@ -282,7 +290,7 @@ async function fetchData() {
     clearError();
   } finally { $('refresh').disabled = false; }
 }
-function refresh() { const task = refreshChain.then(fetchData); refreshChain = task.catch(() => {}); return task; }
+const refresh = createRefreshQueue(fetchData);
 async function resolveReport(id, button) {
   if (sample || resolving || !hasSupervisorRole(user, config.auth.rolesClaim)) return;
   resolving = true; button.disabled = true; button.textContent = 'Resolving…';
@@ -341,5 +349,9 @@ async function start() {
     poll = setInterval(() => void refresh().catch(showError), config.pollMs);
   }
 }
-window.addEventListener('pagehide', () => { stopRealtime?.(); clearInterval(poll); clearInterval(countdownTimer); revokePhotos(); });
+bindPageLifecycle({browser: window, onHide() {
+  stopRealtime?.(); clearInterval(poll); clearInterval(countdownTimer); revokePhotos();
+  $('connection').dataset.connected = 'false';
+  $('connection').textContent = 'Workspace paused · refresh required';
+}});
 void start().catch(error => { $('connection').textContent = 'Not connected'; showError(error); });
