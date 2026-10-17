@@ -1,0 +1,10 @@
+{
+  "name": "planit-control-frontend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node dev/serve.mjs",
+    "test": "node --test",
+    "check": "node dev/check.mjs"
+  }
+}

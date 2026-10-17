@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#080b0c">
+    <meta name="robots" content="noindex">
+    <title>PlanIT Control — Secure sign-in</title>
+    <link rel="stylesheet" href="crew-vendor/leaflet.css">
+    <link rel="stylesheet" href="crew.css">
+    <link rel="stylesheet" href="crew-theme.css">
+    <link rel="stylesheet" href="crew-dark.css">
+    <link rel="stylesheet" href="crew-welcome.css">
+    <script src="crew-vendor/leaflet.js" defer></script>
+    <script type="module" src="crew-entry.js"></script>
+  </head>
+  <body class="planit-crew">
+    <a class="crew-skip" href="#crew-main">Skip to content</a>
+    <div id="crew-access-root">
+      <main id="crew-main" class="crew-login crew-auth-card">
+        <a class="auth-back" href="index.html">← Back to PlanIT</a>
+        <p class="crew-eyebrow">PLANIT CONTROL / SECURE ACCESS</p>
+        <h1>Your next shift<br>starts here.</h1>
+        <p class="crew-muted" id="login-status" role="status">Checking your sign-in…</p>
+        <p class="crew-error" id="login-error" role="alert" hidden></p>
+        <button class="crew-button" id="login-continue" disabled>Continue with Auth0 ↗</button>
+        <button class="crew-link" id="login-signout" hidden>Sign out</button>
+        <p class="auth-security-note">After verification, your account opens the crew or supervisor workspace.</p>
+        <div class="auth-demo-options" id="login-demo" hidden><span>SAMPLE DATA · NO SIGN-IN</span><a href="crew.html?demo=1&site=621">Explore crew view →</a><a href="crew-supervisor.html?demo=1">Explore supervisor view →</a></div>
+      </main>
+    </div>
+    <div id="crew-message" role="status" aria-live="polite"></div>
+  </body>
+</html>

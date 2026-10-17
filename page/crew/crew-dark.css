@@ -1,0 +1,135 @@
+/* Commit: style(crew): unify the welcome and workspaces in a dark palette
+   Why: Quiet surfaces keep attention on conditions; mint, amber and red retain meaning.
+   Scoped to Isaiah's package, including the optional supervisor preview. */
+.planit-crew {
+  --crew-forest: #8de3bf;
+  --crew-paper: #080b0c;
+  --crew-ink: #edf3f1;
+  --crew-muted: #a2b1ad;
+  --crew-border: #293532;
+  --crew-surface: #101716;
+  color-scheme: dark;
+  background: radial-gradient(ellipse at 90% 0, #11231d66, transparent 45%), #080b0c;
+  color: var(--crew-ink);
+}
+.planit-crew :focus-visible { outline: 2px solid #8de3bf; outline-offset: 4px; }
+.planit-crew .crew-skip { background: #101716; color: #8de3bf; border: 1px solid #8de3bf; }
+.planit-crew .crew-header {
+  background: #080d0de8;
+  border-top: 0;
+  border-bottom: 1px solid var(--crew-border);
+  box-shadow: none;
+  backdrop-filter: blur(18px);
+}
+.planit-crew .crew-brand { color: #eef5f1; letter-spacing: -.9px; }
+.planit-crew .crew-brand span:not(.crew-brand-mark) { color: #97a8a0; }
+.planit-crew .crew-brand-mark { background: #19382e; border: 1px solid #456c58; }
+.planit-crew .crew-header-actions .crew-link { color: #b9cac2; }
+.planit-crew .crew-header-actions .crew-link:hover { background: #1a2822; color: #edfff6; }
+.planit-crew .crew-main { padding-bottom: 36px; }
+.planit-crew .crew-demo { background: #211d12; border-color: #53462a; color: #d8c38f; }
+.planit-crew .crew-demo strong { color: #f0d99f; }
+.planit-crew .crew-site-hero {
+  background: linear-gradient(110deg, #13211b, #101916 60%, #162820);
+  border-color: #31473a;
+  border-radius: 14px;
+}
+.planit-crew .crew-site-hero .crew-eyebrow { color: #a4c9b4; }
+.planit-crew .crew-site-hero .crew-muted { color: #b0c0b6; }
+.planit-crew .crew-contour-art { opacity: .25; }
+.planit-crew .crew-hero-end .crew-button { background: #13231c; box-shadow: none; }
+.planit-crew .crew-nav { background: #0e1513; border-color: #2c3b33; }
+.planit-crew .crew-nav button { color: #b1c1b8; }
+.planit-crew .crew-nav button[aria-pressed=true] { background: #203b2f; color: #b7f7d4; box-shadow: inset 0 0 0 1px #3c6550; }
+.planit-crew .crew-nav button:hover:not([aria-pressed=true]) { background: #18251f; }
+.planit-crew .crew-card { background: var(--crew-surface); border-color: var(--crew-border); border-radius: 12px; box-shadow: none; }
+.planit-crew .crew-eyebrow { color: #9cbdab; }
+.planit-crew .crew-button { background: #a7edc9; border: 1px solid #a7edc9; color: #0a1911; font-weight: 650; min-height: 44px; box-shadow: none; }
+.planit-crew .crew-button:hover:not(:disabled) { background: #c8f8df; color: #07140c; border-color: #c8f8df; box-shadow: none; }
+.planit-crew .crew-button.secondary { background: #152019; border: 1px solid #415748; color: #d4e7da; }
+.planit-crew .crew-button.secondary:hover:not(:disabled) { background: #223429; color: #eefff4; border-color: #72947e; }
+.planit-crew button:disabled { opacity: .6; }
+.planit-crew .crew-alert { background: #241f13; color: #f0d49b; border-color: #65522d; border-left-color: #e1b45f; }
+.planit-crew .crew-alert small { color: inherit; opacity: .85; }
+.planit-crew .crew-alert[data-tone=hold] { background: #2b1718; border-color: #82423e; border-left-color: #ff9988; color: #ffd2c9; }
+.planit-crew .crew-alert[data-tone=clear] { background: #13291e; border-color: #3d7352; border-left-color: #8de3b6; color: #b6edc9; }
+.planit-crew #crew-countdown:not(:empty) { background: #160f11; color: #ffe4db; border-color: #80534b; font-variant-numeric: tabular-nums; }
+.planit-crew .crew-flood-notice { background: #2a2013; border-color: #755832; border-left-color: #e4b174; color: #f4cf9e; }
+.planit-crew .crew-hazard { --hazard-color: #94cae4; --hazard-tint: #122129; background: linear-gradient(150deg, var(--hazard-tint), #101716 85%); border-color: #2a3933; border-radius: 12px; }
+.planit-crew .crew-hazard[data-severity] { border-top-color: #2a3933; }
+.planit-crew .crew-hazard[data-hazard=weather] { --hazard-color: #96d3ec; --hazard-tint: #12232b; }
+.planit-crew .crew-hazard[data-hazard=heat] { --hazard-color: #e7c17d; --hazard-tint: #282116; }
+.planit-crew .crew-hazard[data-hazard=lightning] { --hazard-color: #c7b4f0; --hazard-tint: #221b30; }
+.planit-crew .crew-hazard[data-hazard=flood] { --hazard-color: #9bc9ed; --hazard-tint: #142330; }
+.planit-crew .crew-hazard[data-hazard=wildfire] { --hazard-color: #eda98a; --hazard-tint: #2c1d19; }
+.planit-crew .crew-hazard[data-hazard=soil] { --hazard-color: #c2d58e; --hazard-tint: #202619; }
+.planit-crew .crew-hazard[data-hazard=wildlife] { --hazard-color: #8ed3bb; --hazard-tint: #14291f; }
+.planit-crew .crew-hazard-icon { color: var(--hazard-color); background: #ffffff06; border-color: #ffffff17; box-shadow: none; }
+.planit-crew .crew-hazard h3 { color: #becbc4; }
+.planit-crew .crew-hazard > strong { color: #eef5f0; }
+.planit-crew .crew-hazard > p, .planit-crew .crew-hazard small { color: #a8bcb0; }
+.planit-crew .crew-pill { background: #1e2a24; border-color: #405247; color: #c0d2c7; }
+.planit-crew .crew-hazard[data-severity=lower] .crew-pill { color: #b7eac4; background: #1b3325; border-color: #416e4e; }
+.planit-crew .crew-hazard[data-severity=elevated] .crew-pill { color: #f2d392; background: #332914; border-color: #796333; }
+.planit-crew .crew-hazard[data-severity=high] .crew-pill { color: #ffbfb0; background: #3e211c; border-color: #945344; }
+.planit-crew .crew-hazard[data-severity=unknown] .crew-pill { color: #c4ceca; background: #232e29; border-color: #4a5b51; }
+.planit-crew .crew-index-card { background: linear-gradient(120deg, #14231b, #101716 70%); border-color: #3d5542; }
+.planit-crew .crew-score-ring { background: conic-gradient(var(--score-color) var(--score-sweep), #28362d 0); }
+.planit-crew .crew-score-ring::before { background: #111b16; }
+.planit-crew .crew-score-ring .crew-score small { color: #b0c5b7; }
+.planit-crew .crew-factor b { background: #263729; color: #bde8c6; }
+.planit-crew .crew-flood { background: linear-gradient(125deg, #132329, #101716 80%); border-color: #354e55; }
+.planit-crew .crew-flood[data-active=true] { background: linear-gradient(125deg, #2b2115, #141815 80%); border-color: #765d37; }
+.planit-crew .crew-flood .crew-eyebrow { color: #aacdd8; }
+.planit-crew .crew-metrics > span { background: #ffffff04; border-color: #39463f; color: #b1c2b7; }
+.planit-crew .crew-metrics strong { color: #e4ede7; }
+.planit-crew input, .planit-crew select, .planit-crew textarea { background: #0a110e; color: #edf3ef; border-color: #46584b; }
+.planit-crew input::placeholder, .planit-crew textarea::placeholder { color: #8fa398; opacity: 1; }
+.planit-crew input:focus, .planit-crew select:focus, .planit-crew textarea:focus { border-color: #8de3bf; box-shadow: 0 0 0 3px #8de3bf1a; }
+.planit-crew input[type=file]::file-selector-button { background: #233a2b; color: #d3eddb; border-color: #526a56; }
+.planit-crew input[type=checkbox] { accent-color: #a7edc9; }
+.planit-crew label { color: #c0dac8; }
+.planit-crew .crew-error { color: #ffb9aa; }
+.planit-crew .crew-site-result { background: #101c15; border-color: #374f3d; color: #e6f0e8; }
+.planit-crew .crew-site-result:hover { background: #203328; border-color: #7da98b; }
+.planit-crew .crew-demo-controls { background: #151b14; border-color: #566044; }
+.planit-crew #crew-briefing-detail .crew-hazard { background: #142019; }
+.planit-crew .crew-dashboard-stats > div { background: #14251c; border-color: #354c3a; }
+.planit-crew .crew-dashboard-stats > div:nth-child(2) { background: #2a211a; border-color: #634b36; }
+.planit-crew .crew-dashboard-stats > div:nth-child(3) { background: #1c2030; border-color: #434b67; }
+.planit-crew .crew-dashboard-stats strong { color: #eaf5ee; }
+.planit-crew .crew-dashboard-stats span { color: #b4c8b8; }
+.planit-crew .crew-stat-icon { color: #a4d5b1; }
+.planit-crew .crew-dashboard-stats > div:nth-child(2) .crew-stat-icon { color: #edb48b; }
+.planit-crew .crew-dashboard-stats > div:nth-child(3) .crew-stat-icon { color: #bdc2ed; }
+.planit-crew .crew-map-card { border-top-color: #679b80; }
+.planit-crew .crew-ranking { border-top-color: #a58f5f; }
+.planit-crew .crew-ranked-site { background: #101716; border-bottom-color: #314037; color: #e0ebe3; }
+.planit-crew .crew-ranked-site:hover { background: #1e2d23; }
+.planit-crew .crew-ranked-site[data-risk=high] > b { color: #ffb49a; background: #3c241b; }
+.planit-crew .crew-ranked-site[data-risk=elevated] > b { color: #edc780; }
+.planit-crew .crew-map-key { color: #a0d4aa; }
+.planit-crew .crew-map-key b { color: #edc780; }
+.planit-crew .crew-map-key strong { color: #ffb49a; }
+.planit-crew .crew-map { background: #17231f; border-color: #41554a; }
+/* Filter only the basemap, so risk-marker colors retain their meaning. */
+.planit-crew .leaflet-tile-pane { filter: invert(.92) hue-rotate(170deg) saturate(.35) brightness(.8); }
+.planit-crew .leaflet-bar a, .planit-crew .leaflet-popup-content-wrapper, .planit-crew .leaflet-popup-tip { background: #17241c; color: #e9f4eb; }
+.planit-crew .leaflet-control-attribution { background: #0a1711e8; color: #bacfbd; }
+.planit-crew .leaflet-bar a { border-color: #516958; }
+.planit-crew .leaflet-bar a:hover { background: #2d4434; }
+.planit-crew .crew-login { background: linear-gradient(145deg, #15221c, #0d1310 75%); border-color: #35493b; box-shadow: 0 25px 100px #0005; }
+.planit-crew .crew-login h1 { color: #edf8ef; }
+.planit-crew .crew-login > a { color: #bcebcf; }
+.planit-crew #crew-message { background: #213b2b; color: #edf9ee; border: 1px solid #56735b; box-shadow: 0 12px 30px #0006; }
+@media (max-width: 480px) {
+  .planit-crew .crew-alert > .crew-row { flex-wrap: wrap; }
+  .planit-crew .crew-header-actions .crew-link { min-height: 40px; }
+  .planit-crew .crew-index-card > .crew-row { gap: 12px; }
+}
+@media print {
+  .planit-crew { --crew-ink: #17251c; --crew-muted: #435348; --crew-forest: #264b33; --crew-border: #aab6ab; color-scheme: light; background: #fff; color: #17251c; }
+  .planit-crew .crew-card, .planit-crew .crew-hazard, .planit-crew #crew-briefing-detail .crew-hazard { background: #fff; color: #17251c; }
+  .planit-crew .crew-hazard > strong, .planit-crew .crew-hazard h3, .planit-crew .crew-hazard > p, .planit-crew .crew-hazard small { color: #17251c; }
+  .planit-crew .crew-score-ring::before { background: #fff; }
+}

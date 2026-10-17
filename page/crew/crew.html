@@ -1,0 +1,14 @@
+<!doctype html>
+<!-- Frontend part 6
+Commit: feat(crew): assemble crew workspace and supervisor preview
+Why: Assemble previously tested modules into simple crew navigation and an isolated supervisor handoff, retaining alerts across views. -->
+<html lang="en"><head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080b0c"><title>PlanIT Control · Crew</title>
+  <link rel="stylesheet" href="crew-vendor/leaflet.css"><link rel="stylesheet" href="crew.css"><link rel="stylesheet" href="crew-theme.css"><link rel="stylesheet" href="crew-dark.css">
+  <script src="crew-vendor/leaflet.js" defer></script><script type="module" src="crew.js"></script>
+</head><body class="planit-crew">
+  <a class="crew-skip" href="#crew-main">Skip to crew screen</a>
+  <div id="crew-root"><main class="crew-login"><h1>PlanIT Control</h1><p>Loading the crew workspace…</p></main></div>
+  <div id="crew-message" role="status" aria-live="polite"></div>
+</body></html>

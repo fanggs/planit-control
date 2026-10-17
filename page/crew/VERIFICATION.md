@@ -1,0 +1,49 @@
+# Frontend verification — October 17, 2026
+
+## Color theme update
+
+- Browser checks at 1280 × 1000, 390 × 844 and 320 × 740 viewport settings; document widths matched scroll widths, with no horizontal overflow.
+- All seven hazard cards have distinct category tints and decorative icons. Their risk badges retain readable severity labels and consistent colors.
+- Checked hazard-card text against each category tint; minimum sampled contrast is 4.92:1 after darkening source captions.
+- Verified report navigation, photo/category/severity/pin controls and briefing navigation at phone size. Lightning and flood warnings remained visible across views; a sample strike reset the displayed countdown to 30:00.
+- Verified the supervisor's desktop map/ranking columns and its stacked phone layout. The original national preview received a matching palette as a separate local artifact.
+- Browser console reported no errors in the final crew view. Original SVG artwork requires no additional network requests. Temporary viewport overrides were reset.
+- Screenshots beside the package: `planit-colorful-desktop.png`, `planit-colorful-mobile.png`, `planit-colorful-supervisor.png` and `planit-colorful-preview.png`.
+
+## Automated
+
+`node --test`: **22 passed, 0 failed** after report-schema alignment. `node dev/check.mjs`: all application JavaScript syntax checks passed.
+
+The original 17 tests are retained. Five more tests check the current strict backend report payload: enum/ID conversion, an explicit severity choice, omission of client identity and retry ID from JSON, invalid coordinates/description/storage keys, and preservation of opaque key identity with rejection of URLs/control characters. The new selector is a small form extension; live submission still needs the actual upload/report endpoints.
+
+Coverage: 10-mile lightning boundary, distant-strike exclusion, old strike/deadline handling, countdown after tab sleep, ordered per-site alerts, explicit server clear, disconnected/unknown states, DST transitions for 6 PM previews, ranking with missing/out-of-range scores, monotonic site revisions, 13,446 unique plant references with valid coordinates, bearer authentication, cursor pagination, multipart photo upload, permission errors and fragmented/multiline SSE messages.
+
+## Browser checks with the local sample adapter
+
+- Searched the national catalog for Grand Gulf, selected it and confirmed the selected site's name/ID/state changed.
+- A 12-mile sample strike did not trigger a hold; a 4.2-mile strike displayed STOP WORK and 30:00.
+- Another crew tab received the active hold and decreasing countdown through the browser-local event channel.
+- All seven hazard categories rendered with source/time fields and an explainable score panel.
+- The sample Mississippi River flood warning remained visible while navigating to briefings and reports.
+- Briefing preferences used America/Chicago for Grand Gulf; saving showed a local-only receipt rather than claiming delivery.
+- Selected a test image (a UI screenshot, not a real hazard), changed the report pin's latitude, reviewed and submitted. The photo, description, pin and report ID appeared in history.
+- Navigated/reloaded and reopened reports: the saved photo and coordinates remained available.
+- The supervisor preview showed all 13,446 sites, a paginated ranking and search filters. Selected Grand Gulf; its saved report appeared in the site observations. The report marker's map popup displayed its description and retained photo.
+- Desktop at a 1280 × 900 viewport: 1265 px document width after scrollbar, no horizontal overflow; map and ranking used separate columns.
+- Crew at a 390 × 844 viewport: 375 px document width after scrollbar, no horizontal overflow. Supervisor narrow layout also stacked the filters and map/ranking.
+
+Screenshots are delivered beside the package: `planit-complete-preview.png`, `planit-complete-mobile.png` and `planit-complete-supervisor.png`. Temporary viewport overrides were reset after checking.
+
+## Not verified against a live team backend
+
+Auth0 login/role claims, API CORS, actual feeds/10-mile server decisions, DeepSpace cross-device updates/storage, real trained model/evaluation, real flood detection, actual scheduled/email/background-push delivery, physical-phone camera behavior, production hosting/domain/HTTPS and team repository integration. These need the team's services/configuration. The local sample is not evidence that these backend functions are operating.
+
+
+## Dark welcome and role routing — October 17, 2026
+
+- 28 behavior tests pass, including role selection, rejected arbitrary redirect parameters, single-use callback handling, in-memory SDK reuse, and expired-session login. The Auth0 cases use an SDK double; no real tenant verification is claimed.
+- JavaScript syntax checks pass.
+- Browser checked: welcome → login; unconfigured sign-in state; sample crew and supervisor access; report form/map controls; briefing navigation; home links. No console errors in the exercised crew flow.
+- Dark surfaces checked on both workspaces and form controls. Existing stop-work, warning and unavailable states remain distinct.
+- Welcome verified at desktop, 390 × 844 and 320 × 740. Supervisor, report form and briefing verified at 390 px. No horizontal overflow in these checks.
+- Hosted Auth0 branding and real login remain pending team-provided public application settings. Live API adapter alignment with CONTRACT v1.1 is still required.
