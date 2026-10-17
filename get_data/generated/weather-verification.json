@@ -1,0 +1,428 @@
+{
+  "as_of": "2026-10-17T16:32:35.751083Z",
+  "provider": "open-meteo:ecmwf_ifs",
+  "status": "ok",
+  "model_run_time": "2026-10-17T06:00:00Z",
+  "model_available_at": "2026-10-17T12:28:38Z",
+  "successful_sites": 60,
+  "failed_sites": 0,
+  "reading_count": 60,
+  "forecast_count": 2880,
+  "null_counts": {
+    "readings": {
+      "temperature_f": 0,
+      "heat_index_f": 59,
+      "wind_mph": 0,
+      "precip_1h_in": 0,
+      "precip_24h_in": 0,
+      "soil_moisture": 0
+    },
+    "forecasts": {
+      "temperature_f": 0,
+      "heat_index_f": 2813,
+      "wind_mph": 0,
+      "precip_1h_in": 0,
+      "precip_24h_in": 780,
+      "soil_moisture": 0
+    }
+  },
+  "semantics": {
+    "readings": "Hourly modeled estimates; observed_at is the model valid hour, not a station observation",
+    "issued_at": "Named ECMWF run initialization/reference time; NOT publication or retrieval time",
+    "available_at": "Provider model availability is recorded separately in this manifest",
+    "precip_24h_in": "Sum of 24 complete preceding-hour precipitation amounts within the same response; incomplete windows are null",
+    "soil_moisture": "Native soil_moisture_0_to_7cm, m\u00b3/m\u00b3; no substitution from other depths",
+    "heat_index_f": "NWS Rothfusz with humidity adjustments; conservative hot-weather domain only; see weather_values.py"
+  },
+  "limitations": [
+    "Current estimates and prior-hour precipitation are model output, not independently verified observations.",
+    "First forecast rolling-rain windows can be null because the run has less than 24 hours of preceding data.",
+    "Collection status is local; API consumers must check source times and implement stale/unavailable states.",
+    "No lightning detection, stop-work decisions, wildlife predictions or hazard scores are produced here."
+  ],
+  "metadata_source": {
+    "url": "https://api.open-meteo.com/data/ecmwf_ifs/static/meta.json",
+    "sha256": "5308d87d19f2e83a407eba7bdf0a738983e512e9b2cebe9751cd05011cc026b3",
+    "bytes": 658,
+    "retrieved_at": "2026-10-17T16:32:36.239002+00:00"
+  },
+  "coverage": [
+    {
+      "site_id": 9,
+      "status": "ok"
+    },
+    {
+      "site_id": 88,
+      "status": "ok"
+    },
+    {
+      "site_id": 114,
+      "status": "ok"
+    },
+    {
+      "site_id": 120,
+      "status": "ok"
+    },
+    {
+      "site_id": 327,
+      "status": "ok"
+    },
+    {
+      "site_id": 437,
+      "status": "ok"
+    },
+    {
+      "site_id": 445,
+      "status": "ok"
+    },
+    {
+      "site_id": 621,
+      "status": "ok"
+    },
+    {
+      "site_id": 886,
+      "status": "ok"
+    },
+    {
+      "site_id": 1417,
+      "status": "ok"
+    },
+    {
+      "site_id": 1705,
+      "status": "ok"
+    },
+    {
+      "site_id": 1757,
+      "status": "ok"
+    },
+    {
+      "site_id": 1925,
+      "status": "ok"
+    },
+    {
+      "site_id": 2107,
+      "status": "ok"
+    },
+    {
+      "site_id": 2199,
+      "status": "ok"
+    },
+    {
+      "site_id": 2832,
+      "status": "ok"
+    },
+    {
+      "site_id": 3262,
+      "status": "ok"
+    },
+    {
+      "site_id": 3559,
+      "status": "ok"
+    },
+    {
+      "site_id": 3699,
+      "status": "ok"
+    },
+    {
+      "site_id": 4148,
+      "status": "ok"
+    },
+    {
+      "site_id": 6072,
+      "status": "ok"
+    },
+    {
+      "site_id": 6138,
+      "status": "ok"
+    },
+    {
+      "site_id": 6595,
+      "status": "ok"
+    },
+    {
+      "site_id": 6623,
+      "status": "ok"
+    },
+    {
+      "site_id": 10216,
+      "status": "ok"
+    },
+    {
+      "site_id": 10325,
+      "status": "ok"
+    },
+    {
+      "site_id": 54213,
+      "status": "ok"
+    },
+    {
+      "site_id": 54214,
+      "status": "ok"
+    },
+    {
+      "site_id": 54249,
+      "status": "ok"
+    },
+    {
+      "site_id": 54927,
+      "status": "ok"
+    },
+    {
+      "site_id": 55198,
+      "status": "ok"
+    },
+    {
+      "site_id": 56561,
+      "status": "ok"
+    },
+    {
+      "site_id": 56767,
+      "status": "ok"
+    },
+    {
+      "site_id": 57098,
+      "status": "ok"
+    },
+    {
+      "site_id": 57290,
+      "status": "ok"
+    },
+    {
+      "site_id": 57364,
+      "status": "ok"
+    },
+    {
+      "site_id": 57489,
+      "status": "ok"
+    },
+    {
+      "site_id": 57595,
+      "status": "ok"
+    },
+    {
+      "site_id": 57756,
+      "status": "ok"
+    },
+    {
+      "site_id": 58310,
+      "status": "ok"
+    },
+    {
+      "site_id": 58695,
+      "status": "ok"
+    },
+    {
+      "site_id": 59357,
+      "status": "ok"
+    },
+    {
+      "site_id": 59826,
+      "status": "ok"
+    },
+    {
+      "site_id": 60152,
+      "status": "ok"
+    },
+    {
+      "site_id": 61080,
+      "status": "ok"
+    },
+    {
+      "site_id": 61605,
+      "status": "ok"
+    },
+    {
+      "site_id": 61780,
+      "status": "ok"
+    },
+    {
+      "site_id": 61844,
+      "status": "ok"
+    },
+    {
+      "site_id": 62113,
+      "status": "ok"
+    },
+    {
+      "site_id": 63446,
+      "status": "ok"
+    },
+    {
+      "site_id": 63719,
+      "status": "ok"
+    },
+    {
+      "site_id": 63721,
+      "status": "ok"
+    },
+    {
+      "site_id": 63913,
+      "status": "ok"
+    },
+    {
+      "site_id": 66267,
+      "status": "ok"
+    },
+    {
+      "site_id": 66369,
+      "status": "ok"
+    },
+    {
+      "site_id": 66381,
+      "status": "ok"
+    },
+    {
+      "site_id": 67488,
+      "status": "ok"
+    },
+    {
+      "site_id": 67769,
+      "status": "ok"
+    },
+    {
+      "site_id": 67771,
+      "status": "ok"
+    },
+    {
+      "site_id": 67915,
+      "status": "ok"
+    }
+  ],
+  "recorded_snapshot": true,
+  "database_verified": false,
+  "original_output_directory": "data/raw/weather/runs/20261017T163235751083Z",
+  "raw_payload_checksums": {
+    "9-latest.json": "23bbac60e9b7a5e0396a335b3fc0bd09bdec7faea3f96c0be49ff6282bae9fb7",
+    "9-run.json": "40b1b32b9dbb8a64da2cbe721737aff51abc3b054d83e1cdd1bfb953fae9d002",
+    "88-latest.json": "84b8df82328fe64eb68f3c98f9648ded96bd3db1e906832ae7d14faca1ab5ad1",
+    "88-run.json": "55f958583fab9e1b03386298955eba18c39210ad18a0bce6c4df98cafffde629",
+    "114-latest.json": "c2be09c684eb95df967e5d52e3afc04396e6a42b41837b9144df1b687413bb3e",
+    "114-run.json": "5fbf62be855b2040dfc274ae69b356e258316ac7dc911577bbac155dbfb62e60",
+    "120-latest.json": "30a22a3e78572bb8fb9cde855bfcc570baf3151bdc6b124228f69e22f5af0740",
+    "120-run.json": "249428e2e5b751da583d02df3183bbeab1e589c1270c3f3c484be021a0819a6f",
+    "327-latest.json": "fa842de9519e7b8fa4d50a38fcf9a16d340abbd5926c14f3042f56a07071f605",
+    "327-run.json": "5fda02ecfe30fef7fd3d8df74470ffb20f2fa31b24860a8f054a1418aa093f8c",
+    "437-latest.json": "845e001ee93ee7b4124390407188198cb6475140abb0fec5c01fd1245458fb42",
+    "437-run.json": "2f21fd89646a5913579a6f2d20c5fc2adb048e5978a8ea15377b34686da52549",
+    "445-latest.json": "abb24ab003a1c048036b29187cfa7870edadc6aa09f8f625eb6ab917eba18403",
+    "445-run.json": "961025ba9ae2fd216329ab4a52f3279e83a4abb43af53ffc9ab03141420ace13",
+    "621-latest.json": "571992c4b3957478f49a75eb467ce6a6e1a2f2ead35590609adbc60c206e7f76",
+    "621-run.json": "c95fbe768067de3ab1a35c2844fd2ec605b1b5f1268fa5c4da93561a504c9f1a",
+    "886-latest.json": "05cda75ad4e7e6a23d64fe8040f39867a1229e8ad974b601917af3260ad017d1",
+    "886-run.json": "f4f6bf0f2ad1e51cf0c5e47be743da80f9e19c9ec4c78f3bce1f12b85b039744",
+    "1417-latest.json": "5223020165411e69b5a3497f2efaf3a594917772d0e71ee9949de8c5177add0e",
+    "1417-run.json": "f3c1588f5d4a27dcf421053e220815d7ab10c263e803b0798ce2fed22883992d",
+    "1705-latest.json": "f75a74fe1d2b28a3b20292d6eb2e66f5fecd0ebd6842b4991cfec66990b914d2",
+    "1705-run.json": "a3adda2f69fcb87e43d770348e4db29976e840c380f6ec78a81136eca63cb65f",
+    "1757-latest.json": "21b3c650dbc4f1366e357a6f0751d484b55b56270dd694e057533071ae103957",
+    "1757-run.json": "9a188f096fba152ac99151755876d6fe21df8f66208565a1a4c07c20a9de52bc",
+    "1925-latest.json": "1ec56147a7edc3fc8f719f6b89e956f1e53e6305b415e52cc73734439114ecac",
+    "1925-run.json": "63e5ca87e1dfe2ae72298afce96bb5adc485506ef7ade89edd669d62aa853483",
+    "2107-latest.json": "50f2174aa72a6097ed2db95cd7c27576a09d026c3d5212858e33299537449946",
+    "2107-run.json": "4f2984936f4438c0eb4c88c6adec72a5c24b4a97d12be9591e407d4bb80c1000",
+    "2199-latest.json": "625575202a9ddec44455f9f492147a5988aa309cd42c6c6dc61e70c87dde6440",
+    "2199-run.json": "63f70c4eb819be076f411c92a479ac830a365198c6554fe042a220c7251624ef",
+    "2832-latest.json": "a98b152a3075775d27774fdda01a296f42731a738a92a448fc92a614f5f4457a",
+    "2832-run.json": "9c953ef736cf9a6805dc3fb13ebe30c277d4770df512354115b59abfa537b0a1",
+    "3262-latest.json": "29b99a8bfa3090a8eb3bfe47945c2f66f635329e8eef4f5c92a55864da30a0ce",
+    "3262-run.json": "c4267538c47d58a1a7e170b8ec315f7a702f751b589ca15a824bcf9439ad1911",
+    "3559-latest.json": "8a589d0ff821b2cbc4c36d4f00326a93117ac8add751a642ece7e51818663b34",
+    "3559-run.json": "a0b4e920e711e406bc406278a006068245bc3f580af7fc6e625d431468d5e52f",
+    "3699-latest.json": "7851d000d4d378d8a2460caf64e5b79e5ce8a6b224611e84bcb1cfeb35368c0d",
+    "3699-run.json": "0b086cfe6533a99587033e5d8136716da3a40ab9ba85912ab277f091b13df8df",
+    "4148-latest.json": "fe0fb603af74bc1c730e446e5f50fdf74cb0f69a4c97a40d122d68e0233bf2d2",
+    "4148-run.json": "501dcfd937bc96d133788f249372e44df050365d9b44d6cdbcbc2300273e1ad4",
+    "6072-latest.json": "92724cffde6c26e8d79cf9263b0e5d69a62601b0efc04977bc1aae45e01c7ede",
+    "6072-run.json": "8be2474e41c2e8c0f4f34a4f73cd6cad008388b3e18fdad632e74818c9f0ec75",
+    "6138-latest.json": "eda023b3502813bf9adcfd006e093ac7298098afc08138cc3ad060445c7da712",
+    "6138-run.json": "47f58f15831b1dd56b5a4687250c1bc3368f28c352e5422ae83711a958827086",
+    "6595-latest.json": "f7db3359fa0af5354808a268fc57a98894dafc4dd53317f34f3a215b0bcf9c91",
+    "6595-run.json": "1725e659674533abaa9772d7b768ff8178cb126c1fdb8d6492d3ae35c4b84236",
+    "6623-latest.json": "89f74851486517f7b26f13f31e188d5cf25f153701f2c94a1d000cac46c2e228",
+    "6623-run.json": "66970322d2079970dc6a092e564bfa4483dbbf103b7892a05ab0749ed28fa05c",
+    "10216-latest.json": "9e937ceece2b9841f6732971174e9d1f548980f77e4f68bbfe7049909406df7b",
+    "10216-run.json": "275734a78f2f3b69db1caf517c2e788b9dc543290dbdfa060afb1795b909c828",
+    "10325-latest.json": "fcd3daef4e6595eaf91bf22558220a21635f39af5b117c2bc69ad3899a5389f9",
+    "10325-run.json": "309c9dd72019e625483152dbf0d8f1371b41fb490f28092b69d01a0622ca8291",
+    "54213-latest.json": "63adbaf53209f97f8477a9e7f003d80621ca435cae50dee6820cedf131520db9",
+    "54213-run.json": "8c6c4e6288880e9af5556f240f1a98f2f9dd9c9fc384c3013f4782e1ff5563a9",
+    "54214-latest.json": "480d447d519b648e060ef074097bf844b0b945c45723f33638877077dac6d71c",
+    "54214-run.json": "7ea97567ca78729cf622ac097e0430994011ee5f9813c42fbc0668406c98f615",
+    "54249-latest.json": "9db3224e1d7174ad9fd7957662ba75dff4eb482c8d9e262a6a94edfdc8cdca60",
+    "54249-run.json": "fccf73a748fdf00551e7c717d575671f7414b8cf525c8b991f5fd4c464f3a0ee",
+    "54927-latest.json": "75e4139984f8f80cdf61152f3bbb1841b41a371c001c36ad5dbfd1e76a20222b",
+    "54927-run.json": "fddd5fadea825b109372e1b8503cddd97d42709707db7627cb897109b759316f",
+    "55198-latest.json": "9872a613602c7dc3734636d987fe6d178a9c98b9f2e9333bc8c68394f1a5423e",
+    "55198-run.json": "98ad9184fd0b3350394219a37a248e360bc0e9ad1ed8ebe7d482bc3be2088296",
+    "56561-latest.json": "91b2d46211e838989c117e8e754db0dba93d816a2d0ce2036dc31ce7d3ede86d",
+    "56561-run.json": "04ee05eb29917f90f58b51702779bd3f93a2b86a62d6018614bbb914d0036140",
+    "56767-latest.json": "ad723061ea7f0c240899e16600e7a9c2bbe19d4be2d26152712e7c3ca468b66e",
+    "56767-run.json": "32177335039470978dfff722204c6fff72d8422cff8e1915940f36694e9af918",
+    "57098-latest.json": "7a1636b4464821bde402928e2faa00506ed04cb8d2bf6404ddfbe15bcfa98725",
+    "57098-run.json": "03fd62dc6bd00fab521955b0c86709d2fb18677ac0bb4ce862020b3a07a5edfc",
+    "57290-latest.json": "04df760837a8ba10c34d61f4703d532689dcae3d5c7319744f198a8247579168",
+    "57290-run.json": "9baea89cf4a26c198c0c02d507bdc44240410b2e670cdf49832a06bf5845d9e4",
+    "57364-latest.json": "a27ec29c9ba390f9e7b53651cb91e5f39824ed3b874d5453809e98d9a8ec9da2",
+    "57364-run.json": "80a8cce174ca162712dffa071a12ae1833153bc798b048c84d7fe7bf6d14cd8d",
+    "57489-latest.json": "8253faedf099fedb30effb3151c942b8454c37f3035c1f682809526b22a6cd76",
+    "57489-run.json": "812b781fa3e827a586e37c833b7bd9e567e292dfd413c22a1e509dac1b046062",
+    "57595-latest.json": "d0eddd558825237df18a32e0a14e99b3932dc510616794b20f6106bcef0360e3",
+    "57595-run.json": "beeae772cb8e2c4790ca99ba1e7f9a413a230281d879f0484b9b1b0826b77cd3",
+    "57756-latest.json": "9bd00aabaf0f4aeee83e7f1d16cd04ab52b3f02fc83ee48b89cca5ef1efdf8b3",
+    "57756-run.json": "17c3c5fde663f87a269c6baf23c0fd3d4bfadb29314a1844786ad1e21072c5e7",
+    "58310-latest.json": "9ce036593e52a6fb67b197ce776586baa1694c12c08b0a1e2865acca97b5e2b9",
+    "58310-run.json": "bae389ac71dcc1e84e12b8bf4a23d2feba6faccedb7301a0d0936970c3d5b9d3",
+    "58695-latest.json": "ccba3a3d70768ee549f8f5e6f6acf5b856b4102a368c77d933e8c1550b9f2350",
+    "58695-run.json": "34205b08bfa13c7565d0a46856d34e9469c523305780886289d74e5aadcce224",
+    "59357-latest.json": "3c0143e99e465fd0a2127d0aa9962d55f4eb1f036231fe2b18f6c31aab0a390c",
+    "59357-run.json": "2f1652ff7e871fb0679267b58cf0f396004eb273a8743e894ccbfd889947de32",
+    "59826-latest.json": "9b4045ce2586c212485346de4d1b5e777c25e1e2baa7882024ed17a7b056c814",
+    "59826-run.json": "427a952d3a7ad70e6fb669145125df81f79cfa15f8eaf3e6f72c91a2b52e861e",
+    "60152-latest.json": "d26cff3fefb555b31be647a83da7776f97302428a371098401ffa518a23d5783",
+    "60152-run.json": "5cdd9c3d4f85b5c94e77e16dd03285fca89c7ed613f52fc90593261788ef1705",
+    "61080-latest.json": "59003a3c787e98f08baef786fb0886a7e34e3ac6115d8627c1fb1df11c8fdb18",
+    "61080-run.json": "934e40fc63da0a8dab961ffc4b4396007f332d7b85e02e1c81aa9fdb7047be61",
+    "61605-latest.json": "e8f45a16b999675b5c5bc68e2d3cabce15822efd2972b376f7bb2eecffb69213",
+    "61605-run.json": "306db3e4bc8827268203c67512ca5b64319f32f914c0f232fcb72b47f0f76b38",
+    "61780-latest.json": "ba0f0f2e0d74fe46be4222dc47117d6edbee5d1295f80880b301c07c6138ce89",
+    "61780-run.json": "fb3c1a6b8f7598392b191a53751efe0d531868d94277e4dde6fbbe340ef62dff",
+    "61844-latest.json": "4c9da7a1f154b621d0b640ee22cb0dd529031fa49bfda7493c076bff9b02a77a",
+    "61844-run.json": "13fb31999debf346b6a913255784888eaf325be009651a745ee6749afe2a5d48",
+    "62113-latest.json": "d21202c50b41e61d59dfdc8bb7bb29e3cb09be5165f4f98bc97d1570752c8eb1",
+    "62113-run.json": "9af6f2bc523a007581f79c19ab49dc9b9086a580a0b2c17038be0f6b2d4ae4c3",
+    "63446-latest.json": "6b2b0deaf3163024a06b1a43a309769b4634e11d97f44c0b404d2349b9e1edf5",
+    "63446-run.json": "7244daef8bf8e4aa90c2e1abd76795ffdf17384268b90bd6d439cc74bcbe0106",
+    "63719-latest.json": "f72a6b96a8412e25856a65d0da2e4f399fa467051bff6dc92503591a428d5fc9",
+    "63719-run.json": "495ee1f6db9ea0d9baefbb62e4028c7757b4f7a4221bf75979c4ab922c1af47f",
+    "63721-latest.json": "51852926254171579bd9f2d42a131f8b16b9ca4a7ea7ba9425b0c7382f211c99",
+    "63721-run.json": "a06df225740c1b4d76e570a950e5d1515857ee925e5ad5346a40479072340a84",
+    "63913-latest.json": "1307cfd721a82fd5f550c8a525e91301076ec9790c797c281adf06bc22caaec8",
+    "63913-run.json": "f782004377e6a10bfb952f9149db3bc4b3af1c8c0a40903f293cc9486f3b66d4",
+    "66267-latest.json": "93115d9d194123a7ba2447b1da6a511cacd0d863ff615f98555e9a1ab68a207c",
+    "66267-run.json": "3fa03ef924158ea6924be88acc47d37952eafa3e8dafe88691947ae6edc380c6",
+    "66369-latest.json": "cb044ee5a19729520b2a5f227652ed86d65df70cbe9e869d87b22d2df1ca7dea",
+    "66369-run.json": "8cb915ac7ddfded5779de4413fa01131eac1899c51e1764929d8c49862c0f5c9",
+    "66381-latest.json": "9f5aada0c997d57c4bef3524f3666d862016d977c7d432ec602b5d98c72d1abd",
+    "66381-run.json": "c2aeedce357e75686d0c2293a01037f260a7e536152f53b8e9f07226ec1f85ad",
+    "67488-latest.json": "ff30017b22ecc5f5e6f65d1bf74faedf812ae1dc319379915dd9ace60c4d9d0a",
+    "67488-run.json": "9d592f9f8d0edc944973b719d0a7a87ab59dfba21c12c2e60034d40a280badca",
+    "67769-latest.json": "23883e0c3883862d56f833395fa512ae62b721df5833df44895acc5f311de909",
+    "67769-run.json": "815868461249c2bed563336d632ca98c25831e5471085a3b2234c0e4675bfd68",
+    "67771-latest.json": "eadd67ea9bc8d0f4844ee461087efd5b33de6fe4804a1e416f3265c25bdaeb00",
+    "67771-run.json": "9acefeb12be8465e729723f347392209e1832114193fd3c82d6914327a6519f4",
+    "67915-latest.json": "7442b6fe8cc88375b3e912f10602eda60e86b596ae1ec6c4ae04910655e20b38",
+    "67915-run.json": "dbaa5bf78fe9c5147973498cacaad551ad90c88c35c56edb5bdf89506a649789"
+  },
+  "normalized_export_checksums": {
+    "weather-readings.json": "6dd6df05e940dc7c0e67a683c3089b1a19e4a87d239c5346fc339a82dea6333b",
+    "weather-forecasts.json": "525293517108fa775affed00334ddbe2eb929168f452ba4e53c9ac95cd6628ee"
+  },
+  "checks": {
+    "all_60_sites_present": true,
+    "48_future_hours_per_site": true,
+    "units_and_ranges_valid": true,
+    "all_121_raw_payload_checksums_verified": true,
+    "raw_response_replay_identical": true
+  },
+  "notice": "Recorded verification, not a live feed. Actual PostgreSQL execution is pending a development connection."
+}

@@ -1,7 +1,8 @@
 # Data ingestion
 
-Interval 2 implements EIA plant ingestion. Weather and historical/model datasets
-are later intervals; this command does not generate scores or modify the API.
+Intervals 2 and 3 implement EIA plant ingestion and weather collection.
+Historical/model datasets are later intervals. These commands do not generate
+hazard scores or modify the API.
 
 ## Start here
 
@@ -125,6 +126,105 @@ history or report references. Before committing, it re-reads and validates all
 monitored rows and compares every stored field with the intended catalog. A
 failed check rolls back the transaction. Re-running does not duplicate plants.
 
-No database connection is configured in this checkout yet, so actual database
-execution, reload idempotency and transaction rollback remain integration checks
-to run against Tiger Data. The 60-site export and offline validation are ready.
+Actual database execution, reload idempotency and transaction rollback remain
+integration checks until a development Tiger Data connection is configured.
+The 60-site export and offline validation are ready.
+
+## Weather: interval 3
+
+```sh
+# One plant first, or omit --site-id to collect all 60.
+.venv/bin/python -m get_data.weather --site-id 621
+.venv/bin/python -m get_data.weather
+# After database setup and loading the matching sites:
+.venv/bin/python -m get_data.weather --load
+```
+
+The collector makes one poll and exits. It creates a timestamped directory under
+`data/raw/weather/runs/` containing:
+
+- `weather-readings.json`: one current hourly estimate per successful site.
+- `weather-forecasts.json`: 48 future hourly rows per successful site.
+- `validation.json`: coverage, failures, null counts, timing semantics and source receipts.
+- Original provider responses and receipts, including humidity and wind gusts
+  retained for later feature work even though the shared tables lack those columns.
+
+`data/raw/weather/latest.json` points to the most recent collection directory and
+reports its status, including failures. It is updated on failure too, so an old
+successful poll cannot appear to be the latest. Original files stay local and
+ignored by git because weather changes continually. The checked-in
+`generated/weather-readings-example.json` and `weather-verification.json` are
+**recorded verification snapshots**, not a continuously refreshed feed.
+Overlapping polls to the same output directory are blocked with a macOS/Linux
+file lock, so a slower older poll cannot replace a newer collection's status.
+If Tiger Data is not ready yet, start with `db/TIGER-DATA-SETUP.md`.
+
+### Measurements and run identity
+
+The provider is `open-meteo:ecmwf_ifs`, using ECMWF's native IFS HRES model through
+Open-Meteo. No key is needed for this public endpoint. [Open-Meteo documents](https://open-meteo.com/en/docs)
+model-derived conditions: these are **modeled estimates, not station readings**.
+`observed_at` retains the valid hour to fit the existing table. The source name
+explicitly includes `modeled`; the API should preserve that distinction.
+
+Forecasts come from the [Single Runs API](https://open-meteo.com/en/docs/single-runs-api),
+with a requested run identity. `issued_at` stores that run's **initialization /
+reference time**, not when it was published or downloaded. Provider availability
+and actual retrieval times are recorded separately. Historical backtests must
+honor availability; initialization alone does not establish that a forecast was
+known at a decision time. The response must start at the requested run time.
+
+The collector checks [model metadata](https://open-meteo.com/en/docs/model-updates)
+before fetching sites. It rejects inconsistent timestamps, runs over 24 hours
+old, or runs still inside the provider's ten-minute propagation window. The
+24-hour cutoff is an operational freshness policy, not a hazard threshold.
+Hourly model values can include interpolation; the collector does not claim
+sensor precision or independent evidence from a second provider.
+
+### Derived values and missingness
+
+Source units are verified, then Celsius becomes Fahrenheit, km/h becomes mph,
+and mm becomes inches. Soil moisture uses the actual **0–7 cm** variable in
+m³/m³. Other depths are not substituted. Arrays must align, times must be unique
+consecutive UTC hours, measurements must be finite and physically valid, and
+the returned grid must be within 50 km of the requested plant.
+
+Heat index follows the [NWS Rothfusz equation and humidity adjustments](https://www.wpc.ncep.noaa.gov/html/heatindex_equation.shtml).
+This implementation conservatively computes it only for 80–112°F and a passing
+NWS initial hot-weather screen. Missing inputs and values outside that domain
+produce null. It describes shade/light-wind conditions, not WBGT, radiant heat,
+protective clothing effects, or a validated workplace safety decision. No values
+are rounded for storage.
+
+`precip_1h_in` is the preceding-hour accumulation. `precip_24h_in` is a rolling
+sum of **24 complete hourly amounts**, including that hour. It is not a local
+calendar-day total. A missing value or missing hour makes the total null. The
+first hours of a fixed run can lack enough preceding data; they stay null. The
+collector does not fill them with observations, a different run, or a different
+provider. True zero rainfall is retained when the complete window is present.
+
+### Failures and database loading
+
+An unavailable plant is listed explicitly in the manifest; its data is never
+replaced by zeros or silently reused from a previous poll. Partial/failed polls
+exit nonzero and do not attempt any database writes. Optional null measurements
+are counted so empty columns are visible. A poll with missing core temperature
+or incomplete hourly coverage fails for that site. Heat-index nulls outside its
+calculation domain and incomplete rolling-rain windows are expected limitations,
+not evidence of safe conditions.
+
+`db/weather_store.py` validates a complete requested batch, requires its sites
+to exist and be monitored, then upserts both tables in one transaction. It
+checks every stored field before commit, rolls back on a mismatch, and refuses
+to overwrite a newer retrieval with an older one. Reading keys preserve provider
+and time; forecast keys also preserve the run identity. Repeated polls update
+the same keys rather than duplicating them. Actual database execution still
+needs verification against Tiger Data.
+
+Alan can call `collect_weather` from an owned `jobs/` scheduler. Start with an
+hourly poll for all 60 sites and check current provider limits before deployment;
+one full poll uses roughly 121 requests before retries. This interval does not
+install a scheduler or change Alan's files. API integration must check timestamps
+and implement stale/unavailable states: this local manifest is not automatically
+exposed to screens. Lightning detection and mandatory stop-work alerts remain
+Alan's separate live process, independent of these modeled conditions.
