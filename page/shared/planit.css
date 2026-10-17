@@ -1,0 +1,34 @@
+/* Aryan-owned design tokens. Import from either app; component rules are opt-in.
+   Isaiah can set themeStylesheet: '../shared/planit.css' in crew-config.js.
+   Existing crew selectors are deliberately untouched. */
+:root {
+  --planit-bg: #090f11;
+  --planit-surface: #111a1d;
+  --planit-raised: #192529;
+  --planit-ink: #eff5f3;
+  --planit-muted: #a5b8b4;
+  --planit-border: #293b3e;
+  --planit-accent: #a1edcc;
+  --planit-danger: #ffab94;
+  --planit-warning: #f1cf83;
+  --planit-cool: #98bde5;
+  --planit-radius: 14px;
+  --planit-font: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  /* Existing crew-theme aliases; these do not override scoped crew variables. */
+  --ink: var(--planit-ink); --muted: var(--planit-muted); --border: var(--planit-border);
+  --forest: #295a46;
+}
+.planit-app { font-family: var(--planit-font); color: var(--planit-ink); background: var(--planit-bg); color-scheme: dark; }
+.planit-app *, .planit-app *::before, .planit-app *::after { box-sizing: border-box; }
+.planit-app :focus-visible { outline: 3px solid var(--planit-accent); outline-offset: 3px; }
+.planit-button { display: inline-flex; justify-content: center; align-items: center; gap: 8px; min-height: 44px; padding: 10px 15px; border: 1px solid var(--planit-border); border-radius: 9px; font: inherit; font-size: 13px; font-weight: 650; color: var(--planit-ink); background: var(--planit-raised); cursor: pointer; text-decoration: none; }
+.planit-button:hover:not(:disabled) { border-color: var(--planit-accent); background: #233a37; }
+.planit-button.primary { color: #102b20; background: var(--planit-accent); border-color: var(--planit-accent); }
+.planit-button:disabled { cursor: not-allowed; opacity: .55; }
+.planit-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border: 1px solid var(--planit-border); border-radius: 6px; font-size: 11px; line-height: 1.4; color: var(--planit-muted); }
+.planit-chip[data-tone=high] { background: #3c2620; border-color: #6a4036; color: var(--planit-danger); }
+.planit-chip[data-tone=medium] { background: #332e1c; border-color: #665837; color: var(--planit-warning); }
+.planit-chip[data-tone=low] { background: #1a3029; border-color: #375c4b; color: var(--planit-accent); }
+.planit-muted { color: var(--planit-muted); }
+.planit-eyebrow { color: var(--planit-muted); font-size: 10px; font-weight: 750; text-transform: uppercase; letter-spacing: 1.7px; }
+.planit-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }

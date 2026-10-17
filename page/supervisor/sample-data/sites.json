@@ -1,0 +1,79 @@
+[
+  {
+    "site_id": 9001,
+    "name": "Sample Plant, Everglades FL",
+    "state": "FL",
+    "latitude": 25.43,
+    "longitude": -80.33,
+    "timezone": "America/New_York",
+    "hazard_region": "florida_gulf",
+    "score": 8.2,
+    "scored_at": "2026-10-17T18:00:00Z",
+    "top_factors": [
+      {
+        "hazard_type": "heat",
+        "contribution": 3.1
+      },
+      {
+        "hazard_type": "lightning",
+        "contribution": 1.9
+      }
+    ],
+    "active_alert": {
+      "level": "stop_work",
+      "hazard_type": "lightning",
+      "clear_at": "2026-10-17T18:34:00Z"
+    },
+    "open_report_count": 1
+  },
+  {
+    "site_id": 9002,
+    "name": "Sample Plant, Mississippi River",
+    "state": "MS",
+    "latitude": 32.35,
+    "longitude": -90.88,
+    "timezone": "America/Chicago",
+    "hazard_region": "mississippi_corridor",
+    "score": 6.6,
+    "scored_at": "2026-10-17T18:00:00Z",
+    "top_factors": [
+      {
+        "hazard_type": "flooding",
+        "contribution": 2.6
+      },
+      {
+        "hazard_type": "soil_saturation",
+        "contribution": 1.2
+      }
+    ],
+    "active_alert": {
+      "level": "warning",
+      "hazard_type": "flooding",
+      "clear_at": null
+    },
+    "open_report_count": 0
+  },
+  {
+    "site_id": 9003,
+    "name": "Sample Plant, Inland California",
+    "state": "CA",
+    "latitude": 35.37,
+    "longitude": -119.02,
+    "timezone": "America/Los_Angeles",
+    "hazard_region": "california_west",
+    "score": 5.7,
+    "scored_at": "2026-10-17T18:00:00Z",
+    "top_factors": [
+      {
+        "hazard_type": "wildfire",
+        "contribution": 2.9
+      },
+      {
+        "hazard_type": "heat",
+        "contribution": 1.6
+      }
+    ],
+    "active_alert": null,
+    "open_report_count": 0
+  }
+]

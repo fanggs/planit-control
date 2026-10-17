@@ -3,7 +3,8 @@ BEGIN;
 
 CREATE TABLE public.hazard_reports (
     id UUID PRIMARY KEY,
-    site_id BIGINT NOT NULL REFERENCES public.sites(site_id),
+    site_id BIGINT NOT NULL REFERENCES public.sites(site_id)
+        CHECK (site_id > 0),
     -- Verified Auth0 access-token subject, never supplied by report JSON.
     reporter_id VARCHAR(255) NOT NULL
         CHECK (char_length(reporter_id) > 0 AND reporter_id !~ '[[:space:][:cntrl:]]'),
@@ -22,9 +23,7 @@ CREATE TABLE public.hazard_reports (
     photo_key VARCHAR(1024)
         CHECK (photo_key IS NULL OR (
             char_length(photo_key) BETWEEN 1 AND 1024
-            AND photo_key !~ '^[[:space:]]|[[:space:]]$|[[:cntrl:]]'
-            AND photo_key !~ '^[A-Za-z][A-Za-z0-9+.-]*:'
-            AND left(photo_key, 2) <> '//'
+            AND photo_key ~ '^[A-Za-z0-9_-]+$'
         )),
     status VARCHAR(8) NOT NULL DEFAULT 'open'
         CHECK (status IN ('open', 'resolved')),

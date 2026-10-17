@@ -79,12 +79,12 @@ class HazardReportCreate(BaseModel):
     def validate_photo_key(cls, value: str | None) -> str | None:
         if value is None:
             return None
-        if value != value.strip():
-            raise ValueError("photo_key cannot have surrounding whitespace")
-        if any(ord(character) < 32 or ord(character) == 127 for character in value):
-            raise ValueError("photo_key cannot contain control characters")
-        if value.startswith("//") or re.match(r"^[A-Za-z][A-Za-z0-9+.-]*:", value):
-            raise ValueError("photo_key must be an opaque key, not a URL")
+        # A key must fit safely in the single GET /photos/{photo_key} path segment.
+        # The photo service still has to verify that this exact key belongs to
+        # a private upload by the authenticated reporter. The report supplies
+        # the site association; POST /photos itself does not accept a site ID.
+        if re.fullmatch(r"[A-Za-z0-9_-]+", value) is None:
+            raise ValueError("photo_key must be a URL-safe opaque token")
         return value
 
     @model_validator(mode="after")
@@ -133,7 +133,5 @@ class HazardReportRead(HazardReportCreate):
         elif self.resolved_at is None or self.resolved_by is None:
             raise ValueError("resolved reports need resolved_at and resolved_by")
         return self
-
-
 
 
