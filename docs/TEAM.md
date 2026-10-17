@@ -34,7 +34,7 @@ own part.
 | Person | GitHub | Role | Owns |
 | --- | --- | --- | --- |
 | Sid | `SidVal123` | Data + ML models | `get_data/`, `model/`, `db/` (except `db/hazard_report.sql`) |
-| Alan | `fanggs` | API, Gemini, real-time alerts, deploy | `api/` (except Aryan's files below), `jobs/` |
+| Alan | `fanggs` | API, Gemini, real-time alerts, deploy | `api/` (except Aryan's files below), `jobs/`, `page/realtime/`, the DeepSpace bridge (`planit-realtime`) |
 | Aryan | `nimma-aryan` | Crew-report backend, supervisor dashboard | `api/schemas/hazard_report.py`, `api/services/hazard_report_service.py`, report and photo routes, `db/hazard_report.sql`, supervisor files in `page/`, shared styles |
 | Isaiah | `IsaiahCN` | Crew screens, demo readiness | `page/crew/` |
 

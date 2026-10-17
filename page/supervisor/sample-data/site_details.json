@@ -1,0 +1,240 @@
+{
+  "9001": {
+    "site_id": 9001,
+    "name": "Sample Plant, Everglades FL",
+    "utility": "Sample Utility",
+    "state": "FL",
+    "county": "Miami-Dade",
+    "latitude": 25.43,
+    "longitude": -80.33,
+    "timezone": "America/New_York",
+    "plant_type": "natural_gas",
+    "hazard_region": "florida_gulf",
+    "latest_weather": {
+      "observed_at": "2026-10-17T17:45:00Z",
+      "temperature_f": 94,
+      "heat_index_f": 112,
+      "wind_mph": 8,
+      "precip_1h_in": 0.0,
+      "precip_24h_in": 2.1,
+      "soil_moisture": 0.42,
+      "source_name": "Open-Meteo",
+      "source_url": "https://open-meteo.com/"
+    },
+    "score": {
+      "site_id": 9001,
+      "score": 8.2,
+      "baseline": 2.4,
+      "scored_at": "2026-10-17T18:00:00Z",
+      "horizon_hours": 24,
+      "model_version": "sample",
+      "factors": [
+        {
+          "hazard_type": "heat",
+          "contribution": 3.1
+        },
+        {
+          "hazard_type": "lightning",
+          "contribution": 1.9
+        },
+        {
+          "hazard_type": "soil_saturation",
+          "contribution": 0.9
+        },
+        {
+          "hazard_type": "flooding",
+          "contribution": -1.5
+        },
+        {
+          "hazard_type": "wildlife",
+          "contribution": 1.4
+        }
+      ]
+    },
+    "active_alerts": [
+      {
+        "id": 101,
+        "site_id": 9001,
+        "hazard_type": "lightning",
+        "level": "stop_work",
+        "message": "Lightning 6.2 mi away. Stop work.",
+        "started_at": "2026-10-17T18:00:00Z",
+        "last_trigger_at": "2026-10-17T18:04:00Z",
+        "clear_at": "2026-10-17T18:34:00Z",
+        "trigger": {
+          "strike_id": "sample-88213",
+          "distance_mi": 6.2
+        }
+      },
+      {
+        "id": 102,
+        "site_id": 9001,
+        "hazard_type": "wildlife",
+        "level": "warning",
+        "message": "Crew reported an alligator near the east gate.",
+        "started_at": "2026-10-17T17:40:00Z",
+        "last_trigger_at": null,
+        "clear_at": null,
+        "trigger": {
+          "report_id": "3f6c1a2e-0000-4000-8000-000000000001"
+        }
+      }
+    ],
+    "environmental_events": [],
+    "recent_reports": [
+      {
+        "id": "3f6c1a2e-0000-4000-8000-000000000001",
+        "site_id": 9001,
+        "reporter_id": "auth0|sample-crew",
+        "hazard_type": "wildlife",
+        "severity": "high",
+        "description": "Gator in the ditch by the east gate",
+        "latitude": 25.431,
+        "longitude": -80.334,
+        "photo_key": "sample-photo-1",
+        "status": "open",
+        "created_at": "2026-10-17T17:40:00Z",
+        "resolved_at": null,
+        "resolved_by": null
+      }
+    ]
+  },
+  "9002": {
+    "site_id": 9002,
+    "name": "Sample Plant, Mississippi River",
+    "utility": "Sample Utility",
+    "state": "MS",
+    "county": "Warren",
+    "latitude": 32.35,
+    "longitude": -90.88,
+    "timezone": "America/Chicago",
+    "plant_type": "nuclear",
+    "hazard_region": "mississippi_corridor",
+    "latest_weather": {
+      "observed_at": "2026-10-17T17:45:00Z",
+      "temperature_f": 81,
+      "heat_index_f": 85,
+      "wind_mph": 12,
+      "precip_1h_in": 0.3,
+      "precip_24h_in": 3.4,
+      "soil_moisture": 0.47,
+      "source_name": "Open-Meteo",
+      "source_url": "https://open-meteo.com/"
+    },
+    "score": {
+      "site_id": 9002,
+      "score": 6.6,
+      "baseline": 2.4,
+      "scored_at": "2026-10-17T18:00:00Z",
+      "horizon_hours": 24,
+      "model_version": "sample",
+      "factors": [
+        {
+          "hazard_type": "flooding",
+          "contribution": 2.6
+        },
+        {
+          "hazard_type": "soil_saturation",
+          "contribution": 1.2
+        },
+        {
+          "hazard_type": "heat",
+          "contribution": 0.3
+        },
+        {
+          "hazard_type": "lightning",
+          "contribution": -0.4
+        },
+        {
+          "hazard_type": "wildlife",
+          "contribution": 0.5
+        }
+      ]
+    },
+    "active_alerts": [
+      {
+        "id": 103,
+        "site_id": 9002,
+        "hazard_type": "flooding",
+        "level": "warning",
+        "message": "Flood warning after heavy overnight rain.",
+        "started_at": "2026-10-17T11:00:00Z",
+        "last_trigger_at": null,
+        "clear_at": null,
+        "trigger": {
+          "event_id": 501
+        }
+      }
+    ],
+    "environmental_events": [
+      {
+        "id": 501,
+        "hazard_type": "flooding",
+        "event_kind": "nws_warning",
+        "title": "Flood Warning",
+        "severity": "moderate",
+        "starts_at": "2026-10-17T11:00:00Z",
+        "ends_at": "2026-10-18T11:00:00Z",
+        "source_name": "National Weather Service",
+        "source_url": "https://api.weather.gov/alerts"
+      }
+    ],
+    "recent_reports": []
+  },
+  "9003": {
+    "site_id": 9003,
+    "name": "Sample Plant, Inland California",
+    "utility": "Sample Utility",
+    "state": "CA",
+    "county": "Kern",
+    "latitude": 35.37,
+    "longitude": -119.02,
+    "timezone": "America/Los_Angeles",
+    "plant_type": "solar",
+    "hazard_region": "california_west",
+    "latest_weather": {
+      "observed_at": "2026-10-17T17:45:00Z",
+      "temperature_f": 99,
+      "heat_index_f": 97,
+      "wind_mph": 22,
+      "precip_1h_in": 0.0,
+      "precip_24h_in": 0.0,
+      "soil_moisture": 0.06,
+      "source_name": "Open-Meteo",
+      "source_url": "https://open-meteo.com/"
+    },
+    "score": {
+      "site_id": 9003,
+      "score": 5.7,
+      "baseline": 2.4,
+      "scored_at": "2026-10-17T18:00:00Z",
+      "horizon_hours": 24,
+      "model_version": "sample",
+      "factors": [
+        {
+          "hazard_type": "wildfire",
+          "contribution": 2.9
+        },
+        {
+          "hazard_type": "heat",
+          "contribution": 1.6
+        },
+        {
+          "hazard_type": "soil_saturation",
+          "contribution": -0.8
+        },
+        {
+          "hazard_type": "lightning",
+          "contribution": -0.6
+        },
+        {
+          "hazard_type": "wildlife",
+          "contribution": 0.2
+        }
+      ]
+    },
+    "active_alerts": [],
+    "environmental_events": [],
+    "recent_reports": []
+  }
+}

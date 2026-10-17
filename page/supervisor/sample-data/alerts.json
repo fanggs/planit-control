@@ -1,0 +1,42 @@
+[
+  {
+    "id": 101,
+    "site_id": 9001,
+    "hazard_type": "lightning",
+    "level": "stop_work",
+    "message": "Lightning 6.2 mi away. Stop work.",
+    "started_at": "2026-10-17T18:00:00Z",
+    "last_trigger_at": "2026-10-17T18:04:00Z",
+    "clear_at": "2026-10-17T18:34:00Z",
+    "trigger": {
+      "strike_id": "sample-88213",
+      "distance_mi": 6.2
+    }
+  },
+  {
+    "id": 102,
+    "site_id": 9001,
+    "hazard_type": "wildlife",
+    "level": "warning",
+    "message": "Crew reported an alligator near the east gate.",
+    "started_at": "2026-10-17T17:40:00Z",
+    "last_trigger_at": null,
+    "clear_at": null,
+    "trigger": {
+      "report_id": "3f6c1a2e-0000-4000-8000-000000000001"
+    }
+  },
+  {
+    "id": 103,
+    "site_id": 9002,
+    "hazard_type": "flooding",
+    "level": "warning",
+    "message": "Flood warning after heavy overnight rain.",
+    "started_at": "2026-10-17T11:00:00Z",
+    "last_trigger_at": null,
+    "clear_at": null,
+    "trigger": {
+      "event_id": 501
+    }
+  }
+]
