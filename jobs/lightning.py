@@ -17,10 +17,13 @@ fresh data shows 30 quiet minutes.
 """
 from __future__ import annotations
 
+import json
 import logging
+import os
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 from jobs import glm
 
@@ -52,10 +55,7 @@ class ActiveAlert:
     started_at: datetime
     last_trigger_at: datetime
     trigger: dict
-    clear_at: datetime = field(init=False)
-
-    def __post_init__(self):
-        self.clear_at = self.last_trigger_at + ALL_CLEAR
+    clear_at: datetime
 
     def to_row(self) -> dict:
         """Shaped like the contract's alerts table."""
@@ -73,10 +73,11 @@ class ActiveAlert:
 
 
 class LightningRule:
-    def __init__(self, sites: list[dict], first_alert_id: int = 1):
+    def __init__(self, sites: list[dict], first_alert_id: int = 1, all_clear: timedelta = ALL_CLEAR):
         self.sites = sites
         self.active: dict[int, ActiveAlert] = {}  # site_id -> alert
         self._next_id = first_alert_id
+        self.all_clear = all_clear  # shortened only by replay's demo speed
 
     def process(self, flashes: list[dict], now: datetime, feed_ok_since: datetime | None) -> list[dict]:
         """Apply new flashes, then expire countdowns.
@@ -102,16 +103,19 @@ class LightningRule:
             miles, latest = max(near, key=lambda pair: pair[1]["struck_at"])
             struck_at = _parse(latest["struck_at"])
             trigger = {"strike_id": latest["strike_id"], "distance_mi": round(miles, 1)}
+            if latest.get("is_replay"):
+                trigger["is_replay"] = True
 
             alert = self.active.get(sid)
             if alert is None:
-                alert = ActiveAlert(self._next_id, sid, started_at=struck_at, last_trigger_at=struck_at, trigger=trigger)
+                alert = ActiveAlert(self._next_id, sid, started_at=struck_at, last_trigger_at=struck_at,
+                                    trigger=trigger, clear_at=struck_at + self.all_clear)
                 self._next_id += 1
                 self.active[sid] = alert
                 notices.append({"type": "alert.started", "site_id": sid, "alert_id": alert.alert_id})
             elif struck_at > alert.last_trigger_at:
                 alert.last_trigger_at = struck_at
-                alert.clear_at = struck_at + ALL_CLEAR
+                alert.clear_at = struck_at + self.all_clear
                 alert.trigger = trigger
                 notices.append({"type": "alert.updated", "site_id": sid, "alert_id": alert.alert_id,
                                 "clear_at": _iso(alert.clear_at)})
@@ -129,6 +133,21 @@ class LightningRule:
 
     def alerts(self) -> list[dict]:
         return [a.to_row() for a in self.active.values()]
+
+
+# ---------------------------------------------------------------- shared state
+
+# Until the alerts table exists in Tiger Data, the job hands its active alerts
+# to the API through this file (gitignored). Written atomically so the API
+# never reads half a file.
+LIVE_ALERTS = Path(__file__).resolve().parents[1] / "data" / "live" / "alerts.json"
+
+
+def write_live_alerts(rows: list[dict]) -> None:
+    LIVE_ALERTS.parent.mkdir(parents=True, exist_ok=True)
+    tmp = LIVE_ALERTS.with_suffix(".tmp")
+    tmp.write_text(json.dumps({"updated_at": _iso(datetime.now(timezone.utc)), "lightning": rows}, indent=2))
+    os.replace(tmp, LIVE_ALERTS)
 
 
 # ---------------------------------------------------------------- live loop
@@ -159,7 +178,9 @@ def run(sites: list[dict], poll_seconds: float = 20.0, publish=None) -> None:
             log.warning("lightning feed unavailable: %s", e)
             feed_ok_since = None
 
-        for notice in rule.process(flashes, now, feed_ok_since):
+        notices = rule.process(flashes, now, feed_ok_since)
+        write_live_alerts(rule.alerts())  # before publishing, so screens fetch fresh data
+        for notice in notices:
             log.info("notice %s", notice)
             ids = {k: v for k, v in notice.items() if k != "type"}
             publish(notice["type"], **ids)
@@ -168,16 +189,13 @@ def run(sites: list[dict], poll_seconds: float = 20.0, publish=None) -> None:
 
 
 if __name__ == "__main__":
-    import json
-    import os
-    from pathlib import Path
-
     root = Path(__file__).resolve().parents[1]
     for line in (root / ".env").read_text().splitlines():
         if "=" in line and not line.startswith("#"):
             k, v = line.split("=", 1)
             os.environ.setdefault(k.strip(), v.strip())
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
-    sites = json.loads((root / "api" / "samples" / "sites.json").read_text())
+    from api.site_data import load_sites
+    sites = load_sites()
     log.info("watching %d sites for lightning within %.0f mi", len(sites), STOP_WORK_MILES)
     run(sites)

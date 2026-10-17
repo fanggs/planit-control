@@ -318,9 +318,13 @@ bucket names and latency when building.
 - **Accuracy note:** GLM locates flashes to roughly 8 to 14 km, so a strike near
   the 10-mile edge is approximate. Say this if asked.
 - **If the feed is down, show "lightning data unavailable,"** never "no strikes."
-- **Demo backup:** there may be no storms near any site during the expo. Keep a
-  replay mode that plays back real recorded GLM flashes with `is_replay = true`,
-  clearly labeled "replay" in the UI. Live stays the default.
+- **Demo backup:** there may be no storms near any site during the expo.
+  `jobs/replay.py` plays back a real recorded storm (`data/replay/`, real GOES-19
+  flashes from 2026-08-03 near the Everglades site) through the same rule, with
+  `is_replay = true` on every strike. Live stays the default.
+- **Replay alerts are marked:** their `trigger` includes `"is_replay": true`.
+  Screens must show a visible "Replay" label on those alerts. `--speed N` replays
+  N times faster and shortens the countdown by the same factor.
 
 ## 9. Postponed (README "what we'd do next")
 
