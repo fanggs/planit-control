@@ -23,10 +23,31 @@ from api.schemas.alerts import Alert, Briefing
 from api.schemas.sites import SiteDetail, SiteSummary
 
 SAMPLES = Path(__file__).resolve().parent / "samples"
+LIVE_ALERTS = Path(__file__).resolve().parents[1] / "data" / "live" / "alerts.json"
+LEVEL_RANK = {"stop_work": 2, "warning": 1}
 
 
 def _sample(name: str):
     return json.loads((SAMPLES / f"{name}.json").read_text(encoding="utf-8"))
+
+
+def _alerts() -> list[dict]:
+    """Sample alerts, with lightning replaced by the lightning job's live state.
+
+    jobs/lightning.py (live) and jobs/replay.py (demo) write data/live/alerts.json.
+    If neither has run, the sample lightning alert stays so screens have data.
+    """
+    rows = _sample("alerts")
+    try:
+        live = json.loads(LIVE_ALERTS.read_text(encoding="utf-8"))["lightning"]
+    except (FileNotFoundError, json.JSONDecodeError, KeyError):
+        return rows
+    return [a for a in rows if a["hazard_type"] != "lightning"] + live
+
+
+def _site_alerts(site_id: int, rows: list[dict]) -> list[dict]:
+    mine = [a for a in rows if a["site_id"] == site_id]
+    return sorted(mine, key=lambda a: -LEVEL_RANK[a["level"]])
 
 
 app = FastAPI(
@@ -60,7 +81,16 @@ def health():
 
 @app.get("/sites", response_model=list[SiteSummary])
 def sites():
-    return _sample("sites")
+    rows = _alerts()
+    out = []
+    for site in _sample("sites"):
+        top = _site_alerts(site["site_id"], rows)
+        site["active_alert"] = (
+            {"level": top[0]["level"], "hazard_type": top[0]["hazard_type"], "clear_at": top[0]["clear_at"]}
+            if top else None
+        )
+        out.append(site)
+    return out
 
 
 @app.get("/sites/{site_id}", response_model=SiteDetail)
@@ -68,12 +98,13 @@ def site_detail(site_id: int):
     detail = _sample("site_details").get(str(site_id))
     if detail is None:
         raise HTTPException(404, f"Site {site_id} not found")
+    detail["active_alerts"] = _site_alerts(site_id, _alerts())
     return detail
 
 
 @app.get("/alerts", response_model=list[Alert])
 def alerts():
-    return _sample("alerts")
+    return _alerts()
 
 
 @app.get("/briefings/{site_id}", response_model=Briefing)

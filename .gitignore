@@ -16,3 +16,6 @@ data/raw/*
 .DS_Store
 .vscode/
 .idea/
+
+# Live job state shared with the API
+data/live/
