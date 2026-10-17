@@ -45,6 +45,33 @@ the request body.
 | Resolve a report | ❌ | ✅ |
 | Use `/ask` | ✅ | ✅ |
 
+### Alan's local crew sign-in handoff
+
+- On his **own computer**, Alan syncs the repo, runs
+  `node page/crew/dev/serve.mjs` from the repo root, and opens
+  `http://127.0.0.1:4174/crew/login.html`. Loopback points to the computer
+  opening the page; Aryan's local server is not reachable from Alan's computer.
+  Do not use an IDE preview on a different origin for this Auth0 test.
+- The PlanIT Auth0 SPA must allow the exact callback
+  `http://127.0.0.1:4174/crew/login.html`, logout URL
+  `http://127.0.0.1:4174/crew/index.html`, and web origin
+  `http://127.0.0.1:4174`. These are development-only browser URLs; Auth0
+  login still uses the Auth0 cloud tenant, but this does not publish the site.
+- Alan completes Google sign-in with the team-designated crew test account.
+  An Auth0 administrator verifies the resulting user and assigns the `crew`
+  role; the browser must never choose or submit its own role. The deployed
+  Post-Login Action must add `https://planit-control/roles` to both the ID
+  token and API access token. Alan signs out and signs in again **after** the
+  role assignment so the browser receives fresh tokens. Do not share passwords
+  or tokens in team chat.
+- Acceptance for login: Alan lands in the crew workspace rather than the
+  "no workspace role" message.
+  Full crew-to-API integration is a separate check: `page/crew/crew-config.js`
+  is currently in `mock` mode with no API base URL. Alan and Isaiah must
+  coordinate switching it to live data and pointing it at an authorized API
+  reachable from Alan's computer; a successful login alone does not prove
+  that reports or site data are backed by the API.
+
 ## 3. Database tables (Tiger Data / PostgreSQL)
 
 **sites**
