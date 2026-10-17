@@ -21,9 +21,9 @@ export const config = {
   authRoleClaim: 'https://planit-control/roles',
   themeStylesheet: null, // Aryan supplies the actual shared stylesheet URL; do not edit his file.
   auth: {
-    domain: '',
-    clientId: '',
-    audience: '', // Alan/Aryan's API identifier, required for API access tokens.
+    domain: 'dev-qtlneoet2ty1xxbc.us.auth0.com',
+    clientId: 'HsFNjn2AmnjYmXW8XcTXVWrhJDvxrjQd',
+    audience: 'https://planit-control.aasi/api', // Alan/Aryan's API identifier, required for API access tokens.
     // Register this exact callback and the home logout URL in the Auth0 application.
     redirectUri: new URL('login.html', location.href).href,
     logoutReturnTo: new URL('index.html', location.href).href

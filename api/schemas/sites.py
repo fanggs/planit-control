@@ -67,7 +67,7 @@ class LatestWeather(BaseModel):
 
 
 class EnvironmentalEvent(BaseModel):
-    id: int
+    id: str | int  # provider IDs are text (e.g. NWS), sample uses ints
     hazard_type: HazardType
     event_kind: str
     title: str

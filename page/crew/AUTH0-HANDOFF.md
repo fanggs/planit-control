@@ -22,12 +22,12 @@ Example, when publishing `page/crew/` as the website root:
 
 | Setting | Local example |
 | --- | --- |
-| Callback | `http://localhost:4174/login.html` |
-| Logout | `http://localhost:4174/index.html` |
-| Web origin | `http://localhost:4174` |
+| Callback | `http://127.0.0.1:4174/login.html` |
+| Logout | `http://127.0.0.1:4174/index.html` |
+| Web origin | `http://127.0.0.1:4174` |
 
 Use HTTPS for the deployed site. A plain HTTP LAN IP preview is for UI testing;
-Auth0's SPA SDK requires a secure browser context (HTTPS or loopback localhost).
+Auth0's SPA SDK requires a secure browser context (HTTPS or loopback 127.0.0.1).
 The callback mounts the chosen crew-owned workspace in the same document:
 `crew.html` for crew, `crew-supervisor.html` for supervisor. The existing SDK
 client and its memory-only token are reused; no access token, authorization
@@ -71,7 +71,8 @@ The demo chooser is visible only when crew `dataMode` is `mock`. The crew,
 atlas and restored supervisor preview share the same 60 real plant locations
 and synthetic sample scores. `?demo=1` opens the sample supervisor directly in
 mock mode; it cannot bypass live Auth0 checks. Actual
-Auth0 verification cannot be tested until the team supplies its application settings.
+Auth0 verification cannot be tested until tenant callback URLs, roles, and
+account assignments are configured.
 Auth0's API calls are not simulated as successful in the preview.
 
 The HTTP adapter now maps `api/CONTRACT.md` v1.1, including numeric site IDs,

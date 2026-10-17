@@ -29,12 +29,20 @@ export function createHTTPAPI(settings, getToken, fetcher = fetch) {
       return encodeURIComponent(params[key]);
     });
     const base = new URL(settings.baseURL.endsWith('/') ? settings.baseURL : settings.baseURL + '/');
+    // Never send an access token to plain HTTP outside this machine, or to a
+    // URL carrying credentials, a query string, or a fragment.
+    if (base.username || base.password || base.search || base.hash
+      || !(base.protocol === 'https:' || (base.protocol === 'http:' && base.hostname === '127.0.0.1'))) {
+      throw new Error('API URL must use HTTPS, or http://127.0.0.1 for local development.');
+    }
     const result = new URL(path.replace(/^\//, ''), base);
+    if (result.origin !== base.origin) throw new Error('API routes must stay on the configured API origin.');
     for (const [key, value] of Object.entries(query)) if (value != null) result.searchParams.set(key, value);
     return result;
   }
   async function request(route, {params, query, method = 'GET', body, binary = false} = {}) {
     const target = url(route, params, query), token = await getToken();
+    if (typeof token !== 'string' || !token) throw new Error('A valid access token is required.');
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), settings.timeoutMs || 20000);
     try {
@@ -42,7 +50,7 @@ export function createHTTPAPI(settings, getToken, fetcher = fetch) {
       if (body && !(body instanceof FormData)) headers['Content-Type'] = 'application/json';
       const response = await fetcher(target, {method, headers,
         body: body instanceof FormData ? body : body ? JSON.stringify(body) : undefined,
-        signal: controller.signal, cache: 'no-store'});
+        signal: controller.signal, cache: 'no-store', credentials: 'omit', redirect: 'error'});
       if (!response.ok) {
         const problem = await response.json().catch(() => null);
         const fallback = response.status === 401 ? 'Your session expired. Sign in again.'

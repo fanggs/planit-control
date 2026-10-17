@@ -1,5 +1,8 @@
 fastapi
 uvicorn[standard]
-pydantic
+pydantic>=2,<3
+PyJWT[crypto]>=2.10,<3
 google-genai
 netCDF4
+SQLAlchemy>=2,<3
+psycopg[binary]>=3,<4
