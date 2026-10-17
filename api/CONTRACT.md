@@ -1,7 +1,10 @@
-# PlanIT Control: Contract v1.1
+# ForeSite (PlanIT Control): Contract v1.2
 
-**Status:** v1.1, decided 2026-10-17 from Sid's and Aryan's AI reviews and the
-team's answers.
+**Status:** v1.2. v1.1 decided 2026-10-17 from Sid's and Aryan's AI reviews and
+the team's answers. v1.2 (2026-10-17 evening) adopts Sid's ML index correction
+(`model/handoffs/CONTRACT-CHANGE-PROPOSAL.md`): one evaluated screening model
+instead of the 8/2 weather + wildlife split, feature-level explanations, and
+wildlife as a separate evidence layer.
 
 > **This is our base, not a frozen spec.** Build from it, but things will come up
 > once real data and code hit it (an API returns different fields, a feature
@@ -22,7 +25,9 @@ added once the core works.
 ## 1. Shared rules
 
 - **Hazard types (exact strings, used everywhere):** `heat`, `lightning`, `flooding`, `wildfire`, `soil_saturation`, `wildlife`, `other`
-- **Field name for a hazard, everywhere:** `hazard_type`
+- **Field name for a hazard, everywhere:** `hazard_type` (alerts, reports, events).
+  The screening score's explanation is the exception: its factors name model
+  **features** (`feature`), not hazards (section 4).
 - **Field names:** `snake_case`
 - **Times:** UTC ISO 8601, like `2026-10-17T18:00:00Z`. The frontend converts to the site's `timezone`.
 - **Units:** °F, inches, miles, mph. Soil moisture in m³/m³ (0 to 7 cm depth).
@@ -102,9 +107,17 @@ Unique on (`site_id`, `observed_at`, `provider`) so reloads don't duplicate.
 `strike_id` (provider-qualified), `struck_at`, `latitude`, `longitude`,
 `is_replay` (true if replayed historical data), `source_name`, `source_url`, `retrieved_at`
 
-**hazard_scores** (time-series)
-`site_id`, `scored_at`, `horizon_hours` (24), `score`, `baseline`, `factors` (jsonb),
-`model_version`, `inputs_observed_at`
+**hazard_scores** (legacy, from v1.1): kept but unused. The score now comes
+from `screening_predictions`.
+
+**Model evidence (migration 003, Sid):**
+- `model_input_snapshots`: `snapshot_id`, `site_id`, `cutoff_at`, `captured_at`,
+  `schema_version`, `features` (jsonb), `evidence` (jsonb)
+- `screening_models`: `artifact_sha256`, `artifact`, `validation`, `registered_at`
+- `screening_predictions`: `site_id`, `scored_at`, `snapshot_id`,
+  `artifact_sha256`, `score`, `baseline`, `factors` (jsonb), `status`
+  (`research` / `validated_prototype`), `target`
+- `weather_source_payloads`: verified original hourly weather arrays with hashes
 
 **alerts**
 `id`, `site_id`, `hazard_type`, `level` (`warning` / `stop_work`), `message`,
@@ -134,60 +147,71 @@ demo sites**, even if the rule misses them:
 - at least 2 plants along the Mississippi River (flood warning example from the brief)
 - at least 2 plants in a California / Western wildfire area
 
-## 4. Hazard score (model output)
+## 4. Hazard screening index (model output)
 
-The 0 to 10 score has **two trained parts**, added together:
+**What it predicts:** `score = 10 × model-estimated probability that one or more
+selected NWS warnings or heat advisories cover the plant's coordinates during
+the next 24-hour window`. It's a documented operational hazard signal, **not**
+an injury probability and not a guarantee that unreported hazards are absent.
+Red-flag warnings mean fire-weather conditions, not a confirmed fire;
+severe-storm warnings are not measured lightning.
 
-| Part | Range | What it predicts | Trained on |
-| --- | --- | --- | --- |
-| **Weather** | 0 to 8 | How likely hazardous outdoor-work conditions are at the site in the next 24 hours (8 × predicted probability) | NOAA Storm Events: whether a relevant event (thunderstorm, lightning, heat, flood, flash flood, wildfire, high wind) occurred in the site's county that day, with that day's weather as inputs. Not an injury prediction. |
-| **Wildlife** | 0 to 2 | How likely dangerous wildlife is near the site this month (2 × predicted probability) | GBIF sighting records (includes iNaturalist) of American alligator, cottonmouth, rattlesnakes, and copperhead, by location and month |
+**Model:** one evaluated model (`model/generated/forecast-v2`), trained on
+fixed-lead GFS forecasts against archived IEM NWS warning geometries, chosen
+from five candidates with county and time holdouts (Sid, `model/README.md`).
 
-- **Models:** a small decision tree for each part (about 4 levels). Trained on
-  older years, tested on the most recent year.
-- **Inputs when running live:** the weather part uses the **next-24-hour
-  forecast** for the site (from `weather_forecasts`); the wildlife part uses the
-  site's location and the current month.
-- **Explanation:** `score = baseline + sum of contributions`. `baseline` is the
-  weather part's baseline plus the wildlife part's baseline, and `wildlife` is
-  one of the contributions. The weather part stays within 0 to 8 and the wildlife
-  part within 0 to 2. Contributions can be negative. Must match within
-  0.05. Round only for display.
-- **Known limitation (say it if asked):** wildlife sightings cluster where people
-  are, so remote areas can look safer than they are.
-- **Fallback:** if a trained part isn't ready in time, ship a rules-based version
-  and label it **rules-based**, never "ML," until the trained one replaces it.
-- **Crew reports** do not change the score in v1 (see section 7).
-- **The score is separate from the live lightning alert.** The `lightning` factor
-  is forecast risk for the next 24 hours. The stop-work alert (section 8) is a
-  fixed safety rule that fires on real strikes no matter what the score says.
+**Status:** predictions carry `status`: `research` or `validated_prototype`.
+The current artifact is `research` (it missed one of its own probability-error
+checks). The API shows research scores **only with a visible "Prototype" label**
+on every screen that displays them, and never as an established probability.
+
+**Explanation:** `score = baseline + sum of contributions`, contributions may be
+negative, reconciled exactly. Factors name model **features** (e.g.
+`wind_max_mph`, `rain_total_24h_in`, `heat_index_max_f`), not hazards: a feature
+is not exclusively one hazard. Screens should show readable feature labels.
+
+**Unavailable is null, never zero:** missing, stale (inputs older than 2 hours or
+past the 24-hour window), invalid, or unapproved predictions return a null
+score with `status` and `reason`. Zero is a real output.
+
+**Independent of safety alerts:** the score never clears or overrides the
+lightning stop-work rule, flood warnings, or crew report warnings
+(`clears_stop_work: false`).
 
 ```json
 {
-  "site_id": 6045,
-  "score": 8.2,
-  "baseline": 2.4,
-  "scored_at": "2026-10-17T18:00:00Z",
-  "horizon_hours": 24,
-  "model_version": "weather-tree-v1+wildlife-tree-v1",
+  "score": 6.4,
+  "baseline": 2.1,
   "factors": [
-    {"hazard_type": "heat", "contribution": 3.1},
-    {"hazard_type": "lightning", "contribution": 1.9},
-    {"hazard_type": "soil_saturation", "contribution": 0.9},
-    {"hazard_type": "flooding", "contribution": -1.5},
-    {"hazard_type": "wildlife", "contribution": 1.4}
-  ]
+    {"feature": "rain_total_24h_in", "contribution": 2.6},
+    {"feature": "wind_max_mph", "contribution": 1.2},
+    {"feature": "heat_index_max_f", "contribution": 0.9},
+    {"feature": "month_cos", "contribution": -0.4}
+  ],
+  "status": "research",
+  "target": "NWS warning or heat advisory covering the plant within the next 24 hours",
+  "scored_at": "2026-10-17T23:15:57Z",
+  "captured_at": "2026-10-17T23:15:00Z",
+  "valid_from": "2026-10-18T00:00:00Z",
+  "valid_until": "2026-10-19T00:00:00Z",
+  "artifact_sha256": "207c76d8ab9b...",
+  "snapshot_id": "…",
+  "clears_stop_work": false
 }
 ```
 
-Check: 2.4 + 3.1 + 1.9 + 0.9 − 1.5 + 1.4 = 8.2. (Weather part: 2.0 baseline +
-4.4 = 6.4 of 8. Wildlife part: 0.4 baseline + 1.4 = 1.8 of 2.)
+Unavailable example: `{"score": null, "baseline": null, "factors": [], "status": "stale", "reason": "Stored inputs are no longer fresh"}`.
 
-(Site IDs in examples are placeholders.)
+Read with `db.screening_read.site_screening(api.db.query, site_id, allow_research=True)`.
 
-**Breakdown panel (UI):** show it as a waterfall: start at the baseline, then
-each factor as a bar going up (adds risk) or down (lowers risk), ending at the
-score. Label each bar with its hazard and value.
+**Wildlife is a separate evidence layer, not part of the score:**
+`wildlife_context` on site detail lists dated, attributed GBIF sightings near the
+site (within a stated radius, with limitations), `encounter_probability: null`
+and `numeric_score_contribution: null`. Crew wildlife reports stay alongside it.
+Read with `get_data.site_context.for_site(site_id)`.
+
+**Breakdown panel (UI):** waterfall from baseline through each feature's
+contribution to the score, with the "Prototype" label and the target window.
 
 ## 5. API endpoints
 
@@ -206,21 +230,23 @@ Errors always look like: `{"error": {"code": "not_found", "message": "Site 123 n
     "hazard_region": "florida_gulf",
     "score": 8.2,
     "scored_at": "2026-10-17T18:00:00Z",
+    "score_status": "research",
     "top_factors": [
-      {"hazard_type": "heat", "contribution": 3.1},
-      {"hazard_type": "lightning", "contribution": 1.9}
+      {"feature": "rain_total_24h_in", "contribution": 2.6},
+      {"feature": "wind_max_mph", "contribution": 1.2}
     ],
     "active_alert": {"level": "stop_work", "hazard_type": "lightning", "clear_at": "2026-10-17T18:30:00Z"},
     "open_report_count": 1
   }
 ]
 ```
-`score`, `scored_at`, `top_factors` are `null` if no score yet. `active_alert` is `null` if none.
+`score`, `scored_at`, `top_factors` are `null` when the screening index is unavailable; `score_status` says why (`no_data`, `stale`, `invalid`, `research_unapproved`) or is `research` / `validated_prototype` when shown. `active_alert` is `null` if none.
 
 ### `GET /sites/{site_id}`: site detail + breakdown panel
 Returns the site fields, plus:
-`latest_weather` (with `observed_at`), `score` (full model output from section 4),
-`active_alerts` (list), `environmental_events` (active ones), `recent_reports` (list).
+`latest_weather` (with `observed_at`), `screening` (full section 4 output, or
+the null/status/reason form), `wildlife_context` (section 4), `active_alerts`
+(list), `environmental_events` (active ones), `recent_reports` (list).
 
 ### `GET /alerts`: active alerts
 ```json
@@ -322,8 +348,8 @@ Photos do **not** go through DeepSpace.
 
 ## 7. Crew reports and the score
 
-Reports are shown **next to** the score. They do **not** change the trained
-score in v1, so the score stays an honest model output.
+Reports are shown **next to** the score. They do **not** change the screening
+score, so the score stays an honest model output.
 
 **Report warnings:** an open report with `severity = high` creates an alert
 with `level = warning` and the report's `hazard_type` at that site (e.g. a
