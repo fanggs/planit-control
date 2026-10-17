@@ -6,7 +6,9 @@ test('contract requests send bearer headers, correct paths and only the resolve 
   const calls = [];
   const api = createAPI({base: 'http://127.0.0.1:8000', token: async () => 'verified-token',
     fetcher: async (url, options) => { calls.push({url, options}); return new Response(JSON.stringify(url.endsWith('/sites/6045')
-      ? {site_id: 6045, active_alerts: []} : []), {status: 200, headers: {'Content-Type': 'application/json'}}); }});
+      ? {site_id: 6045, active_alerts: []} : options.method === 'PATCH'
+        ? {id: '3f6c1a2e-0000-4000-8000-000000000001', status: 'resolved'} : []),
+    {status: 200, headers: {'Content-Type': 'application/json'}}); }});
   await api.sites(); await api.detail(6045); await api.reports(6045); await api.alerts();
   await api.resolve('3f6c1a2e-0000-4000-8000-000000000001');
   assert.deepEqual(calls.map(call => new URL(call.url).pathname + new URL(call.url).search),
@@ -18,6 +20,14 @@ test('contract requests send bearer headers, correct paths and only the resolve 
   }
   assert.equal(calls.at(-1).options.method, 'PATCH');
   assert.deepEqual(JSON.parse(calls.at(-1).options.body), {status: 'resolved'});
+});
+test('resolution requires a matching committed receipt', async () => {
+  const id = '3f6c1a2e-0000-4000-8000-000000000001';
+  for (const receipt of [{id, status: 'open'}, {id: '00000000-0000-4000-8000-000000000002', status: 'resolved'}]) {
+    const api = createAPI({base: 'https://api.example.com', token: async () => 'token',
+      fetcher: async () => new Response(JSON.stringify(receipt), {status: 200})});
+    await assert.rejects(api.resolve(id), /receipt could not be verified/);
+  }
 });
 test('a failed live request cannot turn into a sample success', async () => {
   const api = createAPI({base: 'https://api.example.com', token: async () => 'token', fetcher: async () =>

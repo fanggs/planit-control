@@ -332,11 +332,21 @@ const refresh = createRefreshQueue(fetchData);
 async function resolveReport(id, button) {
   if (sample || resolving || !hasSupervisorRole(user, config.auth.rolesClaim)) return;
   resolving = true; button.disabled = true; button.textContent = 'Resolving…';
+  const selected = state.selected;
+  let saved = false;
   try {
-    await api.resolve(id);
-    // Never claim success before the response. Reload map counts, warnings and report status.
+    const receipt = await api.resolve(id);
+    saved = true;
+    if (state.selected === selected) {
+      // The committed receipt prevents a stale card from offering a second PATCH
+      // if the following read fails. Counts and alerts still need a fresh read.
+      state.reports = state.reports.map(report => report.id === id ? receipt : report);
+      if (state.detail) renderDetail();
+    }
     await refresh();
-  } catch (error) { showError(error); }
+  } catch (error) {
+    showError(saved ? new Error('Report resolved, but the dashboard could not refresh. Verify current alerts and use Refresh before relying on counts.') : error);
+  }
   finally {
     resolving = false;
     if (state.detail) renderDetail();
