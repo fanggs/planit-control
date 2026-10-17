@@ -433,6 +433,27 @@ class HazardReportTests(unittest.TestCase):
         self.assertEqual(self.count_reports(), 1)
         self.assertEqual(observed_commits, [1])
 
+    def test_false_publisher_result_logs_without_failing_committed_write(self):
+        observed_events = []
+
+        def refused_publisher(event, **ids):
+            observed_events.append((event, self.request_commits))
+            return False
+
+        with self.assertLogs("api.routes.hazard_reports", level="ERROR") as captured:
+            with self.make_client(publish_event=refused_publisher) as client:
+                response = self.create(client=client, severity="high")
+
+        self.assertEqual(response.status_code, 201, response.text)
+        self.assertEqual(self.count_reports(), 1)
+        self.assertEqual(len(self.warning_rows()), 1)
+        self.assertEqual(observed_events, [("report.created", 1), ("alert.started", 1)])
+        self.assertEqual(len(captured.output), 2)
+        self.assertIn("report.created", captured.output[0])
+        self.assertIn("alert.started", captured.output[1])
+        self.assertNotIn(response.json()["id"], " ".join(captured.output))
+        self.assertNotIn("Gator near the east gate", " ".join(captured.output))
+
     def test_async_callable_publisher_is_rejected_at_setup(self):
         class AsyncPublisher:
             async def __call__(self, event, **ids):

@@ -11,7 +11,10 @@ export const label = hazard => HAZARDS[hazard] || 'Unknown hazard';
 export const points = value => `${value > 0 ? '+' : ''}${value.toFixed(1)}`;
 
 export function summaryScore(site) {
-  return validTime(site?.scored_at) && validFactors(site?.top_factors) ? scoreNumber(site?.score) : null;
+  // The map/list only have top factors, not the full baseline. Never display
+  // a numerical score there without at least one signed explanation.
+  return validTime(site?.scored_at) && validFactors(site?.top_factors) && site.top_factors.length > 0
+    ? scoreNumber(site?.score) : null;
 }
 export function validateSummary(site) {
   if (!site || !validSiteId(site.site_id) || typeof site.name !== 'string') throw new Error('Invalid site returned by the API.');
@@ -37,7 +40,7 @@ export function rankSites(rows, {search = '', filter = 'all'} = {}) {
 export function assessScore(model, siteId) {
   if (model == null) return {status: 'no_data', message: 'No score data. A missing feed is never a zero.'};
   if (model.site_id !== siteId || scoreNumber(model.score) === null || !finite(model.baseline)
-    || !validFactors(model.factors) || !validTime(model.scored_at)) {
+    || !validFactors(model.factors) || model.factors.length === 0 || !validTime(model.scored_at)) {
     return {status: 'invalid', message: 'The score explanation is incomplete. Refresh or contact the data team.'};
   }
   const total = model.baseline + model.factors.reduce((sum, factor) => sum + factor.contribution, 0);

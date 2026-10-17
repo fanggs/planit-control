@@ -53,7 +53,9 @@ top signed factors alongside every summary score. Clicking a list entry or map
 marker loads the full explanation. The waterfall starts at the baseline, then
 adds/subtracts each factor, and ends at the score. If the full-precision sum is
 off by more than 0.05, the panel displays an error instead of a misleading
-chart. Zero is a valid score; missing/invalid data is not converted to zero.
+chart. A score without any factor explanation is hidden in both the summary and
+the full breakdown. Zero is a valid score; missing/invalid data is not converted
+to zero.
 
 Reports are displayed separately from model scores, with pins only when both
 coordinates exist. Live private photos are requested with the bearer token and
@@ -116,6 +118,10 @@ after the database transaction commits.
 
 If the bridge connection is unavailable, the dashboard shows that state and
 polls every 30 seconds. Polling does not count as a live connection.
+If `/alerts` fails while `/sites` succeeds, the map stays available but the
+alert count reads **No data**, with a warning that missing alerts do not mean
+safe conditions. If site detail or reports fail to refresh, the last successful
+data stays visible with an explicit stale-data warning until refreshed.
 Refresh bursts are coalesced, not added to an unbounded request queue. A notice
 received during a fetch still requests one follow-up fetch. A stalled JSON body
 remains subject to the configured API timeout even after headers arrive.

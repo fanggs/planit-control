@@ -1,16 +1,18 @@
 import {config} from './config.js';
 import {createAuth} from './auth.js';
 import {createAPI, createSampleAPI} from './api.js';
+import {alertFeedDisplay, loadDashboardFeeds} from './feeds.js';
 import {connectRealtime} from './realtime.js';
 import {createDeepSpaceSource} from '../realtime/deepspace-source.js';
 import {createRefreshQueue} from './refresh.js';
-import {bindPageLifecycle, changeSelectedSite} from './lifecycle.js';
+import {bindPageLifecycle, changeSelectedSite, markDetailStale} from './lifecycle.js';
 import {assessScore, coordinates, countdown, finite, freshness, hasSupervisorRole, label, points,
   rankSites, riskTone, safeSourceURL, siteTime, summaryScore, validFactors} from './domain.js';
 
 const $ = id => document.getElementById(id);
 const sample = config.mode === 'sample';
-const state = {sites: [], alerts: [], selected: null, detail: null, reports: [], search: '', filter: 'all'};
+const state = {sites: [], alerts: null, selected: null, detail: null, detailStale: false,
+  reports: [], search: '', filter: 'all'};
 let api, auth, map, siteLayer, reportLayer, detailGeneration = 0;
 let stopRealtime, poll, countdownTimer, user, resolving = false;
 const photoURLs = new Set();
@@ -31,6 +33,12 @@ function clearError() { $('error').hidden = true; $('error').textContent = ''; }
 function ageText(value) { return freshness(value, Date.now(), config.staleAfterMinutes).text; }
 function section(title) { const node = el('section', null, 'detail-section'); node.append(el('h3', title)); return node; }
 function revokePhotos() { for (const url of photoURLs) URL.revokeObjectURL(url); photoURLs.clear(); }
+function staleDetailNotice() {
+  const warning = note('Site detail and crew reports could not be refreshed. Showing last successful data; hazards and report status may have changed.', true);
+  warning.dataset.detailStale = 'true';
+  warning.setAttribute('role', 'status');
+  return warning;
+}
 
 function initializeMap() {
   if (!window.L) { $('map-status').hidden = false; $('map-status').textContent = 'Map library unavailable. Use the ranked list to inspect sites.'; return; }
@@ -127,7 +135,9 @@ function renderList() {
 function renderMetrics() {
   $('site-count').textContent = String(state.sites.length);
   $('site-subtitle').textContent = sample ? `${state.sites.length} sample sites · not production data` : 'Returned by the authenticated API';
-  $('alert-count').textContent = String(state.alerts.length);
+  const alertDisplay = alertFeedDisplay(state.alerts);
+  $('alert-count').textContent = alertDisplay.count;
+  $('alert-status').textContent = alertDisplay.status;
   const complete = state.sites.every(site => Number.isInteger(site.open_report_count) && site.open_report_count >= 0);
   $('report-count').textContent = complete ? String(state.sites.reduce((sum, site) => sum + site.open_report_count, 0)) : 'No data';
   $('missing-count').textContent = String(state.sites.filter(site => summaryScore(site) === null).length);
@@ -246,7 +256,8 @@ function renderDetail() {
   header.append(el('div', 'Selected site', 'planit-eyebrow'), el('h2', detail.name),
     el('p', `${detail.utility || 'Utility unavailable'} · ${detail.county || ''} ${detail.state || ''} · EIA ${detail.site_id}`));
   if (sample || detail.score?.model_version === 'sample') header.append(chip('SAMPLE DATA', 'medium'));
-  $('detail').replaceChildren(header, renderScore(detail), renderAlerts(detail), renderWeather(detail), renderReports(detail));
+  $('detail').replaceChildren(...(state.detailStale ? [staleDetailNotice()] : []),
+    header, renderScore(detail), renderAlerts(detail), renderWeather(detail), renderReports(detail));
   renderReportPins();
 }
 async function loadDetail(id) {
@@ -255,10 +266,15 @@ async function loadDetail(id) {
   try {
     const [detail, reports] = await Promise.all([api.detail(id), api.reports(id)]);
     if (generation !== detailGeneration || state.selected !== id) return;
-    state.detail = detail; state.reports = reports; renderDetail();
+    state.detail = detail; state.reports = reports; state.detailStale = false; renderDetail();
   } catch (error) {
-    if (generation === detailGeneration && state.selected === id && !state.detail) {
-      $('detail').replaceChildren(el('p', 'Site detail unavailable. Use Refresh to retry.', 'empty'));
+    if (generation === detailGeneration && state.selected === id) {
+      if (markDetailStale(state, id)) {
+        const panel = $('detail');
+        if (!panel.querySelector('[data-detail-stale]')) panel.prepend(staleDetailNotice());
+      } else {
+        $('detail').replaceChildren(el('p', 'Site detail unavailable. Use Refresh to retry.', 'empty'));
+      }
     }
     throw error;
   } finally { if (generation === detailGeneration) $('detail').setAttribute('aria-busy', 'false'); }
@@ -281,14 +297,15 @@ async function selectSite(id, pan = true) {
 async function fetchData() {
   $('refresh').disabled = true;
   try {
-    const [sites, alerts] = await Promise.all([api.sites(), api.alerts()]);
+    const {sites, alerts} = await loadDashboardFeeds(api);
     state.sites = sites; state.alerts = alerts;
     if (!sites.some(site => site.site_id === state.selected)) updateSelection(rankSites(sites)[0]?.site_id ?? null);
     renderMetrics(); renderList();
     if (state.selected !== null) await loadDetail(state.selected);
     else { state.detail = null; state.reports = []; revokePhotos(); reportLayer?.clearLayers(); $('detail').replaceChildren(el('p', 'The API returned no sites.', 'empty')); }
     $('updated').textContent = `Fetched ${new Date().toLocaleTimeString([], {hour: 'numeric', minute: '2-digit', second: '2-digit'})}`;
-    clearError();
+    if (alerts === null) showError(new Error('Alert feed unavailable. The site map is still available, but do not infer safety from missing alerts.'));
+    else clearError();
   } finally { $('refresh').disabled = false; }
 }
 const refresh = createRefreshQueue(fetchData);
