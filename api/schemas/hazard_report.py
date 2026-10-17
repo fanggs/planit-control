@@ -72,3 +72,23 @@ class HazardReportCreate(BaseModel):
                 raise ValueError("description cannot contain a NUL character")
             return value.strip()
         return value
+
+    @field_validator("photo_key")
+    @classmethod
+    def validate_photo_key(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        # Keep the exact returned storage key; never silently rewrite its identity.
+        if value != value.strip():
+            raise ValueError("photo_key cannot have leading or trailing whitespace")
+        if any(ord(character) < 32 or ord(character) == 127 for character in value):
+            raise ValueError("photo_key cannot contain control characters")
+        if value.startswith("//") or re.match(r"^[A-Za-z][A-Za-z0-9+.-]*:", value):
+            raise ValueError("photo_key must be a storage key, not a URL or data URI")
+        return value
+
+    @model_validator(mode="after")
+    def require_coordinate_pair(self) -> HazardReportCreate:
+        if (self.latitude is None) != (self.longitude is None):
+            raise ValueError("provide both latitude and longitude, or neither")
+        return self
