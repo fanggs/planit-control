@@ -90,14 +90,13 @@ def _live_lightning() -> list[dict] | None:
 def _alerts() -> list[dict]:
     live = _live_lightning()
     if site_data.mode() == "database":
-        # Lightning still uses the local live-feed file. Report warnings are
-        # committed to Tiger Data with their report and must appear beside it.
-        warnings = db.query("""
+        # Every active alert lives in Tiger Data: lightning stop-work alerts
+        # (jobs/lightning.py and the labeled replay) and report warnings.
+        return db.query("""
             SELECT id, site_id, hazard_type, level, message, started_at,
                    last_trigger_at, clear_at, trigger
             FROM public.alerts WHERE ended_at IS NULL
             ORDER BY started_at DESC, id DESC""")
-        return warnings + (live or [])
     if site_data.mode() != "sample":
         return live or []
     # Sample mode: sample alerts, with lightning replaced by live state if any.

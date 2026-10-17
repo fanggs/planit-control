@@ -28,7 +28,7 @@ import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from jobs.lightning import ALL_CLEAR, LightningRule, _iso, write_live_alerts
+from jobs.lightning import ALL_CLEAR, LightningRule, _iso, _tiger_store, write_live_alerts
 
 log = logging.getLogger("planit.replay")
 ROOT = Path(__file__).resolve().parents[1]
@@ -56,9 +56,12 @@ def storm_start(storm: dict, rule: LightningRule) -> datetime:
 def replay(storm: dict, sites: list[dict], speed: float = 1.0, publish=None, tick: float = 1.0) -> None:
     if publish is None:
         from api.realtime import publish
-    rule = LightningRule(sites, all_clear=ALL_CLEAR / speed)
+    store = _tiger_store(replay=True)
+    rule = LightningRule(sites, all_clear=ALL_CLEAR / speed, store=store)
     t0_storm = storm_start(storm, rule)
     t0_wall = datetime.now(timezone.utc)
+    if store is not None:
+        store.end_all_open(t0_wall)  # a previous replay that was stopped midway
     pending = [f for f in storm["flashes"] if f["_orig"] >= t0_storm]
     log.info("replaying %s at %sx: %d flashes, starting %s", storm["name"], speed, len(pending), _iso(t0_storm))
 
@@ -79,7 +82,10 @@ def replay(storm: dict, sites: list[dict], speed: float = 1.0, publish=None, tic
                 "is_replay": True,
                 "source_name": storm["source_name"] + " (replay)",
                 "source_url": f["source_url"],
+                "retrieved_at": _iso(now),
             })
+        if store is not None and due:
+            store.save_strikes(due, sites)
         # The replay feed is always "up": it's recorded data.
         notices = rule.process(due, now, t0_wall - timedelta(hours=1))
         write_live_alerts(rule.alerts())
@@ -89,6 +95,8 @@ def replay(storm: dict, sites: list[dict], speed: float = 1.0, publish=None, tic
         if not pending and not rule.active:
             log.info("replay finished: storm over and all clear")
             write_live_alerts([])
+            if store is not None:
+                store.end_all_open(datetime.now(timezone.utc))
             return
         time.sleep(tick)
 
