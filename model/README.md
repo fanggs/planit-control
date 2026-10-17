@@ -3,6 +3,8 @@
 The corrected forecast-based pipeline and operating instructions are in
 [CORRECTIONS.md](CORRECTIONS.md). The report below preserves the original interval
 5 experiment; its realized-weather inputs are not used by the new live scorer.
+The interval 7 response adapter, offline replay and remaining deployment steps
+are in [INTEGRATION.md](INTEGRATION.md).
 
 ## Original interval 5 experiment
 

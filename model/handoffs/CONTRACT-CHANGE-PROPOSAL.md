@@ -39,10 +39,12 @@ continues to drive the existing independent stop-work rule.
 
 ## Ready integration points
 
-1. `model.inference.current_prediction(psycopg_connection, site_id)` returns a
-   recent stored prototype or an explicit no-data/stale state. For SQLAlchemy
-   use its underlying psycopg connection carefully within the request lifecycle,
-   or translate the static query into the existing api.db adapter.
+1. `db.screening_read.site_screening(api.db.query, site_id)` uses Alan's existing
+   SQLAlchemy query helper directly, with no competing connection setup. Missing,
+   stale, invalid and unapproved research scores remain null. Explicit
+   `allow_research=True` enables a labeled prototype response after agreement.
+   The raw-psycopg `model.inference.current_prediction` remains a lower-level
+   research helper; prefer the guarded read adapter for the proposed API layer.
 2. `get_data.site_context.for_site(site_id)` returns the public, precomputed
    wildlife evidence layer with dates/uncertainty and sample limitations.
 3. `db.ask_query.connect()` opens only the dedicated restricted account;

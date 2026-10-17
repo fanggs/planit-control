@@ -43,7 +43,7 @@ def run(*,load_database=False,allow_research=False,screen_only=False):
     if hashlib.sha256(canonical(artifact).encode()).hexdigest()!=validation['artifact_sha256']:
         raise ValueError('Model artifact does not match the evaluation report')
     directory=ROOT/'data/raw/runtime/runs'/datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ');directory.mkdir(parents=True)
-    report={'status':'building','failures':[],'database_loaded':False,'output_directory':str(directory.relative_to(ROOT))}
+    report={'status':'building','failures':[],'database_loaded':False,'weather_database_loaded':False,'output_directory':str(directory.relative_to(ROOT))}
     latest=ROOT/'data/raw/runtime/latest.json';write(latest,report)
     snapshots=[];predictions=[];throttle=Throttle()
     with ThreadPoolExecutor(max_workers=3) as pool:
@@ -63,6 +63,8 @@ def run(*,load_database=False,allow_research=False,screen_only=False):
             # One transaction covers model inputs and predictions, including checks.
             load(connection,snapshots,predictions,artifact,validation)
         report['database_loaded']=True
+        # A later native-weather failure cannot undo this separate transaction.
+        write(latest,report)
     if not screen_only:
         from get_data.weather import collect_weather
         from db.weather_store import load_weather
@@ -75,6 +77,8 @@ def run(*,load_database=False,allow_research=False,screen_only=False):
                 with connection.transaction():
                     load_weather(connection,readings,forecasts,[s['site_id'] for s in sites],as_of=weather_report['as_of'])
                     load_weather_evidence(connection,weather_report,sites)
+            report['weather_database_loaded']=True
+            write(latest,report)
         if weather_report['status']!='ok':report['status']='partial'
     write(directory/'validation.json',report);write(latest,report)
     print('Screening',report['status'],len(predictions),'/',len(sites),'sites; database_loaded=',report['database_loaded'],flush=True)
@@ -91,10 +95,13 @@ def main():
     with (root/'worker.lock').open('a') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
         while True:
+            write(root/'latest.json',{'status':'building','database_loaded':False,'weather_database_loaded':False})
             try:
                 report=run(load_database=args.load,allow_research=args.allow_research,screen_only=args.screen_only)
             except Exception as exc:
-                write(root/'latest.json',{'status':'failed','database_loaded':False,'error_type':type(exc).__name__})
+                failed=json.loads((root/'latest.json').read_text())
+                failed.update(status='failed',error_type=type(exc).__name__)
+                write(root/'latest.json',failed)
                 if not args.interval_seconds:raise SystemExit('Collection failed; no success is claimed. Inspect local runtime status.') from None
             else:
                 if not args.interval_seconds:raise SystemExit(0 if report['status']=='ok' else 1)

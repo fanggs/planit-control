@@ -33,7 +33,17 @@ separate real-service/team checks. This bundle includes integration helpers
 because the correction needs a complete inference/storage path; it does not
 edit teammates' owned files or claim those integration checks are finished.
 
-## Original interval 5 direction
+## Interval 7 implementation
+
+Implemented the API-query-compatible read adapter, explicit research-display
+opt-in, unavailable/stale/invalid response handling and a full offline replay
+from original 60-site forecasts through response generation. Worker reporting
+preserves committed phases if a later phase fails. See `INTEGRATION.md` and
+`generated/integration-verification.json`. This completes the local code and
+handoff interval; cloud execution, shared-contract changes, deployed integration
+and model validation remain release work and are not claimed complete.
+
+## Original interval 5 direction (historical)
 
 Interval 5 status: five fixed candidates trained and exported; no weather model
 met the predeclared validation acceptance rule. Logistic regression leads mean

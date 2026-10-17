@@ -1,0 +1,11 @@
+{
+  "artifact_sha256": "207c76d8ab9b0eb7387f17ce07c82fd348f70d667c9a5215aac737943e42b808",
+  "database_writes": 0,
+  "maximum_replay_difference": 0.0,
+  "network_requests": 0,
+  "recorded_run": "data/raw/runtime/runs/20261017T231557163624Z",
+  "scope": "Offline replay, explanation, read-response and missing/stale/research-display checks; not cloud/API deployment verification",
+  "sites": 60,
+  "status": "ok",
+  "verified_at": "2026-10-17T23:23:52.095556+00:00"
+}
