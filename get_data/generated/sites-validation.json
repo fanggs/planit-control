@@ -1,0 +1,97 @@
+{
+  "built_at": "2026-10-17T16:06:22.169076+00:00",
+  "source_vintage": "2026-08",
+  "sources": {
+    "eia": {
+      "url": "https://www.eia.gov/electricity/data/eia860m/xls/august_generator2026.xlsx",
+      "sha256": "b4b70abb4c217e8e2658c3bde7608a3d530e86a81279ccc572ced82a200e9f1c",
+      "bytes": 13955142,
+      "retrieved_at": "2026-10-17T16:06:18.329488+00:00"
+    },
+    "county_reference": {
+      "url": "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2026_Gazetteer/2026_Gaz_counties_national.zip",
+      "sha256": "6a99ca00efbc0be5112e225d4102704c51d5ce3b16e3afd6e4159460595fd12a",
+      "bytes": 139190,
+      "retrieved_at": "2026-10-17T16:06:18.487376+00:00"
+    }
+  },
+  "derivations": {
+    "county_fips": "2026 Census state + normalized county name; no fuzzy guesses",
+    "timezone": "timezonefinder polygon lookup using EIA plant coordinates",
+    "plant_type": "Sorted unique Technology values across OP generators; semicolon separated",
+    "utility": "Sorted unique Entity Name values across OP generators; semicolon separated"
+  },
+  "dependency_versions": {
+    "openpyxl": "3.1.5",
+    "timezonefinder": "8.3.0",
+    "timezonefinder-data": "1.2026.3"
+  },
+  "counts": {
+    "generator_rows": 28377,
+    "non_operating_generator_rows": 2251,
+    "rejected_plants": 1,
+    "operating_plants_before_validation": 14182,
+    "grouped_plants": 14181,
+    "eligible_plants": 13781,
+    "selected_plants": 60
+  },
+  "rejections_by_reason": {
+    "county_not_matched_to_2026_census": 186,
+    "missing_utility_or_technology": 1,
+    "outside_contiguous_us_scope": 214
+  },
+  "region_counts": {
+    "eastern_storms": 10,
+    "florida_gulf": 10,
+    "mississippi_valley": 10,
+    "plains_storms": 10,
+    "southwest_heat": 10,
+    "western_wildfire": 10
+  },
+  "demo_sites": [
+    {
+      "site_id": 621,
+      "name": "Turkey Point",
+      "state": "FL",
+      "purpose": "Everglades-area opener"
+    },
+    {
+      "site_id": 1925,
+      "name": "Prairie Island",
+      "state": "MN",
+      "purpose": "Mississippi River"
+    },
+    {
+      "site_id": 6072,
+      "name": "Grand Gulf",
+      "state": "MS",
+      "purpose": "Mississippi River"
+    },
+    {
+      "site_id": 437,
+      "name": "Edward C Hyatt",
+      "state": "CA",
+      "purpose": "Butte County wildfire geography"
+    },
+    {
+      "site_id": 445,
+      "name": "Shasta",
+      "state": "CA",
+      "purpose": "Shasta County wildfire geography"
+    }
+  ],
+  "checks": {
+    "unique_plant_ids": true,
+    "all_required_fields_present": true,
+    "all_sites_operating": true,
+    "county_fips_matched": true,
+    "valid_coordinates_and_timezones": true,
+    "all_demo_sites_present": true
+  },
+  "limitations": [
+    "Regions are demo coverage groups, not hazard ratings.",
+    "Coordinates and county names come from EIA; no parcel-level boundary verification.",
+    "2026 county codes need vintage-aware crosswalks when joining older NOAA records.",
+    "No hazard scores or wildlife probabilities are inferred from site selection."
+  ]
+}
