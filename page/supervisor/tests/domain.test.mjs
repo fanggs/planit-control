@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {assessScore, summaryScore, rankSites, freshness, countdown, coordinates,
-  validNotice, hasSupervisorRole, safeSourceURL} from '../domain.js';
+  isReplayAlert, siteHasReplayAlert, validNotice, hasSupervisorRole, safeSourceURL} from '../domain.js';
 const sites = JSON.parse(await fs.readFile(new URL('../sample-data/sites.json', import.meta.url)));
 const details = JSON.parse(await fs.readFile(new URL('../sample-data/site_details.json', import.meta.url)));
 
@@ -47,6 +47,18 @@ test('an expired countdown never gives all-clear; missing timestamp is unavailab
   assert.equal(countdown(null, now), 'Clear time unavailable');
   assert.equal(freshness(null, now).stale, true);
   assert.equal(freshness('2026-10-16T18:00:00Z', now).stale, true);
+});
+test('replay labels require the explicit alert flag and matching active site alert', () => {
+  const site = {site_id: 621, active_alert: {hazard_type: 'lightning', level: 'stop_work'}};
+  const replay = {site_id: 621, hazard_type: 'lightning', level: 'stop_work',
+    trigger: {strike_id: 'opaque-provider-id', is_replay: true}};
+  assert.equal(isReplayAlert(replay), true);
+  assert.equal(siteHasReplayAlert(site, [replay]), true);
+  assert.equal(isReplayAlert({...replay, trigger: {strike_id: 'replay-looking-id'}}), false);
+  assert.equal(siteHasReplayAlert(site, [{...replay, site_id: 622}]), false);
+  assert.equal(siteHasReplayAlert(site, [{...replay, level: 'warning'}]), false);
+  assert.equal(siteHasReplayAlert(site, null), false);
+  assert.equal(siteHasReplayAlert({...site, active_alert: null}, [replay]), false);
 });
 test('reject invalid coordinates, unrecognized notices, forged role strings and unsafe links', () => {
   assert.equal(coordinates({latitude: 0, longitude: 0})[0], 0);

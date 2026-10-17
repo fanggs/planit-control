@@ -10,6 +10,22 @@ test('HTTP reads contract arrays without invented pagination and preserves prefi
   const seen=[];const api=createHTTPAPI(settings,async()=>'test-token',async(url,options)=>{seen.push([url.href,options]);return json(fixture.sites);});
   const sites=await api.listSites();assert.equal(sites[0].id,'9001');assert.equal(sites.length,3);
   assert.equal(seen[0][0],'https://example.test/api/sites');assert.equal(seen[0][1].headers.Authorization,'Bearer test-token');
+  assert.equal(seen[0][1].credentials,'omit');assert.equal(seen[0][1].redirect,'error');
+});
+test('access tokens only go to HTTPS or 127.0.0.1, never unsafe routes or empty sessions',async()=>{
+  let tokenCalls=0,fetchCalls=0;
+  const token=async()=>{tokenCalls++;return 'test-token';};
+  const fetcher=async()=>{fetchCalls++;return json(fixture.sites);};
+  for(const baseURL of ['http://example.test/api','http://localhost:8000','ftp://example.test/api',
+    'https://user:password@example.test/api','https://example.test/api?token=x','https://example.test/api#fragment']){
+    await assert.rejects(createHTTPAPI({baseURL},token,fetcher).listSites(),/API URL must use HTTPS/);
+  }
+  await assert.rejects(createHTTPAPI({baseURL:'https://example.test/api',routes:{sites:'https://other.test/sites'}},token,fetcher).listSites(),/configured API origin/);
+  assert.equal(tokenCalls,0);assert.equal(fetchCalls,0);
+  const local=createHTTPAPI({baseURL:'http://127.0.0.1:8000'},token,fetcher);
+  await local.listSites();assert.equal(tokenCalls,1);assert.equal(fetchCalls,1);
+  await assert.rejects(createHTTPAPI(settings,async()=>'',fetcher).listSites(),/valid access token/);
+  assert.equal(fetchCalls,1);
 });
 test('site detail requests validate identity and map the full nested score',async()=>{
   const api=createHTTPAPI(settings,async()=>'token',async()=>json(fixture.details['9001']));
