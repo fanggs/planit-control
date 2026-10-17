@@ -265,10 +265,24 @@ Reports are shown **next to** the score and can trigger their own warning. They
 do **not** change the trained score in v1, so the score stays an honest model
 output.
 
-## 8. Lightning data
+## 8. Lightning data (live)
 
-Search for a free live source for at most 1 hour. If none works, replay real
-historical strikes with `is_replay = true`, and say so in the demo.
+**Source: NOAA GOES Geostationary Lightning Mapper (GLM)**, free, no API key,
+published on AWS Open Data in near real time (new files about every 20 seconds).
+GOES-East covers the eastern/central U.S., GOES-West the western U.S. Verify
+bucket names and latency when building.
+
+- A job (Alan, `jobs/`) polls the newest GLM files about every minute, extracts
+  each flash's time, latitude, longitude, and stores it in `lightning_strikes`
+  with `is_replay = false`.
+- The lightning rule checks distance from every monitored site (10 miles →
+  stop-work alert, 30-minute countdown, reset on each new strike).
+- **Accuracy note:** GLM locates flashes to roughly 8 to 14 km, so a strike near
+  the 10-mile edge is approximate. Say this if asked.
+- **If the feed is down, show "lightning data unavailable,"** never "no strikes."
+- **Demo backup:** there may be no storms near any site during the expo. Keep a
+  replay mode that plays back real recorded GLM flashes with `is_replay = true`,
+  clearly labeled "replay" in the UI. Live stays the default.
 
 ## 9. Postponed (README "what we'd do next")
 
