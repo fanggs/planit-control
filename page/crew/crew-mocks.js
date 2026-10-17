@@ -2,6 +2,7 @@
 import {hazards,strikeDeadline,nextSixPM,timezoneValid,localParts} from './crew-domain.js';
 import {atlasRoster} from './crew-atlas-data.js';
 import {localRead,localWrite} from './crew-local-store.js';
+import {featureLabel} from './crew-screening.js';
 let catalogPromise;
 const demoSource={source_name:'Synthetic demonstration fixture',source_url:null};
 const listeners=new Set(),memory=new Map();
@@ -16,7 +17,7 @@ async function catalog(){
   }).then(rows=>atlasRoster(rows).map(r=>({...r,operator:r.utility,
     score:Math.round((2+hash(r.id)%76/10)*10)/10,
     provenance:{source_name:r.source_name,source_url:r.source_url,retrieved_at:r.retrieved_at},
-    score_updated_at:now(),demo:true})));
+    score_status:'sample',valid_from:now(),valid_until:new Date(Date.now()+86400000).toISOString(),score_updated_at:now(),demo:true})));
   return catalogPromise;
 }
 function emit(event){listeners.forEach(fn=>fn(event));channel?.postMessage(event);}
@@ -32,8 +33,9 @@ async function site(id){
   const readings=[['Partly cloudy · wind 12 mph','Check local visibility before vehicle movements.'],['Heat index 110°F','Plan water, shade and heat breaks.'],[value.alert.status==='hold'?`${value.alert.distance_miles?.toFixed(1)} mi · sample strike`:'No measured strike data','Use designated shelter when a hold is active.'],[value.floodWarning?'68 mm overnight · flood warning':'12 mm overnight · sample','Inspect access roads before entering.'],['Smoke outlook · sample elevated','Check smoke and fire updates before travel.'],['Soil saturation 86% · sample','Review access and equipment stability.'],['Unverified wildlife observation','Keep clear and share confirmed sightings.']];
   return {...base,revision:value.revision,server_time:stamp,timezone:base.timezone||null,
     hazards:Object.fromEntries(hazards.map(([key],i)=>[key,{reading:readings[i][0],advice:readings[i][1],severity:key==='flood'&&value.floodWarning||key==='lightning'&&value.alert.status==='hold'?'high':high&&['heat','soil'].includes(key)?'high':'elevated',observed_at:stamp,...demoSource}])),
-    score_method:'Synthetic demo index. No trained model is connected.',model:{name:'Demo fixture',version:'sample-v2',training_period:'Not trained',trained_at:null,evaluation:'No historical model evaluation'},baseline:1,
-    factors:hazards.map(([,name],i)=>({name,contribution:Math.round((base.score-1)/7*100)/100,unit:'score_points',reading:readings[i][0],retrieved_at:stamp,...demoSource})),alert:value.alert,
+    score_method:'Synthetic demo index. No trained model is connected.',model:{name:'Demo fixture',version:'sample-v3',training_period:'Not trained',trained_at:null,evaluation:'No historical model evaluation'},baseline:1,
+    score_reconciles:true,
+    factors:[['rain_total_24h_in',.45],['wind_max_mph',.35],['heat_index_max_f',.25],['month_cos',-.05]].map(([feature,weight])=>({feature,name:featureLabel(feature),contribution:(base.score-1)*weight,unit:'score_points',reading:'Synthetic example contribution',scored_at:stamp,...demoSource})),wildlife_context:{site_id:id,status:'sample_no_evidence',sightings:[],encounter_probability:null,numeric_score_contribution:null,limitations:'Demo mode has no historical sighting feed. Crew reports are stored separately.'},alert:value.alert,
     flood:{status:value.floodWarning?'warning':'unknown',message:value.floodWarning?'Sample river-side scenario: heavy overnight rain may flood access roads. Check with your supervisor before entering.':'Live flood assessment is not connected.',river_name:value.floodWarning?(id==='6072'?'Mississippi River':'Demo river scenario — not verified for this plant'):null,river_distance_miles:value.floodWarning?1.1:null,overnight_rain_mm:value.floodWarning?68:null,window_label:value.floodWarning?'Previous night, 6 PM–6 AM (sample)':null,observed_at:stamp,rule_description:value.floodWarning?'Demo scenario only: river proximity and heavy rain; backend must supply its own hydrologic criteria.':null,...demoSource}};
 }
 export const mockAPI={

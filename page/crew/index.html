@@ -54,44 +54,13 @@
           <li><span class="workflow-number">05</span><div><h3>Prepare for the next shift.</h3><p>At 6 PM in each site’s local timezone, the daily briefing summarizes tomorrow’s hazards using the forecast and score. Open the briefing to review its date and the information it was based on.</p></div></li>
         </ol>
         <div class="score-method" aria-labelledby="score-method-title">
-          <header class="score-method-heading"><p class="welcome-kicker">THE HAZARD INDEX / 0–10</p><h3 id="score-method-title">Two models. One explainable score.</h3><p>The index combines a weather outlook for the next 24 hours with the likelihood of dangerous wildlife nearby this month. A higher number means greater predicted environmental risk.</p></header>
+          <header class="score-method-heading"><p class="welcome-kicker">HAZARD SCREENING INDEX / 0–10 · PROTOTYPE</p><h3 id="score-method-title">One screening model. Clear evidence.</h3><p>The index estimates whether selected National Weather Service warnings or heat advisories may cover a plant during the next 24-hour forecast window. It is not an injury prediction or a guarantee that other hazards are absent.</p></header>
           <div class="score-models">
-            <article class="score-model weather-model">
-              <div class="score-model-top"><h4>Weather risk</h4><span>0–8 points</span></div>
-              <p>A small decision-tree model—one that learns a sequence of yes/no checks—is trained on historical weather and NOAA Storm Events, including heat, lightning, flooding, wildfire, and high wind.</p>
-              <p>It uses the site’s next-24-hour forecast to estimate the chance of hazardous outdoor-work conditions.</p>
-              <p class="score-model-formula">Predicted probability × 8</p>
-            </article>
-            <article class="score-model wildlife-model">
-              <div class="score-model-top"><h4>Wildlife risk</h4><span>0–2 points</span></div>
-              <p>A second decision tree learns from GBIF wildlife sightings, including iNaturalist records of alligators, cottonmouths, rattlesnakes, and copperheads.</p>
-              <p>It uses the site’s location and the current month to estimate the chance of dangerous wildlife nearby.</p>
-              <p class="score-model-formula">Predicted probability × 2</p>
-            </article>
+            <article class="score-model weather-model"><div class="score-model-top"><h4>Forecast screening</h4><span>0–10 index</span></div><p>One model was selected from five candidates using fixed-lead GFS forecasts and archived warning areas, with separate county and time evaluations.</p><p>Readable features such as 24-hour rain, max wind, max heat index and seasonal patterns explain the score. A feature can relate to more than one hazard.</p><p class="score-model-formula">Prototype · model estimate × 10</p></article>
+            <article class="score-model wildlife-model"><div class="score-model-top"><h4>Wildlife evidence</h4><span>Separate context</span></div><p>Dated GBIF sightings near a plant show the species, source, distance and available coordinate uncertainty.</p><p>Sightings and crew reports do not contribute score points or establish an encounter probability. Missing sightings do not mean wildlife is absent.</p></article>
           </div>
-          <figure class="score-example">
-            <figcaption><span class="welcome-kicker">ILLUSTRATIVE EXAMPLE</span><strong>Weather 6.4 + wildlife 1.8 = <span>8.2 / 10</span></strong><span>An 80% weather prediction contributes 6.4 points; a 90% wildlife prediction contributes 1.8.</span></figcaption>
-            <div class="score-example-track" role="img" aria-label="Example index of 8.2 out of 10: weather contributes 6.4 points and wildlife contributes 1.8 points."><span class="score-weather-segment"></span><span class="score-wildlife-segment"></span></div>
-            <div class="score-example-legend"><span><i class="weather-key" aria-hidden="true"></i>Weather · 6.4</span><span><i class="wildlife-key" aria-hidden="true"></i>Wildlife · 1.8</span><span>Scale: 0–10</span></div>
-          </figure>
-          <details class="score-explanation">
-            <summary>How do the individual factors add up?</summary>
-            <p>The breakdown starts at a <strong>baseline</strong>, the model’s starting score. Each factor then raises or lowers it. In a waterfall chart, these changes lead from the baseline to the final score.</p>
-            <div class="score-example-table-wrap"><table><caption>The same 8.2-point example, explained factor by factor</caption><thead><tr><th scope="col">Factor</th><th scope="col">Change</th><th scope="col">Running score</th></tr></thead><tbody>
-              <tr><th scope="row">Baseline</th><td>Starting point</td><td>2.4</td></tr>
-              <tr><th scope="row">Heat</th><td>+3.1</td><td>5.5</td></tr>
-              <tr><th scope="row">Lightning forecast</th><td>+1.9</td><td>7.4</td></tr>
-              <tr><th scope="row">Soil saturation</th><td>+0.9</td><td>8.3</td></tr>
-              <tr><th scope="row">Flooding</th><td>−1.5</td><td>6.8</td></tr>
-              <tr><th scope="row">Wildlife</th><td>+1.4</td><td>8.2</td></tr>
-            </tbody></table></div>
-            <p>A negative contribution lowers the model’s estimate; it does not mean a hazard is impossible. These example values explain the model design and are not current site readings.</p>
-          </details>
-          <div class="score-method-notes">
-            <p><strong>Alerts work independently.</strong> The score’s lightning factor is a forecast. An actual nearby strike triggers the stop-work rule regardless of the score.</p>
-            <p><strong>Reports add context.</strong> Crew reports sit alongside the score and can trigger warnings. They do not change the trained score in this version.</p>
-            <p><strong>Understand the limits.</strong> Models train on older years and are tested on the most recent year. Wildlife sightings are less complete in remote areas. The index is not an injury prediction; a rules-based fallback must be labeled as such.</p>
-          </div>
+          <details class="score-explanation"><summary>How do features explain the index?</summary><p>The baseline is the model's starting value. Signed feature contributions raise or lower it to reach the final index. For example: 2.1 baseline + 2.6 rain + 1.2 wind + 0.9 heat index − 0.4 seasonal contribution = 6.4. These are illustrative values, not current readings.</p></details>
+          <div class="score-method-notes"><p><strong>Prototype status stays visible.</strong> The current research model missed one of its evaluation checks. Scores remain labeled Prototype and show their target window; they must not be presented as established probabilities.</p><p><strong>Freshness matters.</strong> Inputs older than two hours, expired forecasts and invalid or unapproved predictions show no data. A missing score is never zero.</p><p><strong>Alerts are independent.</strong> The index never clears lightning stop-work instructions, flood warnings or crew-report warnings. A red-flag warning means fire-weather conditions; a severe-storm warning does not confirm a measured lightning strike.</p></div>
         </div>
       </section>
       <section class="welcome-demo" id="explore-demo" aria-labelledby="demo-title" hidden>

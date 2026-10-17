@@ -1,6 +1,34 @@
-# Crew backend connection — contract v1.1
+# Crew backend connection — contract v1.2
 
-`api/CONTRACT.md` is the source of truth. An **adapter** translates API data into the existing screen fields. The HTTP adapter now implements v1.1; internal display aliases are retained so the screens and local demo keep working.
+`api/CONTRACT.md` is the source of truth. An **adapter** translates API data into the existing screen fields. The adapter accepts v1.2 `screening`, feature contributions and separate `wildlife_context`, while retaining a visibly labeled bridge for the earlier API responses.
+
+## Screening migration and demo readiness (#6)
+
+- `crew-screening.js` validates status, signed contributions, exact reconciliation,
+  input freshness and the forecast window. `research` and `validated_prototype`
+  display as **Prototype**, with their target window. Unavailable or expired
+  scores display **No data**; an actual numeric zero remains zero.
+- The v1.2 screening value takes precedence even when it is explicitly null.
+  It never falls back to a legacy number or clears a lightning stop-work alert.
+- Legacy API scores remain readable as **Legacy API score** or **Sample score**
+  during rollout. A legacy number is never relabeled as a v1.2 model output.
+- Bulk site responses currently do not specify forecast-window fields. The map
+  preserves those fields when supplied, otherwise shows **Forecast window: not
+  supplied**. It does not infer a window or fetch 60 individual site details.
+- Wildlife sightings show recorded dates, sources, distances, uncertainty and
+  limitations separately from scores and crew reports. An empty record list is
+  never treated as confirmed wildlife absence.
+- Local demo conditions stay synthetic and use feature-shaped sample factors.
+  The homepage explains v1.2. A waterfall chart remains deferred at Isaiah's
+  direction; signed contributions are available in the existing details list.
+- At implementation time, both local and public `/openapi.json` still expose
+  the earlier `score` / `hazard_type` schema. Alan must finish the v1.2 API
+  schema and response integration; do not change `api/` from the crew work.
+- Alan confirmed #7 is complete: Auth0 accepts the production callbacks and test users are ready. Phone acceptance is still pending. The crew callback is
+  `https://foresite.work/crew/login.html`, logout URL
+  `https://foresite.work/crew/index.html`, origin `https://foresite.work`, and a
+  test account from Aryan with the crew role. Verify the supervisor separately with
+  Aryan. Do not close #6 solely because adapter tests pass.
 
 ## Configure a live connection
 
@@ -14,16 +42,16 @@ Default mode remains `mock`. Live errors never substitute synthetic conditions. 
 | --- | --- |
 | `site_id` integer | `id` / selected site ID string |
 | `utility` | `operator` |
-| Nested detail `score.score` | Numeric `score` |
+| Detail `screening.score` (v1.2), or legacy `score.score` | Numeric `score` |
 | `scored_at` | `score_updated_at` |
-| Factor `hazard_type` | Readable factor `name`; canonical type is also retained |
+| Factor `feature` (v1.2), or legacy `hazard_type` | Readable factor `name`; source key is also retained |
 | `flooding`, `soil_saturation` | Display cards `flood`, `soil` |
 | Report `hazard_type` | Display `category` |
 | Alert `level: 'stop_work'` | Lightning display `status: 'hold'` |
 | Alert `clear_at`, `last_trigger_at`, `trigger.distance_mi` | `all_clear_at`, `last_strike_at`, `distance_miles` |
 | Briefing `text`, `for_date` | `body`, `valid_date` |
 
-Outbound requests always use contract names and numeric site IDs. Weather stays a display card; its report category maps to `other`, never a `weather` hazard type. Contributions remain signed score points. Baseline plus contributions must match the score within 0.05; inconsistent explanations show an unavailable message. Scores are never estimated by the live frontend. Report warnings sit beside the score and do not change it.
+Outbound requests always use contract names and numeric site IDs. Weather stays a display card; its report category maps to `other`, never a `weather` hazard type. Contributions remain signed score points. Baseline plus contributions must reconcile with the score (floating-point tolerance only for v1.2; 0.05 for the legacy format); inconsistent explanations show an unavailable message. Scores are never estimated by the live frontend. Report warnings sit beside the score and do not change it.
 
 Readings retain actual units, observation times and provenance when supplied. Rolling 24-hour precipitation is labeled as such, not as overnight rain. Missing river association, training metrics, delivery status and readings remain unavailable. Revisions and alert versions are local request-order counters, not new backend requirements. No server clock or lightning-feed health is invented.
 

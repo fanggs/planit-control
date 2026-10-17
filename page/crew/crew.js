@@ -6,7 +6,8 @@ import {initAuth,session,signIn,signOut,enterDemo,authConfigured} from './crew-a
 import {services,demoAction} from './crew-services.js';
 import {acceptAlert,alertView} from './crew-state.js';
 import {acceptSnapshot,rankSites} from './crew-domain.js';
-import {esc,sourceLink,dateLabel,hazardHTML,scorePanel,floodHTML} from './crew-ui.js';
+import {esc,sourceLink,dateLabel,hazardHTML,scorePanel,floodHTML,wildlifeHTML} from './crew-ui.js';
+import {expireScreening} from './crew-screening.js';
 import {icon,brandMark,contourArt} from './crew-visuals.js';
 import {mountReports} from './crew-reports.js';
 import {mountBriefing} from './crew-briefing.js';
@@ -89,13 +90,14 @@ function renderView(){
 function renderStatus(){
   if(state.view!=='status'||!$('#crew-view'))return;const p=state.site;
   const open=$('#crew-score-panel details')?.open;
-  $('#crew-view').innerHTML=`<div class="crew-section-heading"><div><p class="crew-eyebrow">ONE RISK PICTURE</p><h2>Conditions around your site</h2><p class="crew-muted">Readings carry their observation time and source. Missing data stays unavailable.</p></div><button class="crew-link" data-action="refresh">Refresh</button></div>${hazardHTML(p)}<div id="crew-score-panel">${scorePanel(p)}</div>${floodHTML(p)}
+  $('#crew-view').innerHTML=`<div class="crew-section-heading"><div><p class="crew-eyebrow">ONE RISK PICTURE</p><h2>Conditions around your site</h2><p class="crew-muted">Readings carry their observation time and source. Missing data stays unavailable.</p></div><button class="crew-link" data-action="refresh">Refresh</button></div>${hazardHTML(p)}<div id="crew-score-panel">${scorePanel(p)}</div>${floodHTML(p)}${wildlifeHTML(p)}
     <div class="crew-quick-actions"><button class="crew-button" data-view="reports">${icon("report")} Report a hazard</button><button class="crew-button secondary" data-view="briefing">${icon("briefing")} Read tomorrow’s briefing</button></div>
     ${config.dataMode==='mock'?`<details class="crew-card crew-demo-controls"><summary>Demo scenarios</summary><p>These controls simulate backend events. They never report actual conditions.</p><label for="crew-strike-distance">Sample strike distance (miles)</label><input id="crew-strike-distance" type="number" min="0" max="100" step="0.1" value="4.2"><div class="crew-quick-actions"><button class="crew-button secondary" data-action="strike">Trigger / reset lightning hold</button><button class="crew-button secondary" data-action="clear">Simulate server clear</button><button class="crew-button secondary" data-action="flood">Trigger flood warning</button><button class="crew-button secondary" data-action="flood-off">Remove sample flood warning</button></div><small>Strikes beyond 10 miles do not trigger a hold. Timer expiry alone never clears it. Try Grand Gulf (plant 6072) for the Mississippi River scenario.</small></details>`:''}`;
   if(open)$('#crew-score-panel details').open=true;updateAlert();
 }
 function updateAlert(){
   if(!$('#crew-alert'))return;
+  const fresh=expireScreening(state.site);if(fresh!==state.site){state.site=fresh;if(state.view==='status')renderStatus();}
   if(!navigator.onLine||Date.now()-state.lastEvent>config.api.heartbeatMs)state.connected=false;
   const view=alertView(state.alert,state.connected,Date.now()+state.clockOffset);
   $('#crew-alert').dataset.tone=view.tone;if($('#crew-alert-title').textContent!==view.title)$('#crew-alert-title').textContent=view.title;if($('#crew-alert-detail').textContent!==view.detail)$('#crew-alert-detail').textContent=view.detail;

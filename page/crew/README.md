@@ -1,5 +1,12 @@
 # ForeSite — complete frontend package
 
+Contract v1.2 support: the screening index uses feature explanations, a visible
+Prototype label and forecast window, local expiry handling, and separate GBIF
+wildlife evidence. Local demos remain labeled samples. See
+`BACKEND-CONNECTION.md` for the temporary legacy API bridge and the remaining
+live API/Auth0/phone acceptance steps for issue #6. The waterfall is deferred;
+the existing signed contribution list remains available.
+
 Dark welcome page, role-aware Auth0 entry, crew workspace, and primary 60-site 2D/3D map. All six challenge capabilities have frontend screens and service connections. Actual environmental feeds, trained ML, shared storage, Auth0 tenant configuration, notification delivery and 6 PM background jobs must be provided by the backend.
 
 The visual theme uses near-black surfaces, mint/cyan accents, restrained hazard tints, original grid/contour artwork, icon navigation and a score ring. `crew-dark.css` supplies the shared dark palette inside Isaiah’s package. Category tints are independent from risk: the labeled severity badges and alert colors retain a consistent vocabulary. `crew-theme.css` keeps these changes scoped, and `crew-visuals.js` contains the original inline SVG artwork without external asset dependencies.

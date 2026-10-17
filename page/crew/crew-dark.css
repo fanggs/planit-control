@@ -132,3 +132,8 @@
   .planit-crew .crew-hazard > strong, .planit-crew .crew-hazard h3, .planit-crew .crew-hazard > p, .planit-crew .crew-hazard small { color: #17251c; }
   .planit-crew .crew-score-ring::before { background: #fff; }
 }
+.planit-crew .crew-score-badge { display:inline-block; margin:8px 0; padding:4px 9px; border:1px solid #796333; border-radius:6px; font-size:10px; font-weight:650; color:#f2d392; background:#332914; }
+.planit-crew .crew-score-window { margin:10px 0; font-size:11px; line-height:1.7; color:var(--crew-muted); }
+.planit-crew .crew-wildlife-evidence { border-top:2px solid #608f78; }
+.planit-crew .crew-wildlife-evidence .crew-factor { padding:12px 0; }
+@media print { .planit-crew .crew-score-badge { color:#59420d; background:white; border-color:#59420d; } }

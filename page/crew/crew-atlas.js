@@ -2,7 +2,8 @@ import {watchAtlasScores} from './crew-atlas-realtime.js';
 import {config} from './crew-config.js';
 import {supervisorNavigationURL} from './crew-routing.js';
 import {validScore} from './crew-domain.js';
-import {esc,dateLabel} from './crew-ui.js';
+import {esc,dateLabel,scoreBadgeHTML,scoreWindowHTML} from './crew-ui.js';
+import {expireScreening,scoreBadgeText} from './crew-screening.js';
 import {REGIONS,RISK_BANDS,atlasRisk,atlasRank,atlasRoster,atlasSummaries,atlasFilter,atlasPoint,atlasZoom,atlasEase,atlasPins,layoutAtlasLabels} from './crew-atlas-data.js';
 
 const $=selector=>document.querySelector(selector),canvas=$('#atlas-canvas'),ctx=canvas.getContext('2d');
@@ -103,14 +104,14 @@ function draw(now){
 }
 function renderList(){
   $('#atlas-result-count').textContent=`${state.visible.length} / 60`;
-  $('#atlas-plants').innerHTML=state.visible.map(s=>`<button class="atlas-plant" data-plant="${s.id}" aria-pressed="${s.id===state.selected}" style="--risk:${atlasRisk(s.score).color}" data-risk="${atlasRisk(s.score).key}"><span class="atlas-plant-dot" aria-hidden="true"></span><span><span class="atlas-plant-name">${esc(s.name)}</span><span class="atlas-plant-meta">${esc(s.state)} · EIA ${s.site_id} · ${REGIONS[s.hazard_region].short}</span></span><span class="atlas-plant-score" aria-label="${atlasRisk(s.score).label} hazard score">${validScore(s.score)?s.score.toFixed(1):'—'}</span></button>`).join('')||'<p class="atlas-empty">No matching monitored plants. Try a state, utility or plant name.</p>';
+  $('#atlas-plants').innerHTML=state.visible.map(s=>`<button class="atlas-plant" data-plant="${s.id}" aria-pressed="${s.id===state.selected}" style="--risk:${atlasRisk(s.score).color}" data-risk="${atlasRisk(s.score).key}"><span class="atlas-plant-dot" aria-hidden="true"></span><span><span class="atlas-plant-name">${esc(s.name)}</span><span class="atlas-plant-meta">${esc(s.state)} · EIA ${s.site_id} · ${REGIONS[s.hazard_region].short} · ${esc(scoreBadgeText(s))}</span></span><span class="atlas-plant-score" aria-label="${atlasRisk(s.score).label} hazard score">${validScore(s.score)?s.score.toFixed(1):'—'}</span></button>`).join('')||'<p class="atlas-empty">No matching monitored plants. Try a state, utility or plant name.</p>';
   $('#atlas-risk-key').innerHTML=RISK_BANDS.map(r=>`<div class="atlas-risk-key-row" style="--risk:${r.color}"><i aria-hidden="true"></i><span>${r.label} <small>${r.range}</small></span><strong>${state.visible.filter(s=>atlasRisk(s.score).key===r.key).length}</strong></div>`).join('');
   $('#atlas-mobile-risk').innerHTML=RISK_BANDS.map(r=>`<span style="color:${r.color}" title="${r.range}">${state.visible.filter(s=>atlasRisk(s.score).key===r.key).length} ${r.label.toLowerCase()}</span>`).join('<span aria-hidden="true"> · </span>');
 }
 function crewLink(id){const url=new URL('crew.html',location.href);url.searchParams.set('site',id);if(config.dataMode==='mock')url.searchParams.set('demo','1');return url.href;}
 function renderInspection(){
   const site=selected();if(!site)return;
-  $('#atlas-inspection').innerHTML=`<p class="atlas-eyebrow">SELECTED PLANT / ${esc(REGIONS[site.hazard_region].label.toUpperCase())}</p><h2>${esc(site.name)}</h2><p class="atlas-selected-meta">${esc(site.county)}, ${esc(site.state)} · EIA ${site.site_id}</p><p class="atlas-selected-utility">${esc(site.utility)}</p><div class="atlas-selected-score" style="--risk:${atlasRisk(site.score).color}"><strong>${validScore(site.score)?site.score.toFixed(1):'—'}</strong><div><small>${validScore(site.score)?atlasRisk(site.score).label.toUpperCase()+' HAZARD INDEX / 10':'HAZARD SCORE UNAVAILABLE'}</small><small>${validScore(site.score)?(config.dataMode==='mock'?'Sample score · ':'Scored ')+esc(dateLabel(site.score_updated_at,site.timezone)):'Verified location · no score inferred'}</small></div><button class="atlas-detail-button" data-atlas-action="focus">Locate ↗</button></div><a class="atlas-open-site" href="${esc(crewLink(site.id))}">Open crew site <span aria-hidden="true">↗</span></a>`;
+  $('#atlas-inspection').innerHTML=`<p class="atlas-eyebrow">SELECTED PLANT / ${esc(REGIONS[site.hazard_region].label.toUpperCase())}</p><h2>${esc(site.name)}</h2><p class="atlas-selected-meta">${esc(site.county)}, ${esc(site.state)} · EIA ${site.site_id}</p><p class="atlas-selected-utility">${esc(site.utility)}</p>${scoreBadgeHTML(site)}${scoreWindowHTML(site)}<div class="atlas-selected-score" style="--risk:${atlasRisk(site.score).color}"><strong>${validScore(site.score)?site.score.toFixed(1):'—'}</strong><div><small>${validScore(site.score)?atlasRisk(site.score).label.toUpperCase()+' SCREENING INDEX / 10':'HAZARD SCORE UNAVAILABLE'}</small><small>${validScore(site.score)?(config.dataMode==='mock'?'Sample score · ':'Scored ')+esc(dateLabel(site.score_updated_at,site.timezone)):'Verified location · no score inferred'}</small></div><button class="atlas-detail-button" data-atlas-action="focus">Locate ↗</button></div><a class="atlas-open-site" href="${esc(crewLink(site.id))}">Open crew site <span aria-hidden="true">↗</span></a>`;
 }
 function selectSite(id,{focus=false}={}){
   if(!state.sites.some(s=>s.id===String(id)))return;
@@ -173,7 +174,8 @@ const resize=new ResizeObserver(build);resize.observe(canvas);
 on(window,'pagehide',()=>{stopScoreUpdates?.();stopScoreUpdates=undefined;updatesConnected=false;cancelAnimationFrame(raf);raf=0;});on(window,'pageshow',e=>{if(e.persisted){build();if(config.dataMode==='live')void refreshScores().then(startScoreUpdates);}});
 function scoreStatus(){
   const scored=state.sites.filter(s=>validScore(s.score)).length;
-  $('#atlas-data-status').textContent=state.scoreState==='unavailable'?'VERIFIED LOCATIONS / SCORE FEED UNAVAILABLE':config.dataMode==='mock'?`SAMPLE SCORES · ${scored} REAL PLANT LOCATIONS`:`${scored} OF 60 SCORES · ${updatesConnected?'LIVE UPDATES':'UPDATES DISCONNECTED'}`;
+  const prototypes=state.sites.filter(s=>['research','validated_prototype'].includes(s.score_status)&&validScore(s.score)).length;
+  $('#atlas-data-status').textContent=state.scoreState==='unavailable'?'VERIFIED LOCATIONS / SCORE FEED UNAVAILABLE':config.dataMode==='mock'?`SAMPLE SCORES · ${scored} REAL PLANT LOCATIONS`:`${scored} OF 60 SCORES · ${prototypes} PROTOTYPE · ${updatesConnected?'LIVE UPDATES':'UPDATES DISCONNECTED'}`;
 }
 function startScoreUpdates(){
   if(config.dataMode!=='live'||!sourceAPI||stopScoreUpdates)return;
@@ -207,4 +209,7 @@ async function boot(){
     $('#atlas-data-refresh').hidden=false;await refreshScores();startScoreUpdates();
   }catch(error){$('#atlas-loading').hidden=false;$('#atlas-loading').textContent=error.message+' The plant list remains available if the roster loaded.';announce(error.message);}
 }
+let expiryTimer;
+function startExpiry(){clearInterval(expiryTimer);expiryTimer=setInterval(()=>{const checked=state.sites.map(s=>expireScreening(s));if(checked.some((s,i)=>s!==state.sites[i])){state.sites=checked;filter();scoreStatus();}},30000);}
+startExpiry();on(window,'pagehide',()=>clearInterval(expiryTimer));on(window,'pageshow',startExpiry);
 boot();

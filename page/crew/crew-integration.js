@@ -1,5 +1,6 @@
-/* API fields follow api/CONTRACT.md v1.1. UI aliases stay on this side of the boundary.
+/* API fields follow api/CONTRACT.md v1.2, with an explicit legacy API bridge.
    Revisions below order client requests; they are not backend data or timestamps. */
+import {screeningDetail,screeningSummary,screeningFactors} from './crew-screening.js';
 export const HAZARD_LABELS = Object.freeze({
   heat: 'Extreme heat', lightning: 'Lightning', flooding: 'Flooding',
   wildfire: 'Wildfire', soil_saturation: 'Soil saturation', wildlife: 'Wildlife', other: 'Other'
@@ -21,14 +22,21 @@ function wireSiteId(value) {
 }
 function factors(rows) {
   return (Array.isArray(rows) ? rows : []).map(factor => {
+    if (factor?.feature != null) return screeningFactors([factor])[0];
     if (!Object.hasOwn(HAZARD_LABELS, factor.hazard_type) || !finite(factor.contribution)) throw new Error('Invalid score factor from the API.');
     return {...factor, name: HAZARD_LABELS[factor.hazard_type], unit: 'score_points'};
   });
 }
-export function mapSiteSummary(raw) {
+export function mapSiteSummary(raw, {now = Date.now()} = {}) {
+  const modern = raw.score_status != null;
+  const screening = modern ? screeningSummary(raw,now) : {
+    score:scoreValue(raw.score),score_updated_at:time(raw.scored_at),score_status:'legacy',
+    score_reason:'The API is still using the earlier score format.',valid_from:null,valid_until:null,captured_at:null
+  };
+  let topFactors=null;
+  try{topFactors=raw.top_factors==null||screening.score===null?null:factors(raw.top_factors);}catch{topFactors=null;}
   return {...raw, id: wireSiteId(raw.site_id), operator: raw.utility,
-    score: scoreValue(raw.score), score_updated_at: time(raw.scored_at),
-    top_factors: raw.top_factors == null ? null : factors(raw.top_factors), provenance: source(raw)};
+    ...screening,top_factors:topFactors,provenance:source(raw)};
 }
 export function mapReport(raw) {
   const site_id = wireSiteId(raw.site_id);
@@ -68,7 +76,7 @@ function displayHazards(raw, activeAlerts) {
   return hazards;
 }
 
-export function createContractMapper() {
+export function createContractMapper({now = () => Date.now()} = {}) {
   let sequence = 0;
   const snapshots = new Map();
   const nextRevision = () => ++sequence;
@@ -89,7 +97,8 @@ export function createContractMapper() {
     // A stale same-alert response must not shorten a hold that already incorporated a newer strike.
     if (hold && previous?.alert?.status === 'hold' && String(hold.id) === String(previous.alert.contract_id)
       && Date.parse(hold.clear_at) < Date.parse(previous.alert.all_clear_at)) Object.assign(alert, previous.alert, {version: revision});
-    const model = raw.score;
+    const modern = Object.hasOwn(raw,'screening');
+    const model = modern ? null : raw.score;
     if (model && wireSiteId(model.site_id) !== id) throw new Error('The score belongs to a different site.');
     const mappedFactors = factors(model?.factors);
     const baseline = finite(model?.baseline) ? model.baseline : null;
@@ -97,13 +106,18 @@ export function createContractMapper() {
     const reconciles = value !== null && baseline !== null && Math.abs(baseline + mappedFactors.reduce((sum, f) => sum + f.contribution, 0) - value) <= .050000001;
     const floodAlert = active.find(a => a.hazard_type === 'flooding');
     const floodEvent = (raw.environmental_events || []).find(e => e.hazard_type === 'flooding');
-    const mapped = {...mapSiteSummary({...raw, score: value, scored_at: model?.scored_at}),
+    const screening = modern ? screeningDetail(raw.screening,now()) : null;
+    const mapped = {...mapSiteSummary({...raw, score: value, scored_at: model?.scored_at},{now:now()}),
       revision, server_time: null, timezone: raw.timezone ?? null, sample: model?.model_version === 'sample',
       score_method: model?.model_version === 'sample' ? 'Sample API score. Not a live trained-model result.'
         : model ? `${String(model.model_version || 'Model version unavailable')} · ${model.horizon_hours ?? 'Unknown'}-hour outlook` : 'Score unavailable.',
       baseline, factors: mappedFactors.map(f => ({...f, scored_at: time(model?.scored_at)})),
       score_reconciles: reconciles, horizon_hours: model?.horizon_hours ?? null,
-      model: {version: model?.model_version}, alert, active_alerts: active,
+      model: {version: model?.model_version},
+      ...(modern?{...screening,sample:false,score_method:'Prototype screening index for NWS warnings or heat advisories in the next 24 hours. Not an injury probability.',
+        model:{name:'Forecast screening model',version:raw.screening?.artifact_sha256},
+        factors:screening.factors?.map(f=>({...f,scored_at:screening.score_updated_at}))||[],horizon_hours:24}:{}),
+      wildlife_context:mapWildlife(raw.wildlife_context,id),alert, active_alerts: active,
       warnings: active.filter(a => a.level === 'warning'), hazards: displayHazards(raw, active),
       flood: {...source(floodEvent), status: floodAlert || floodEvent ? 'warning' : 'unknown',
         message: floodAlert?.message || floodEvent?.title || 'Flood warning status unavailable. No hydrologic assessment was supplied.',
@@ -122,6 +136,12 @@ export function createContractMapper() {
       timezone: snapshots.get(String(siteId))?.timezone ?? null, forecast: [], sources: [], delivery_status: null};
   }
   return {nextRevision, site, briefing};
+}
+
+function mapWildlife(raw,id){
+  if(!raw)return null;
+  if(raw.site_id!=null&&String(raw.site_id)!==id)throw new Error('Wildlife evidence belongs to a different site.');
+  return {...raw,site_id:id,sightings:Array.isArray(raw.sightings)?raw.sightings:[],encounter_probability:null,numeric_score_contribution:null};
 }
 
 /* Alan supplies the DeepSpace SDK connection through this small frontend boundary.
