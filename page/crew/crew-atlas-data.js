@@ -1,4 +1,5 @@
 import {validScore} from './crew-domain.js';
+import {screeningSummary,expireScreening} from './crew-screening.js';
 
 // Match the crew score bands. A missing reading never becomes a safe score.
 export const RISK_BANDS=Object.freeze([
@@ -36,9 +37,12 @@ export function atlasSummaries(roster,rows) {
   const summaries=new Map((Array.isArray(rows)?rows:[]).map(s=>[String(s.id??s.site_id),s]));
   return roster.map(site=>{
     const raw=summaries.get(site.id);
-    return {...site,score:validScore(raw?.score)?raw.score:null,
-      score_updated_at:raw?.score_updated_at??raw?.scored_at??null,
-      active_alert:raw?.active_alert??null};
+    const modern=raw?.score_status&& !['legacy','sample'].includes(raw.score_status);
+    const score=modern?screeningSummary({...raw,scored_at:raw.scored_at??raw.score_updated_at}):{
+      score:validScore(raw?.score)?raw.score:null,score_status:raw?.demo?'sample':validScore(raw?.score)?'legacy':'no_data',
+      score_updated_at:raw?.score_updated_at??raw?.scored_at??null,valid_from:raw?.valid_from??null,valid_until:raw?.valid_until??null};
+    return expireScreening({...site,...score,demo:raw?.demo===true,sample:raw?.sample===true,timezone:site.timezone,
+      active_alert:raw?.active_alert??null});
   });
 }
 

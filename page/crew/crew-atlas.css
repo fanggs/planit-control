@@ -50,3 +50,9 @@
 .atlas-workspaces a{font-size:12px;color:#d4e7da;padding:10px 0}
 .atlas-workspaces a span{color:var(--atlas-mint);margin-left:5px}
 @media(max-width:900px){.atlas-header{gap:8px;padding-inline:12px}.atlas-workspaces{gap:12px}.atlas-workspaces a{font-size:10px}}
+
+/* Screening metadata remains visible alongside every displayed index. */
+.planit-atlas .crew-score-badge{display:inline-block;margin:8px 0 0;padding:3px 7px;border:1px solid #796333;border-radius:5px;color:#f2d392;background:#332914;font-size:9px;font-weight:650}
+.planit-atlas .crew-score-window{font-size:9px;line-height:1.6;color:#a2b1ad;margin:6px 0}
+.planit-atlas .atlas-inspection{max-height:300px}
+@media(max-width:900px){.planit-atlas .atlas-inspection{max-height:225px}}
