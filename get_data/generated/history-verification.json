@@ -1,0 +1,275 @@
+{
+  "built_at": "2026-10-17T19:38:18.731093Z",
+  "status": "ok",
+  "output_directory": "data/raw/history/builds/20261017T193811576908Z",
+  "database_loaded": false,
+  "reanalysis": {
+    "rows": 17220,
+    "sites": 60,
+    "county_windows": 17220,
+    "unique_reported_events": 1361,
+    "unique_episodes": 534,
+    "labels": {
+      "unknown": 77,
+      "negative_no_applicable_report": 16258,
+      "positive": 885
+    },
+    "eligible_for_experiment": 17136,
+    "feature_null_counts": {
+      "temperature_max_f": 0,
+      "temperature_min_f": 0,
+      "relative_humidity_mean_pct": 0,
+      "relative_humidity_min_pct": 0,
+      "wind_max_mph": 0,
+      "wind_gust_max_mph": 0,
+      "precip_max_1h_in": 0,
+      "precip_total_24h_in": 0,
+      "soil_moisture_mean_m3_m3": 7,
+      "heat_index_max_f": 9964,
+      "month_sin": 0,
+      "month_cos": 0
+    },
+    "hazard_positive_counts": {
+      "heat": 166,
+      "lightning": 8,
+      "flooding": 165,
+      "wildfire": 207,
+      "other": 384
+    },
+    "first_cutoff": "2025-03-19T12:00:00Z",
+    "last_cutoff": "2025-12-30T12:00:00Z"
+  },
+  "forecast_pilot": {
+    "rows": 960,
+    "sites": 60,
+    "county_windows": 960,
+    "unique_reported_events": 102,
+    "unique_episodes": 35,
+    "labels": {
+      "negative_no_applicable_report": 912,
+      "positive": 48
+    },
+    "eligible_for_experiment": 960,
+    "feature_null_counts": {
+      "temperature_max_f": 0,
+      "temperature_min_f": 0,
+      "relative_humidity_mean_pct": 0,
+      "relative_humidity_min_pct": 0,
+      "wind_max_mph": 0,
+      "wind_gust_max_mph": 0,
+      "precip_max_1h_in": 0,
+      "precip_total_24h_in": 0,
+      "soil_moisture_mean_m3_m3": 0,
+      "heat_index_max_f": 436,
+      "month_sin": 0,
+      "month_cos": 0
+    },
+    "hazard_positive_counts": {
+      "heat": 9,
+      "lightning": 0,
+      "flooding": 4,
+      "wildfire": 17,
+      "other": 19
+    },
+    "first_cutoff": "2026-05-13T12:00:00Z",
+    "last_cutoff": "2026-06-27T12:00:00Z"
+  },
+  "forecast_sampling_step_days": 3,
+  "noaa": {
+    "source_records": 111422,
+    "matched_C_geography_records": 32095,
+    "matched_Z_geography_records": 9098,
+    "unresolved_zone_events": 1939,
+    "zone_events_spanning_geography_change": 20,
+    "invalid_geography_type_records": 2,
+    "site_event_rows": 2136,
+    "reported_months": {
+      "2025": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "2026": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    "crosswalk_quarantine": [
+      {
+        "source": "data/raw/history/sources/bp18mr25.dbx",
+        "zone_field": "WY198",
+        "state_zone_field": "WY098",
+        "county_fips": "56033",
+        "reason": "conflicting_zone_columns_quarantined"
+      },
+      {
+        "source": "data/raw/history/sources/bp18mr25.dbx",
+        "zone_field": "WY199",
+        "state_zone_field": "WY099",
+        "county_fips": "56033",
+        "reason": "conflicting_zone_columns_quarantined"
+      },
+      {
+        "source": "data/raw/history/sources/bp18mr25.dbx",
+        "zone_field": "FL326",
+        "state_zone_field": "FL025",
+        "county_fips": "12077",
+        "reason": "conflicting_zone_columns_quarantined"
+      },
+      {
+        "source": "data/raw/history/sources/bp18mr25.dbx",
+        "zone_field": "FL426",
+        "state_zone_field": "FL125",
+        "county_fips": "12077",
+        "reason": "conflicting_zone_columns_quarantined"
+      },
+      {
+        "source": "data/raw/history/sources/bp18mr25.dbx",
+        "zone_field": "FL233",
+        "state_zone_field": "FL223",
+        "county_fips": "12109",
+        "reason": "conflicting_zone_columns_quarantined"
+      }
+    ]
+  },
+  "feature_columns": [
+    "temperature_max_f",
+    "temperature_min_f",
+    "relative_humidity_mean_pct",
+    "relative_humidity_min_pct",
+    "wind_max_mph",
+    "wind_gust_max_mph",
+    "precip_max_1h_in",
+    "precip_total_24h_in",
+    "soil_moisture_mean_m3_m3",
+    "heat_index_max_f",
+    "month_sin",
+    "month_cos"
+  ],
+  "target_definition": "Any of the documented NOAA weather-event types reported in the plant county or an intersecting public forecast zone during (UTC noon, next UTC noon].",
+  "zero_label_definition": "No applicable record in these published extracts; NOT confirmed absence of danger.",
+  "forecast_cutoff_policy": "00 UTC run, 12 UTC decision cutoff. Historical publication time is unverified; 12-hour lag is an explicit availability assumption.",
+  "limitations": [
+    "ERA5 is retrospective reanalysis, not a forecast available at the prediction cutoff.",
+    "The forecast pilot is a predetermined every-N-days sample over May\u2013June 2026, not full seasonal validation.",
+    "Pilot dates follow the documented 2026-05-12 IFS cycle change to avoid mixing earlier hindcasts with operational runs.",
+    "Archived-run publication latency is not independently observed; promotion requires additional availability verification.",
+    "County and intersecting-zone reports do not establish events at a plant or worker injury probability.",
+    "Unresolved zone geography masks uncertain negatives instead of manufacturing safe labels.",
+    "Wildlife data has no absence/survey-effort labels; no unified wildlife danger weighting is inferred.",
+    "Soil saturation has no direct event label; soil moisture is a feature, not an invented saturation outcome.",
+    "Repeated sites in the same county share labels; split by county/time and purge overlapping episodes before evaluation."
+  ],
+  "model_promotion_eligible": false,
+  "code_fingerprints": {
+    "history.py": "4e25c94515a7e2d8eefb6aebf4a8f21019480f2b7416f21cc55d40ea75757eb3",
+    "history_features.py": "94b5a04dcbe0b77a9eaae412d3a0508e8ed1f46632a491567f6963599da06313",
+    "noaa.py": "e5470dddb7b810f5ec847468d6bc31700d7bfb83a86dbbbe05ef14d2777f670b",
+    "wildlife.py": "10b9dab35a1c3c87801a509f992836d8136f93b4af9275b2b0324f48fe436cdf",
+    "weather_values.py": "4749b9e11a7dcbf0cbc78cbace4c49d0b71741279bef7899337dfa3bac62aab8",
+    "download.py": "c5df30d26058940e2f0c5db5292cd3226cfce4566f5c19b228f4dad935e0527c"
+  },
+  "study_sites_fingerprint": "bc4feef346333b4ddce78820ac2a61a2fc2abc3ff56e80b5b900485d7410ccec",
+  "artifact_checksums": {
+    "weather-reanalysis-examples.jsonl": "a8e3963f1922cc72f041c82efe8aad4d152e91f2f3215f6075ddaec89c5e3971",
+    "weather-forecast-pilot.jsonl": "a32f9472e7ed6554045858622ba1409a65a45730471d9f1044ba2e3fb4014ad4",
+    "environmental-events.json": "8ea5c7dcd58e4dcfa9ff90605c2e8862d977148064bac4400599c3d48c718991",
+    "unresolved-noaa-geography.json": "fad3110dea81f168738b03ca36a054e5e69fba186c7e69700c6c1322e3fe1d95",
+    "wildlife-observations.json": "6f4137575bdffcf4aa1846649d72abd0f21817a7408e6b23620d7cd27df1e87b"
+  },
+  "quarantined_weather_cells": {
+    "soil_moisture_0_to_7cm": 53
+  },
+  "wildlife": {
+    "taxa": [
+      {
+        "taxon": "Alligator mississippiensis",
+        "taxon_key": 2441370,
+        "api_reported_count": 48852,
+        "fetched": 600,
+        "accepted_unique": 563,
+        "capped_subset": true
+      },
+      {
+        "taxon": "Agkistrodon piscivorus",
+        "taxon_key": 9105722,
+        "api_reported_count": 11123,
+        "fetched": 600,
+        "accepted_unique": 465,
+        "capped_subset": true
+      },
+      {
+        "taxon": "Agkistrodon conanti",
+        "taxon_key": 9577440,
+        "api_reported_count": 3385,
+        "fetched": 600,
+        "accepted_unique": 452,
+        "capped_subset": true
+      },
+      {
+        "taxon": "Agkistrodon contortrix",
+        "taxon_key": 9215881,
+        "api_reported_count": 12048,
+        "fetched": 600,
+        "accepted_unique": 453,
+        "capped_subset": true
+      },
+      {
+        "taxon": "Crotalus",
+        "taxon_key": 2444354,
+        "api_reported_count": 51346,
+        "fetched": 600,
+        "accepted_unique": 377,
+        "capped_subset": true
+      },
+      {
+        "taxon": "Sistrurus",
+        "taxon_key": 2444221,
+        "api_reported_count": 3850,
+        "fetched": 600,
+        "accepted_unique": 344,
+        "capped_subset": true
+      }
+    ],
+    "accepted_records": 2654,
+    "rejections": {
+      "location_uncertainty_over_10km_or_invalid": 942,
+      "not_an_observation": 4
+    },
+    "date_anchoring": "Naive/date-only source values become explicitly marked UTC calendar-day anchors, not exact observation times.",
+    "limitations": [
+      "Presence-only API subsets do not provide absence labels or encounter/injury probabilities.",
+      "API ordering and record caps are not representative random sampling or survey effort.",
+      "Unknown uncertainty is retained as unknown, never replaced with zero.",
+      "The 10-km uncertainty filter is a declared data-quality choice, not a safety distance.",
+      "Species list follows the current contract; Turkey Point crocodile coverage remains a team question."
+    ]
+  },
+  "verification": {
+    "source_checksums_verified": 1042,
+    "derived_artifact_hashes_verified": 5,
+    "cached_rebuild_identical": true,
+    "all_example_provenance_and_windows_valid": true,
+    "sql_and_plpgsql_syntax_checked": true,
+    "hypertable_migration_executed": false,
+    "historical_database_load_executed": false
+  },
+  "source_ledger": {
+    "path": "data/raw/history/builds/20261017T193811576908Z/validation.json",
+    "sha256": "7c3bdce2066f9e7e73b3a7e20fea8d0d17bbf13ea39e9019644220dd4e4f1490"
+  },
+  "recorded_snapshot": true
+}

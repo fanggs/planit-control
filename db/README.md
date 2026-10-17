@@ -5,6 +5,9 @@ the repository root.
 
 ## Setup
 
+For local PostgreSQL/PL/pgSQL parser tests, install `db/requirements-dev.txt`.
+These syntax tests do not claim that a migration has executed on a real service.
+
 Install `db/requirements.txt` inside the project's virtual environment. Configure
 `DATABASE_URL` through your local environment or secret manager; the runner does
 not load `.env` automatically. Never put the connection string in source control
@@ -46,10 +49,35 @@ so its key is `(id, site_id)`. Forecast uniqueness includes the issue time to
 preserve successive forecast runs instead of overwriting history.
 
 Time-series primary keys include their time column to support TimescaleDB.
-This first migration uses ordinary PostgreSQL tables; it does **not** enable
-extensions or convert tables into hypertables. Confirm the installed Tiger Data
-version and privileges before that separate setup. Do not assume hypertables
-exist merely because the database is hosted on Tiger Data.
+`001_foundation.sql` creates ordinary PostgreSQL tables. `002_hypertables.sql`
+then converts readings, forecasts, strikes and scores using their existing time
+columns, without changing `001` or removing its populated rows. Sites and the
+other tables stay ordinary tables. TimescaleDB must already be installed; this
+migration does not install extensions or alter cloud privileges.
+
+## Apply the hypertable conversion
+
+In the same Mac terminal with `DATABASE_URL` configured:
+
+```sh
+.venv/bin/python -m db.migrate --prompt-password
+```
+
+Enter the database password in the hidden prompt. The runner skips the already
+applied foundation and should print `Applied 002_hypertables.sql`. The conversion
+uses the [generalized TimescaleDB API](https://www.tigerdata.com/docs/reference/timescaledb/hypertables/create_hypertable),
+requires version 2.13+, and was prepared for Sid's reported 2.30.2 service.
+It migrates existing rows, uses seven-day chunks, takes the referenced-table
+lock first, and checks that all four expected time dimensions exist before
+committing. Lock acquisition is bounded to 15 seconds and execution to five
+minutes. Pause concurrent loaders while applying it; a failed conversion rolls
+back that migration and leaves its migration marker unapplied. The runner will
+retry it next time. SQL and PL/pgSQL syntax were checked locally; real-service
+execution still needs confirmation.
+
+`db/history_store.py` loads only GBIF observations and historical NOAA events,
+with parameterized upserts and post-load field comparisons. Large experimental
+weather matrices stay in the local historical dataset, separate from live feeds.
 
 `validation.py` checks external-row provenance, timezone-aware timestamps,
 nonempty loads, required columns, and finite, reconciled score explanations.

@@ -25,6 +25,10 @@ def safe_failure(exc):
         "42601": "PostgreSQL found a syntax error in the migration SQL.",
         "42P01": "A table needed by this operation does not exist.",
         "42883": "A required database function is unavailable.",
+        "55000": "A database extension or schema prerequisite is not satisfied; check the migration instructions.",
+        "55P03": "A table lock could not be acquired. Pause concurrent ingestion and retry the migration.",
+        "57014": "The database operation was cancelled or timed out. The current migration transaction did not complete.",
+        "0A000": "This operation requires a database feature or extension version that is unavailable.",
     }
     if state in messages:
         return f"SQLSTATE {state}: {messages[state]}"

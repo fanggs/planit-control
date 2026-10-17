@@ -1,7 +1,7 @@
 # Data ingestion
 
 Intervals 2 and 3 implement EIA plant ingestion and weather collection.
-Historical/model datasets are later intervals. These commands do not generate
+Historical evidence is documented in `HISTORY.md` (interval 4). These commands do not generate
 hazard scores or modify the API.
 
 ## Start here
@@ -232,3 +232,6 @@ install a scheduler or change Alan's files. API integration must check timestamp
 and implement stale/unavailable states: this local manifest is not automatically
 exposed to screens. Lightning detection and mandatory stop-work alerts remain
 Alan's separate live process, independent of these modeled conditions.
+
+For historical source collection, labels, data-quality exclusions and model
+experiment limits, continue with **`get_data/HISTORY.md`**.
