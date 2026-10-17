@@ -20,5 +20,9 @@ export function createHazardReportPayload(report,photoKey=null){
   if(!description||description.length>2000||description.includes('\0'))throw new Error('Description must be 1–2000 characters without NUL.');
   if(!Number.isFinite(report.latitude)||Math.abs(report.latitude)>90||!Number.isFinite(report.longitude)||Math.abs(report.longitude)>180)throw new Error('Valid latitude and longitude are required.');
   if(photoKey!==null&&(typeof photoKey!=='string'||photoKey.length<1||photoKey.length>1024))throw new Error('The upload must return a valid stored photo key.');
+  // Follow-up commit: fix(crew): match current photo storage key validation.
+  // A key is an opaque storage identity. Reject URLs/control characters and do
+  // not trim or rewrite the exact key returned by the upload service.
+  if(photoKey!==null&&(photoKey!==photoKey.trim()||/[\u0000-\u001f\u007f]/.test(photoKey)||photoKey.startsWith('//')||/^[A-Za-z][A-Za-z0-9+.-]*:/.test(photoKey)))throw new Error('Use the exact storage key, not a URL, whitespace or control characters.');
   return {site_id:Number(id),hazard_type,severity:report.severity,description,latitude:report.latitude,longitude:report.longitude,photo_key:photoKey};
 }

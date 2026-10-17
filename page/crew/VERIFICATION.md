@@ -2,9 +2,9 @@
 
 ## Automated
 
-`node --test`: **21 passed, 0 failed** after report-schema alignment. `node dev/check.mjs`: all application JavaScript syntax checks passed.
+`node --test`: **22 passed, 0 failed** after report-schema alignment. `node dev/check.mjs`: all application JavaScript syntax checks passed.
 
-The original 17 tests are retained. Four more tests check the current strict backend report payload: enum/ID conversion, an explicit severity choice, omission of client identity and retry ID from JSON, and invalid coordinates/description/storage keys. The new selector is a small form extension; live submission still needs the actual upload/report endpoints.
+The original 17 tests are retained. Five more tests check the current strict backend report payload: enum/ID conversion, an explicit severity choice, omission of client identity and retry ID from JSON, invalid coordinates/description/storage keys, and preservation of opaque key identity with rejection of URLs/control characters. The new selector is a small form extension; live submission still needs the actual upload/report endpoints.
 
 Coverage: 10-mile lightning boundary, distant-strike exclusion, old strike/deadline handling, countdown after tab sleep, ordered per-site alerts, explicit server clear, disconnected/unknown states, DST transitions for 6 PM previews, ranking with missing/out-of-range scores, monotonic site revisions, 13,446 unique plant references with valid coordinates, bearer authentication, cursor pagination, multipart photo upload, permission errors and fragmented/multiline SSE messages.
 

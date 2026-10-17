@@ -2,7 +2,7 @@
 
 ## Current repository report schema
 
-At integration baseline `5502248`, `api/schemas/hazard_report.py` defines a strict **JSON** creation payload with numeric `site_id`, `hazard_type`, required `severity` (`low`, `medium`, `high`), `description`, optional paired UI coordinates, and `photo_key`. It forbids extra fields. It does not yet implement a photo-upload/report HTTP endpoint. The default multipart route below remains a proposed transport, not that finalized endpoint.
+At integration baseline `20f18bd`, `api/schemas/hazard_report.py` defines a strict **JSON** creation payload with numeric `site_id`, `hazard_type`, required `severity` (`low`, `medium`, `high`), `description`, optional paired coordinates, and `photo_key`. It forbids extra fields and rejects photo URLs, surrounding whitespace and control characters in storage keys. It does not yet implement a photo-upload/report HTTP endpoint. The default multipart route below remains a proposed transport, not that finalized endpoint.
 
 For the current schema, use `transport: 'custom'`: upload the File with the team's storage flow, then call `createHazardReportPayload(report, storedPhotoKey)` from `crew-report-mapping.js` before posting the JSON. That helper maps the UI category to `hazard_type` (Weather maps to `other`), converts safe numeric EIA IDs, validates severity, and excludes request ID, identity, timestamps and the raw File from JSON. Use a backend-agreed idempotency header for `report.request_id`. Do not put a `reporter_id` supplied by the browser into the body. Keep the actual schema owned by Aryan unchanged.
 
