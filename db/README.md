@@ -12,9 +12,25 @@ or paste it into a terminal command that will be saved in history.
 
 ```sh
 python -m db.migrate --list
+python -m db.migrate --check
 python -m db.migrate
 python -m unittest discover -s db/tests -v
 ```
+
+`--check` connects with a 15-second timeout and reads PostgreSQL/TimescaleDB
+versions and the number of public tables inside a read-only transaction. It
+does not run migrations. Failure messages identify common login, URI, network,
+SSL and schema errors without echoing driver text or connection secrets.
+If a copied URI omits its password, run `python -m db.migrate --check
+--prompt-password` in an interactive terminal. Enter the database password saved
+when the service was created. Hidden input is supplied directly to the driver,
+overriding URI/environment password settings; it is not printed or saved.
+Use the same `--prompt-password` flag without `--check` to apply migrations
+when the connection URI omits the password.
+
+Sid confirmed a successful foundation migration and verified site/weather loads
+on October 17, 2026, using PostgreSQL 18.6 and TimescaleDB 2.30.2. Hypertable
+conversion and restricted Gemini login setup remain pending.
 
 The runner records SHA-256 checksums, skips already applied migrations, rejects
 edited applied files, serializes migration processes with a database lock, and

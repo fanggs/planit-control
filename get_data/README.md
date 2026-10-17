@@ -126,9 +126,11 @@ history or report references. Before committing, it re-reads and validates all
 monitored rows and compares every stored field with the intended catalog. A
 failed check rolls back the transaction. Re-running does not duplicate plants.
 
-Actual database execution, reload idempotency and transaction rollback remain
-integration checks until a development Tiger Data connection is configured.
-The 60-site export and offline validation are ready.
+On October 17, 2026, Sid ran the foundation migration and the 60-site loader
+against the team's Tiger Data service and reported successful post-load
+verification. The service reports PostgreSQL 18.6 and TimescaleDB 2.30.2.
+Repeated-load idempotency and deliberate rollback-failure tests remain separate
+integration checks. The foundation tables are not yet hypertables.
 
 ## Weather: interval 3
 
@@ -218,8 +220,10 @@ to exist and be monitored, then upserts both tables in one transaction. It
 checks every stored field before commit, rolls back on a mismatch, and refuses
 to overwrite a newer retrieval with an older one. Reading keys preserve provider
 and time; forecast keys also preserve the run identity. Repeated polls update
-the same keys rather than duplicating them. Actual database execution still
-needs verification against Tiger Data.
+the same keys rather than duplicating them. Sid also ran `get_data.weather
+--load` against Tiger Data on October 17, 2026 and confirmed the loader's
+successful commit-and-verify message. This confirms the normal database path;
+deliberate failure/rollback and repeated-load tests remain to be run.
 
 Alan can call `collect_weather` from an owned `jobs/` scheduler. Start with an
 hourly poll for all 60 sites and check current provider limits before deployment;
