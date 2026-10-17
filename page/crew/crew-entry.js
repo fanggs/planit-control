@@ -1,6 +1,6 @@
 import {config} from './crew-config.js';
 import {initAuth, session, signIn, signOut, authConfigured} from './crew-auth.js';
-import {workspaceForUser, siteParameter} from './crew-routing.js';
+import {workspaceForUser, siteParameter, workspaceURL} from './crew-routing.js';
 const query = new URLSearchParams(location.search);
 const status = document.getElementById('login-status');
 const errorBox = document.getElementById('login-error');
@@ -37,14 +37,19 @@ async function boot() {
         return;
       }
       const siteId = siteParameter(callback.siteId ?? query.get('site'));
-      const filename = workspace === 'supervisor' ? 'crew-supervisor' : 'crew';
-      const url = new URL(filename + '.html', location.href);
-      if (siteId) url.searchParams.set('site', siteId);
-      document.title = 'PlanIT Control · ' + (workspace === 'supervisor' ? 'Supervisor' : 'Crew');
-      document.getElementById('crew-access-root').id = workspace === 'supervisor' ? 'crew-supervisor-root' : 'crew-root';
-      history.replaceState({}, document.title, url);
-      // Preserve the SDK's memory-only token by importing into this document.
-      await import('./' + filename + '.js');
+      const url = workspaceURL(workspace,location.href);
+      if(workspace==='supervisor'){
+        // The independent dashboard initializes its own Auth0 session and checks
+        // the verified role. Never pass an access token between pages in a URL.
+        location.replace(url.href);
+        return;
+      }
+      if(siteId)url.searchParams.set('site',siteId);
+      document.title='PlanIT Control · Crew';
+      document.getElementById('crew-access-root').id='crew-root';
+      history.replaceState({},document.title,url);
+      // Crew keeps the SDK's memory-only token by loading in this document.
+      await import('./crew.js');
       return;
     }
     status.textContent = 'Use your work account to continue securely.';
@@ -52,4 +57,4 @@ async function boot() {
     if (query.get('start') === '1') await startLogin();
   } catch (error) { showError(error); }
 }
-boot();
+export const ready=boot();

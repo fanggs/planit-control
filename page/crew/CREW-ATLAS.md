@@ -1,10 +1,12 @@
 # PlanIT primary site map
 
 Open **Site map** in the welcome page navigation or crew header. The main map
-is `crew-atlas.html`. The old `crew-supervisor.html` entry mounts this same map;
-it preserves query parameters and the Auth0 SDK’s memory-only token by keeping
-the current document alive. The old national renderer and catalog are removed.
-Aryan’s separately owned supervisor application has not been changed.
+is `crew-atlas.html`. **Supervisor** opens Aryan’s separate dashboard through
+the crew-owned `crew-supervisor.html` compatibility entry. The welcome page,
+login demo links and map distinguish the two workspaces from the shared map.
+Crew demo users and signed-in supervisors also see a supervisor link in the
+crew header. Aryan’s application and its sample/live configuration are unchanged.
+The old national renderer and catalog remain removed.
 
 ## Locations and scores
 

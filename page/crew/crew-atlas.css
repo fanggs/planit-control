@@ -44,3 +44,9 @@
 @media(max-height:600px){.atlas-sample-note,.atlas-mobile-risk{display:none}.atlas-intro h1{font-size:27px}.atlas-view-controls{top:15px}}
 
 @media(min-width:901px){.atlas-compass{top:165px}}
+
+/* Workspaces and the shared site map are distinct destinations. */
+.atlas-workspaces{display:flex;align-items:center;gap:20px;margin-left:auto;white-space:nowrap}
+.atlas-workspaces a{font-size:12px;color:#d4e7da;padding:10px 0}
+.atlas-workspaces a span{color:var(--atlas-mint);margin-left:5px}
+@media(max-width:900px){.atlas-header{gap:8px;padding-inline:12px}.atlas-workspaces{gap:12px}.atlas-workspaces a{font-size:10px}}

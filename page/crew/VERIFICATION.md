@@ -101,3 +101,23 @@ Auth0 login/role claims, API CORS, actual feeds/10-mile server decisions, DeepSp
 - No browser console errors in the final preview. Live Auth0/API operation
   was not exercised; demo scores are explicitly synthetic.
 - Aryan’s dashboard and all files outside page/crew were untouched.
+
+
+## Supervisor navigation restored · October 17, 2026
+
+- `node dev/check.mjs`: passed. `node --test`: 60 passed, none failed.
+- Regression checks cover the real login entry: verified supervisors navigate
+  to `/supervisor/index.html`, callback parameters/tokens are not forwarded,
+  and a URL role cannot route an account without a supported verified claim.
+- The crew preview server now serves both workspace folders and shared assets
+  on one origin, with legacy root aliases retained. HTTP tests cover the routes,
+  directory redirects, blocked repository/hidden paths, GET/HEAD and rejected POST.
+- Browser preview on port 4177: welcome Supervisor link opens Aryan’s dashboard;
+  its Crew workspace link returns to the crew welcome page. Phone navigation
+  works from welcome → 60-site map → crew demo → supervisor dashboard.
+- Supervisor currently shows its own three-site labeled, read-only contract
+  sample. The separate primary map still shows Sid’s 60 real plant locations.
+- Live Auth0 single sign-on was not exercised: both workspace configurations
+  still require the team’s tenant setup. No supervisor/shared/API files changed.
+- Restart old preview processes to enable the sibling routes; the process that
+  was already on port 4176 still has its original routing until restarted.

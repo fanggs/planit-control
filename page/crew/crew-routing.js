@@ -17,3 +17,11 @@ export function siteParameter(value) {
   return /^\d+$/.test(text) && Number.isSafeInteger(Number(text)) && Number(text) > 0
     ? String(Number(text)) : null;
 }
+
+// Fixed destinations work with both /crew/ hosting and the local root aliases.
+// No role, arbitrary return URL, token or authorization code goes in this URL.
+export function workspaceURL(workspace,baseURL){
+  if(workspace==='supervisor')return new URL('../supervisor/index.html',baseURL);
+  if(workspace==='crew')return new URL('crew.html',baseURL);
+  throw new Error('Unknown workspace.');
+}

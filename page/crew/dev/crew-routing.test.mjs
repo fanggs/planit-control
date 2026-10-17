@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {workspaceForUser, userRoles, siteParameter} from '../crew-routing.js';
+import {workspaceForUser, userRoles, siteParameter, workspaceURL} from '../crew-routing.js';
 const claim = 'https://planit-control/roles';
 
 test('verified role claims choose the workspace; unknown roles fail closed', () => {
@@ -18,4 +18,15 @@ test('login preserves only a valid plant ID, never an arbitrary redirect', () =>
   for (const value of ['https://example.com', '../crew-supervisor.html', '-1', '1.5', '1e3', '', null, '9007199254740992']) {
     assert.equal(siteParameter(value), null);
   }
+});
+
+test('fixed workspace destinations stay separate in root and nested crew deployments',()=>{
+  for(const base of ['http://127.0.0.1:4176/crew-routing.js','https://planit.example/crew/crew-routing.js','https://planit.example/demo/crew/crew-routing.js']){
+    const supervisor=workspaceURL('supervisor',base),crew=workspaceURL('crew',base);
+    assert.equal(supervisor.origin,new URL(base).origin);
+    assert.ok(supervisor.pathname.endsWith('/supervisor/index.html'));assert.ok(crew.pathname.endsWith('/crew.html'));
+    assert.equal(supervisor.search,'');assert.equal(supervisor.hash,'');assert.notEqual(supervisor.href,crew.href);
+    assert.ok(!supervisor.pathname.includes('atlas'));
+  }
+  assert.throws(()=>workspaceURL('https://outside.example','https://planit.example/crew/crew-routing.js'),/Unknown/);
 });

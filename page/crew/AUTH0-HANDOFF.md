@@ -28,9 +28,22 @@ Example, when publishing `page/crew/` as the website root:
 
 Use HTTPS for the deployed site. A plain HTTP LAN IP preview is for UI testing;
 Auth0's SPA SDK requires a secure browser context (HTTPS or loopback localhost).
-The callback imports the chosen workspace in the same document so SDK tokens
-remain in memory. Page reloads use Auth0's session check; if browser cookie
-restrictions prevent renewal, the user can sign in again through Universal Login.
+The callback imports the crew workspace in the same document so its SDK token
+remains in memory. A verified supervisor role navigates to
+`../supervisor/index.html`; that independent application initializes its own
+Auth0 client and validates the supervisor role again. Tokens, authorization
+codes and arbitrary return URLs are never forwarded between the pages.
+
+Alan/Aryan must configure `page/supervisor/config.js` for live mode, the agreed
+tenant/application, audience and role claim. Register its own callback and
+logout URLs too (for example `http://localhost:4174/supervisor/index.html`).
+The existing Auth0 session can support single sign-on; browser cookie
+restrictions may require another explicit sign-in. The frontend cannot promise
+a seamless live handoff until both workspace configurations are tested together.
+
+Serve the complete `page/` structure in production. The crew local preview
+server now also serves `/supervisor/`, `/shared/` and `/realtime/`, so both
+workspaces run on one origin. Restart older preview processes after this change.
 
 ## Match Auth0's hosted page to the app
 
@@ -53,8 +66,10 @@ Verify sign-in, any verification/MFA prompt, and sign-out on the deployed domain
 
 ## Demo and integration limits
 
-Sample workspace links are visible only when `dataMode` is `mock`. They load
-synthetic conditions and never authenticate or grant API permissions. Actual
+The demo chooser is visible only when crew `dataMode` is `mock`. Crew and atlas
+demo scores are synthetic. The separate supervisor application keeps its own
+mode: by default it shows three read-only contract sample plants. Its ordinary
+navigation link does not grant a role or change its sample/live configuration. Actual
 Auth0 verification cannot be tested until the team supplies its application settings.
 Auth0's API calls are not simulated as successful in the preview.
 
