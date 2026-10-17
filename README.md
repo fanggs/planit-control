@@ -26,3 +26,15 @@ DeepSpace (real-time alerts, photo storage) · Vultr (hosting) · GoDaddy (domai
 ## Setup
 
 Copy `.env.example` to `.env` and fill in keys. Never commit `.env`.
+
+## Run the API
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+.venv/bin/uvicorn api.main:app --reload --port 8010
+```
+
+Then open http://localhost:8010/docs to see every endpoint and try it.
+Until the database is connected, endpoints serve the sample data in
+`api/samples/` (shaped exactly like `api/CONTRACT.md`).

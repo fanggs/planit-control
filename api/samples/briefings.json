@@ -1,0 +1,32 @@
+{
+  "9001": {
+    "site_id": 9001,
+    "for_date": "2026-10-18",
+    "generated_at": "2026-10-17T22:00:00Z",
+    "text": "Tomorrow at this site: heat index reaches 112°F by 1 PM and storms are likely after 3 PM. Soil is saturated after 2.1 in of rain. An alligator was reported near the east gate. Recommend starting at 6 AM and stopping outdoor work by noon.",
+    "inputs": {
+      "forecast_valid_from": "2026-10-18T04:00:00Z",
+      "score_scored_at": "2026-10-17T18:00:00Z"
+    }
+  },
+  "9002": {
+    "site_id": 9002,
+    "for_date": "2026-10-18",
+    "generated_at": "2026-10-17T23:00:00Z",
+    "text": "Tomorrow at this site: a flood warning is in effect until 6 AM after 3.4 in of rain. Expect standing water and soft ground near the river. Hold heavy equipment off low areas until the warning ends.",
+    "inputs": {
+      "forecast_valid_from": "2026-10-18T05:00:00Z",
+      "score_scored_at": "2026-10-17T18:00:00Z"
+    }
+  },
+  "9003": {
+    "site_id": 9003,
+    "for_date": "2026-10-18",
+    "generated_at": "2026-10-18T01:00:00Z",
+    "text": "Tomorrow at this site: dry, hot, and windy, with gusts near 22 mph and almost no soil moisture, which raises wildfire risk. Avoid spark-producing work in the afternoon.",
+    "inputs": {
+      "forecast_valid_from": "2026-10-18T07:00:00Z",
+      "score_scored_at": "2026-10-17T18:00:00Z"
+    }
+  }
+}
