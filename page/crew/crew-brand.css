@@ -1,0 +1,18 @@
+/* The selected flat Cooling Towers logo is a complete wordmark, not an icon
+   beside a second name. Outlined letters render consistently without fonts. */
+img.foresite-logo { display:block; width:128px; height:auto; aspect-ratio:27/14; object-fit:contain; flex:none; }
+.planit-crew .crew-brand { flex-shrink:0; gap:0; }
+.planit-crew .welcome-header { padding-top:12px; padding-bottom:12px; }
+.planit-crew .crew-login > img.foresite-logo { width:190px; margin-bottom:22px; }
+.planit-crew .crew-auth-card > .crew-brand { margin-bottom:20px; }
+.planit-crew .crew-auth-card .foresite-logo { width:160px; }
+.planit-atlas .atlas-brand { gap:0; flex:none; }
+.planit-atlas .atlas-brand .foresite-logo { width:104px; }
+.supervisor-app .topbar .brand { gap:0; flex-shrink:0; }
+.supervisor-app .topbar .foresite-logo { width:128px; }
+@media(max-width:600px) {
+  img.foresite-logo { width:100px; }
+  .planit-crew .welcome-header nav { gap:12px; }
+  .planit-atlas .atlas-brand .foresite-logo { width:88px; }
+  .supervisor-app .topbar .foresite-logo { width:110px; }
+}

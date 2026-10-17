@@ -1,4 +1,4 @@
-# PlanIT Control — complete frontend package
+# ForeSite — complete frontend package
 
 Dark welcome page, role-aware Auth0 entry, crew workspace, and primary 60-site 2D/3D map. All six challenge capabilities have frontend screens and service connections. Actual environmental feeds, trained ML, shared storage, Auth0 tenant configuration, notification delivery and 6 PM background jobs must be provided by the backend.
 

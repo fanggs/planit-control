@@ -1,4 +1,4 @@
-# PlanIT primary site map
+# ForeSite primary site map
 
 Open **Site map** in the welcome page navigation or crew header. The main map
 is `crew-atlas.html`. **Supervisor** opens the restored original crew-owned
@@ -31,7 +31,7 @@ reads clear scores and remain unavailable without falling back to sample data.
 
 - **2D / 3D** animates over 1.05 seconds; this is an orthographic map without
   terrain elevation data. Forest surfaces, mint controls and system typography
-  follow the crew workspace’s PlanIT palette.
+  follow the crew workspace’s ForeSite palette.
 - Search by plant, utility, state or EIA ID. Region filters stay within the
   roster; clearing filters restores all 60. Every plant keeps a separate beacon.
 - Select a plant to inspect; **Locate** centers it; **Overview** resets the view.

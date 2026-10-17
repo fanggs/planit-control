@@ -19,7 +19,7 @@
 @media(max-height:600px) and (max-width:900px){.atlas-sidebar:not(.atlas-mobile-open){display:none}.atlas-sidebar{max-height:none}.atlas-view-controls .atlas-mobile-motion{font-size:8px;padding-inline:5px}}
 @media(max-width:900px){.atlas-compass{display:none}}
 
-/* PlanIT primary map: forest surfaces and hazard colors shared with crew cards. */
+/* ForeSite primary map: forest surfaces and hazard colors shared with crew cards. */
 .atlas-brand-icon{border:0;background:none;width:30px;height:30px;margin-right:1px}
 .atlas-brand-icon .crew-brand-mark{position:static;display:block;inset:auto;border:0;transform:none;width:30px;height:30px}
 .atlas-brand-icon svg{display:block;width:100%;height:100%}

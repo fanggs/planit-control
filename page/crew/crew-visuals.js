@@ -1,5 +1,5 @@
 /* Visual update
-   Why: Category icons make scanning easier; decorative contour lines give PlanIT
+   Why: Category icons make scanning easier; decorative contour lines give ForeSite
    its own identity without adding controls, data dependencies or map claims. */
 const paths = {
   weather:'<path d="M5 16h12a4 4 0 0 0 0-8h-.6A6 6 0 0 0 5 9a3.5 3.5 0 0 0 0 7Z"/><path d="M7 20h6m3 0h2"/>',
@@ -16,5 +16,5 @@ const paths = {
   shield:'<path d="m12 2 8 3v6c0 5-8 11-8 11S4 16 4 11V5l8-3Z"/><path d="m8 11 3 3 5-6"/>'
 };
 export function icon(name){return `<svg class="crew-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths[name]||paths.site}</svg>`;}
-export function brandMark(){return '<span class="crew-brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="m7 21 8-13 10 1-8 13-10-1Z" fill="#d6e8a2"/><path d="M10 24V10h8a5 5 0 0 1 0 10h-4" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';}
+export function brandMark(){return '<img class="foresite-logo" src="'+new URL('crew-assets/foresite-logo.svg',import.meta.url).href+'" alt="ForeSite" width="540" height="280">';}
 export function contourArt(){return `<div class="crew-contour-art" aria-hidden="true"><svg viewBox="0 0 260 150" fill="none"><path d="M12 116c-20-55 36-107 81-93s53-38 97-16 70 82 40 115-53-1-90 9-107 44-128-15Z" fill="#d6e8a2" fill-opacity=".55"/><g stroke="#609582" stroke-width="1.2"><path d="M14 114C-7 62 51 9 94 25s58-33 95-14 66 78 39 109-50-1-88 10-106 39-126-16Z"/><path d="M32 108C17 66 58 26 98 40s50-28 82-11 54 60 32 86-42-6-76 4-88 32-104-11Z"/><path d="M51 104c-9-32 20-59 51-49s41-22 68-10 42 43 24 64-35-10-64-2-68 25-79-3Z"/><path d="M72 100c-7-23 17-39 35-30s34-17 53-8 30 27 16 42-27-13-49-6-47 20-55 2Z"/></g><path d="m127 42 5 13-5 13-5-13 5-13Z" fill="#173f32"/><circle cx="127" cy="55" r="23" stroke="#173f32" stroke-opacity=".16" stroke-dasharray="3 5"/><circle cx="209" cy="39" r="7" fill="#e2ac5c"/><circle cx="49" cy="124" r="5" fill="#5a8f9f"/></svg></div>`;}

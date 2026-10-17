@@ -1,7 +1,5 @@
 import {watchAtlasScores} from './crew-atlas-realtime.js';
 import {config} from './crew-config.js';
-import {supervisorDashboardURL} from './crew-routing.js';
-import {brandMark} from './crew-visuals.js';
 import {validScore} from './crew-domain.js';
 import {esc,dateLabel} from './crew-ui.js';
 import {REGIONS,RISK_BANDS,atlasRisk,atlasRank,atlasRoster,atlasSummaries,atlasFilter,atlasPoint,atlasZoom,atlasEase,atlasPins,layoutAtlasLabels} from './crew-atlas-data.js';
@@ -198,9 +196,7 @@ async function boot(){
   try{
     state.roster=atlasRoster(await getJSON('./crew-data/monitored-sites.json'));state.sites=state.roster.slice();state.visible=atlasRank(state.sites);
     state.selected=state.sites.some(s=>s.id===query.get('site'))?query.get('site'):'621';
-    $('.atlas-brand-icon').innerHTML=brandMark();
-    const supervisorLink=$('a[href="crew-supervisor.html"]');
-    if(supervisorLink)supervisorLink.href=config.dataMode==='mock'?'crew-supervisor.html?demo=1':supervisorDashboardURL(location.href).href;
+    const supervisorLink=$('a[href="crew-supervisor.html"]');if(supervisorLink&&config.dataMode==='mock')supervisorLink.href='crew-supervisor.html?demo=1';
     $('#atlas-sample-note').hidden=config.dataMode!=='mock';
     $('#atlas-region').insertAdjacentHTML('beforeend',Object.entries(REGIONS).map(([key,r])=>`<option value="${key}">${r.label}</option>`).join(''));
     const crewURL=new URL('crew.html',location.href);crewURL.searchParams.set('site',returnId);if(config.dataMode==='mock')crewURL.searchParams.set('demo','1');$('#atlas-crew-link').href=crewURL.href;
