@@ -58,10 +58,12 @@ synthetic conditions and never authenticate or grant API permissions. Actual
 Auth0 verification cannot be tested until the team supplies its application settings.
 Auth0's API calls are not simulated as successful in the preview.
 
-This visual/auth update does not claim to complete the live API integration.
-The restored package's HTTP adapter predates `api/CONTRACT.md` v1.1: Alan/Aryan
-must map the current site/score/event shapes, separate photo upload, and latest
-briefing endpoint before switching to `live`. Contract v1.1 remains authoritative.
+The HTTP adapter now maps `api/CONTRACT.md` v1.1, including numeric site IDs,
+nested score explanations, two-step photo/report creation, protected photo reads
+and the latest briefing endpoint. See `BACKEND-CONNECTION.md` for Alan's
+`window.PlanITCrewRealtime` bridge. Live browser integration still requires
+Auth0 settings, the actual SDK provider and the backend's photo/report routes.
+Contract v1.1 remains authoritative.
 
 References:
 - https://auth0.com/docs/libraries/auth0-single-page-app-sdk

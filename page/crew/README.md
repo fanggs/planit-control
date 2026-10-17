@@ -12,7 +12,7 @@ Install Node.js 20 or newer. No package installation or build is required.
 node dev/serve.mjs
 ```
 
-Open http://127.0.0.1:4174/ for the welcome page. **Log in** starts the Auth0 handoff; **Explore the demo** offers separate crew and supervisor previews. Read **AUTH0-HANDOFF.md** for callback URLs, role configuration, hosted-login colors, and the remaining contract v1.1 integration work. Supervisor preview: http://127.0.0.1:4174/crew-supervisor.html?demo=1. If port 4174 is already serving this package, reload it. To use a different port set the `PORT` environment variable first. Serve over HTTP/HTTPS; opening HTML directly as a file will not load modules or the plant catalog correctly.
+Open http://127.0.0.1:4174/ for the welcome page. **Log in** starts the Auth0 handoff; **Explore the demo** offers separate crew and supervisor previews. Read **AUTH0-HANDOFF.md** for callback URLs, role configuration and hosted-login colors, and **BACKEND-CONNECTION.md** for the contract v1.1 adapter. Supervisor preview: http://127.0.0.1:4174/crew-supervisor.html?demo=1. If port 4174 is already serving this package, reload it. To use a different port set the `PORT` environment variable first. Serve over HTTP/HTTPS; opening HTML directly as a file will not load modules or the plant catalog correctly.
 
 ## Included
 
@@ -20,11 +20,11 @@ Open http://127.0.0.1:4174/ for the welcome page. **Log in** starts the Auth0 ha
 2. **Combined site picture:** weather, extreme heat, lightning, flooding, wildfire, soil saturation and wildlife cards, each with status, advice, observation time and source.
 3. **Lightning alerts:** a persistent alert across all crew tabs, absolute 30-minute deadline, event ordering, reconnect/disconnect states and server-confirmed clear. Demo scenarios exercise strikes within and beyond 10 miles and reset the hold on another nearby strike.
 4. **Flood warnings:** river proximity, overnight rain, observation window, rule explanation and a warning banner across crew views. Grand Gulf (6072) has a Mississippi River demonstration scenario. Real flood criteria remain backend-owned.
-5. **Briefing:** next-day seven-hazard outlook, history, evidence, print view, daily 18:00 site-timezone preferences, optional email destination and server delivery status. No browser timer pretends to send a report while closed.
-6. **Photo reports:** camera/file selection, image preview, map click or draggable pin, accessible coordinate inputs, validation, upload/retry state, stable request ID, stored receipt, open/history/archive filters and report-map pins.
+5. **Briefing:** latest next-day text, date, generation time, available input evidence and print view. History, delivery preferences and email controls remain hidden pending a team contract update. The backend owns the 18:00 site-local job.
+6. **Photo reports:** optional JPEG/PNG up to 5 MB, preview, map click or draggable pin, accessible paired coordinates, validation, two-step upload/report state, stored receipt, open/all/resolved filters and report-map pins. Archived controls remain hidden.
 7. **Supervisor preview:** national canvas-rendered map, scores sorted high-first, state/search/risk filters, paginated ranking, selected-site explanation, flood details and crew observations. Crew reports appear here in another tab in the local demo.
-8. **Explainable 0–10 model display:** score validation, signed factor contributions and their original units, baseline, model version, training period and evaluation fields. Missing values never become zero.
-9. **Backend adapters:** authenticated REST requests, multipart photo uploads, cursor pagination, authenticated streaming events with heartbeat checks/reconnect, plus an optional adapter for the team's existing API/DeepSpace implementation.
+8. **Explainable 0–10 model display:** validated score, signed contributions in score points, baseline, model version, score time and forecast horizon. Mismatched totals show an unavailable explanation; missing values never become zero. Training/evaluation fields render only when supplied.
+9. **Backend adapters:** authenticated contract REST requests, separate photo upload and JSON report creation, protected image reads, and an ID-notice bridge for Alan's DeepSpace source with refetch, reconnect and cleanup. No legacy `/events` request or invented pagination.
 10. **Auth0 entry points:** Universal Login, callback handling and sign-out. Sample access is available only in mock mode. Supervisor live entry checks a configurable roles claim; the API must independently enforce authorization.
 
 ## Connect the backend
@@ -32,8 +32,9 @@ Open http://127.0.0.1:4174/ for the welcome page. **Log in** starts the Auth0 ha
 Read **BACKEND-CONNECTION.md** first. An adapter is a small translation layer between your team's API and the fields the screens expect.
 
 - Set public Auth0 identifiers, API URL and route mapping in `crew-config.js`.
-- Use the included HTTP adapter or implement `window.PlanITCrewAPI` in `crew-integration.js` for existing routes/DeepSpace.
-- Confirm the shapes in `crew-contract.d.ts` with Alan, Aryan and Sid. This package proposes a UI boundary; it does not change the team's shared contract.
+- Use the included HTTP adapter and connect Alan's SDK through `window.PlanITCrewRealtime`. An optional custom `window.PlanITCrewAPI` must supply the existing UI shapes.
+- `crew-contract.d.ts` separates API types from UI display aliases. `crew-integration.js` translates between them; `api/CONTRACT.md` v1.1 remains authoritative.
+- Confirm `api.photoField` with Aryan. The contract specifies multipart images but not the field name; the configurable default is `file`.
 - Change `dataMode` to `live` only after these are configured. Live failures show errors and never substitute synthetic data.
 
 ## Local demonstration limits
@@ -57,8 +58,9 @@ For static hosting, publish the **contents of `page/crew/`** as the web root. It
 ```sh
 node dev/check.mjs
 node --test
+node dev/check-api.mjs
 ```
 
-Tests cover lightning distance/boundary/reset/order, expiry/disconnect behavior, DST-aware schedule previews, score/ranking integrity, real-site coverage, multipart uploads, bearer headers, pagination and fragmented streaming events. Browser QA notes are in `VERIFICATION.md`.
+Tests cover lightning distance/boundary/reset/order, expiry/disconnect behavior, DST-aware schedule previews, score/ranking integrity, real-site coverage, contract field mapping, upload/report sequencing, authenticated photo reads, latest briefings, error handling and DeepSpace notice refetch/reconnect/cleanup. The optional read-only API check requires Alan's local sample server at port 8010. Browser QA notes are in `VERIFICATION.md`.
 
 See CREW-DEVELOPMENT.md for the seven commit groups, file ownership, implementation rationale and validation.

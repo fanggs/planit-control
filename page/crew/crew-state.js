@@ -9,7 +9,7 @@ export function remainingSeconds(deadline, now = Date.now()) {
 }
 
 // A later version wins even when messages arrive in the wrong order.
-// Alan must supply a monotonic version per site's lightning-alert state.
+// The contract adapter supplies a local request-order counter, not a backend revision.
 export function acceptAlert(previous, incoming, siteId) {
   if (!incoming || String(incoming.site_id) !== String(siteId)) return previous;
   if (!Number.isSafeInteger(incoming.version) || incoming.version < 0) return previous;

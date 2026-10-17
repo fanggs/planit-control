@@ -1,0 +1,70 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {createHTTPAPI} from '../crew-http.js';
+const fixture=JSON.parse(await fs.readFile(new URL('./fixtures/contract-v1.1.json',import.meta.url)));
+const json=value=>new Response(JSON.stringify(value),{headers:{'Content-Type':'application/json'}});
+const flush=()=>new Promise(resolve=>setImmediate(resolve));
+function clock(){
+  let id=0;const timeouts=new Map(),intervals=new Map();
+  return {timeouts,intervals,setTimeout(fn,ms){const key=++id;timeouts.set(key,{fn,ms});return key;},clearTimeout(key){timeouts.delete(key);},setInterval(fn,ms){const key=++id;intervals.set(key,{fn,ms});return key;},clearInterval(key){intervals.delete(key);},next(){const [key,value]=timeouts.entries().next().value;timeouts.delete(key);value.fn();}};
+}
+function harness(){
+  const timers=clock(),events=[],connections=[],requests=[],callbacks=[];
+  let closes=0,tokens=0,alerts=structuredClone(fixture.alerts),fail=false;
+  const source={subscribe(options){callbacks.push(options);return()=>{closes++;};}};
+  const api=createHTTPAPI({baseURL:'https://example.test',realtimeSource:source,timers},async()=>`token-${++tokens}`,async url=>{
+    requests.push(url.pathname);if(fail)throw new TypeError('API unavailable');
+    return json(url.pathname==='/alerts'?alerts:url.pathname==='/sites'?fixture.sites:fixture.details['9001']);
+  });
+  return {api,timers,events,connections,requests,callbacks,get closes(){return closes;},get alerts(){return alerts;},set alerts(value){alerts=value;},set fail(value){fail=value;}};
+}
+test('ID-only notices refetch details; unrelated sites and old custom event names are ignored',async()=>{
+  const h=harness(),stop=h.api.subscribeEvents('9001',e=>h.events.push(e),c=>h.connections.push(c));
+  await flush();h.callbacks[0].onConnection(true);await flush();
+  assert.equal(h.connections.at(-1),true);assert.equal(h.events.at(-1).site.alert.status,'hold');
+  assert.equal(h.callbacks[0].site_id,9001);assert.equal(h.callbacks[0].accessToken,'token-1');
+  const count=h.requests.length;
+  h.callbacks[0].onEvent({type:'alert.updated',site_id:9002,alert_id:103,clear_at:'2026-10-17T19:00:00Z'});
+  h.callbacks[0].onEvent({type:'alert',site_id:9001,alert:{status:'cleared'}});await flush();
+  assert.equal(h.requests.length,count);
+  h.alerts=structuredClone(fixture.alerts);h.alerts[0].clear_at='2026-10-17T19:00:00Z';
+  h.callbacks[0].onEvent({type:'alert.updated',site_id:9001,alert_id:101,clear_at:'1900-01-01T00:00:00Z'});await flush();
+  assert.equal(h.events.at(-1).site.alert.all_clear_at,'2026-10-17T19:00:00Z');
+  assert.ok(!h.requests.includes('/events'));stop();
+});
+test('only a fetched matching lightning clearance clears the hold; report notices refresh reports',async()=>{
+  const h=harness(),stop=h.api.subscribeEvents('9001',e=>h.events.push(e),c=>h.connections.push(c));
+  await flush();h.callbacks[0].onConnection(true);await flush();
+  h.alerts=[];
+  h.callbacks[0].onEvent({type:'alert.cleared',site_id:9001,alert_id:102});await flush();
+  assert.equal(h.events.at(-1).site.alert.status,'unknown');
+  h.callbacks[0].onEvent({type:'alert.cleared',site_id:9001,alert_id:101});await flush();
+  assert.equal(h.events.at(-1).site.alert.status,'cleared');
+  h.callbacks[0].onEvent({type:'report.created',site_id:9001,report_id:fixture.reports[0].id,created_at:fixture.reports[0].created_at});await flush();
+  assert.equal(h.events.at(-1).type,'report');assert.equal(h.events.at(-1).report,undefined);
+  stop();
+});
+test('reconnect gets a fresh token and snapshot; cleanup stops retries, heartbeats and late events',async()=>{
+  const h=harness(),stop=h.api.subscribeEvents('9001',e=>h.events.push(e),c=>h.connections.push(c));
+  await flush();h.callbacks[0].onConnection(true);await flush();
+  assert.equal(h.timers.intervals.size,1);
+  for(const {fn} of h.timers.intervals.values())fn();assert.equal(h.events.at(-1).type,'heartbeat');
+  h.callbacks[0].onError();assert.equal(h.connections.at(-1),false);assert.equal(h.closes,1);
+  assert.equal(h.timers.intervals.size,0);assert.equal([...h.timers.timeouts.values()][0].ms,1000);
+  h.timers.next();await flush();assert.equal(h.callbacks.length,2);assert.notEqual(h.callbacks[1].accessToken,h.callbacks[0].accessToken);
+  h.callbacks[1].onConnection(true);await flush();assert.equal(h.connections.at(-1),true);
+  stop();const count=h.events.length;
+  h.callbacks[1].onEvent({type:'alert.started',site_id:9001,alert_id:101});await flush();
+  assert.equal(h.events.length,count);assert.equal(h.timers.timeouts.size,0);assert.equal(h.timers.intervals.size,0);assert.equal(h.closes,2);
+});
+test('API failures keep notifications disconnected and an unconfigured provider never requests /events',async()=>{
+  const h=harness(),stop=h.api.subscribeEvents('9001',e=>h.events.push(e),c=>h.connections.push(c));
+  await flush();h.fail=true;h.callbacks[0].onConnection(true);await flush();
+  assert.equal(h.connections.at(-1),false);assert.equal(h.events.length,0);stop();
+  const timers=clock();let requested=false;const connections=[];
+  const api=createHTTPAPI({baseURL:'https://example.test',timers},async()=>'token',async()=>{requested=true;return json([]);});
+  const close=api.subscribeEvents('9001',()=>{},value=>connections.push(value));await flush();
+  assert.equal(requested,false);assert.equal(connections.at(-1),false);assert.equal(timers.timeouts.size,1);
+  close();assert.equal(timers.timeouts.size,0);
+});

@@ -1,6 +1,6 @@
 /* Contract HTTP transport. Screens consume mapped UI objects, never raw API DTOs.
    Commit: fix(crew): map contract site_id and hazard names in adapter */
-import {contractSiteId, createContractMapper, mapSiteSummary, mapReport} from './crew-integration.js';
+import {contractSiteId, createContractMapper, mapSiteSummary, mapReport, subscribeContractEvents} from './crew-integration.js';
 import {createHazardReportPayload, validateReportPhoto, MAX_PHOTO_BYTES} from './crew-report-mapping.js';
 
 export const CONTRACT_ROUTES = Object.freeze({
@@ -156,7 +156,12 @@ export function createHTTPAPI(settings, getToken, fetcher = fetch) {
     try { return await pending; }
     finally { if (key) submissions.delete(key); }
   }
-  function subscribeEvents(_siteId, _onEvent, onConnection) { onConnection(false); return () => {}; }
+  function subscribeEvents(siteId, onEvent, onConnection) {
+    return subscribeContractEvents({siteId: siteId === null ? null : String(contractSiteId(siteId)),
+      getSource: () => settings.realtimeSource || globalThis.window?.PlanITCrewRealtime,
+      getToken, readSite, listSites, onEvent, onConnection,
+      heartbeatMs: settings.heartbeatMs, timers: settings.timers || globalThis, retryBaseMs: settings.retryBaseMs});
+  }
   return {listSites, readSite, listReports, submitReport, listBriefings, readBriefing,
     readPreferences: unsupported, savePreferences: unsupported, subscribeEvents};
 }

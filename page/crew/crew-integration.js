@@ -99,7 +99,7 @@ export function createContractMapper() {
     const floodAlert = active.find(a => a.hazard_type === 'flooding');
     const floodEvent = (raw.environmental_events || []).find(e => e.hazard_type === 'flooding');
     const mapped = {...mapSiteSummary({...raw, score: value, scored_at: model?.scored_at}),
-      revision, server_time: null, timezone: raw.timezone ?? null,
+      revision, server_time: null, timezone: raw.timezone ?? null, sample: model?.model_version === 'sample',
       score_method: model?.model_version === 'sample' ? 'Sample API score. Not a live trained-model result.'
         : model ? `${String(model.model_version || 'Model version unavailable')} · ${model.horizon_hours ?? 'Unknown'}-hour outlook` : 'Score unavailable.',
       baseline, factors: mappedFactors.map(f => ({...f, scored_at: time(model?.scored_at)})),
@@ -123,4 +123,87 @@ export function createContractMapper() {
       timezone: snapshots.get(String(siteId))?.timezone ?? null, forecast: [], sources: [], delivery_status: null};
   }
   return {nextRevision, site, briefing};
+}
+
+/* Commit: fix(crew): bridge contract event notices and verify adapter compatibility
+   Alan supplies the DeepSpace SDK connection through this small frontend boundary.
+   Events are invalidation notices: fetch authorized API data before updating screens. */
+export function subscribeContractEvents({siteId, getSource, getToken, readSite, listSites,
+  onEvent, onConnection, heartbeatMs = 45000, timers = globalThis, retryBaseMs = 1000}) {
+  const types = new Set(['alert.started', 'alert.updated', 'alert.cleared', 'report.created', 'report.resolved']);
+  let stopped = false, generation = 0, cleanup, retry, heartbeat, opening;
+  let connected = false, attempt = 0, queue = Promise.resolve();
+  const current = gen => !stopped && gen === generation;
+  const clearTimers = () => {timers.clearInterval(heartbeat); timers.clearTimeout(opening);};
+  function reconnect(gen) {
+    if (!current(gen)) return;
+    generation++; connected = false; clearTimers();
+    const close = cleanup; cleanup = undefined;
+    try { close?.(); } catch { /* The SDK connection is already lost. */ }
+    onConnection(false);
+    retry = timers.setTimeout(connect, Math.min(30000, retryBaseMs * 2 ** Math.min(attempt++, 5)));
+    retry?.unref?.();
+  }
+  async function refresh(gen, notice) {
+    if (!current(gen)) return;
+    const id = siteId ?? (notice ? String(notice.site_id) : null);
+    if (id === null) {
+      await listSites();
+      if (current(gen)) onEvent({type: 'site'});
+    } else {
+      const site = await readSite(id, {refreshAlerts: true, clearedAlertId: notice?.type === 'alert.cleared' ? notice.alert_id : undefined});
+      if (!current(gen)) return;
+      onEvent({type: 'site', site_id: String(id), site});
+      if (notice?.type.startsWith('report.')) onEvent({type: 'report', site_id: String(id)});
+    }
+  }
+  function enqueue(gen, task) {
+    queue = queue.then(() => current(gen) ? task() : undefined).catch(() => reconnect(gen));
+  }
+  async function connect() {
+    if (stopped) return;
+    const gen = ++generation; queue = Promise.resolve();
+    onConnection(false);
+    opening = timers.setTimeout(() => reconnect(gen), heartbeatMs);
+    opening?.unref?.();
+    try {
+      const source = getSource();
+      if (typeof source?.subscribe !== 'function') { reconnect(gen); return; }
+      const accessToken = await getToken();
+      if (!current(gen)) return;
+      const unsubscribe = await source.subscribe({
+        site_id: siteId === null ? null : contractSiteId(siteId), accessToken,
+        onEvent(notice) {
+          if (!current(gen) || !types.has(notice?.type) || !Number.isSafeInteger(notice.site_id) || notice.site_id <= 0) return;
+          if (siteId !== null && String(notice.site_id) !== String(siteId)) return;
+          if (notice.type.startsWith('alert.') && (!Number.isSafeInteger(notice.alert_id) || notice.alert_id <= 0)) return;
+          if (notice.type.startsWith('report.') && (typeof notice.report_id !== 'string' || !notice.report_id)) return;
+          enqueue(gen, () => refresh(gen, notice));
+        },
+        onConnection(value) {
+          if (!current(gen)) return;
+          if (!value) { if (connected) reconnect(gen); else onConnection(false); return; }
+          enqueue(gen, async () => {
+            await refresh(gen);
+            if (!current(gen)) return;
+            connected = true; attempt = 0; clearTimers(); onConnection(true);
+            // This heartbeat describes a confirmed SDK transport, not lightning-feed health.
+            heartbeat = timers.setInterval(() => {if (current(gen) && connected) onEvent({type: 'heartbeat'});}, Math.max(1000, Math.floor(heartbeatMs / 3)));
+            heartbeat?.unref?.();
+          });
+        },
+        onError() { reconnect(gen); }
+      });
+      if (!current(gen)) { if (typeof unsubscribe === 'function') unsubscribe(); return; }
+      if (typeof unsubscribe !== 'function') throw new Error('The real-time source must supply an unsubscribe function.');
+      cleanup = unsubscribe;
+    } catch { reconnect(gen); }
+  }
+  connect();
+  return () => {
+    stopped = true; generation++; connected = false;
+    timers.clearTimeout(retry); clearTimers();
+    const close = cleanup; cleanup = undefined;
+    try { close?.(); } catch { /* Closing an already-disconnected SDK is harmless. */ }
+  };
 }

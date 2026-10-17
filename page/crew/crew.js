@@ -4,6 +4,7 @@ Why: Assemble previously tested modules into simple crew navigation and an isola
 */
 import {config} from './crew-config.js';
 import {userRoles} from './crew-routing.js';
+import {HAZARD_LABELS} from './crew-integration.js';
 import {initAuth,session,signIn,signOut,enterDemo,authConfigured} from './crew-auth.js';
 import {services,demoAction} from './crew-services.js';
 import {acceptAlert,alertView} from './crew-state.js';
@@ -68,12 +69,12 @@ async function refreshSite(version=state.loadVersion,incoming){
 function renderWorkspace(){
   const p=state.site;cleanupView();
   $('#crew-root').innerHTML=`<header class="crew-header"><a href="index.html" class="crew-brand">${brandMark()}PlanIT <span>Control</span></a><div class="crew-header-actions">${state.user?.demo||userRoles(state.user,config.authRoleClaim).includes('supervisor')?`<a class="crew-link" href="crew-supervisor.html${state.user?.demo?'?demo=1':''}">Supervisor view ↗</a>`:''}<button class="crew-link" data-action="logout">Sign out</button></div></header><main id="crew-main" class="crew-main">
-    ${config.dataMode==='mock'?'<p class="crew-demo"><strong>SAMPLE DATA</strong> · Real plant locations. Synthetic conditions and scores. Reports stay on this browser; no live alerts or delivery.</p>':''}
+    ${config.dataMode==='mock'?'<p class="crew-demo"><strong>SAMPLE DATA</strong> · Real plant locations. Synthetic conditions and scores. Reports stay on this browser; no live alerts or delivery.</p>':p.sample?'<p class="crew-demo"><strong>SAMPLE API DATA</strong> · Placeholder plants and fixed sample readings. This is not a live safety assessment.</p>':''}
     <section class="crew-section-heading crew-site-hero"><div class="crew-hero-copy"><p class="crew-eyebrow">YOUR JOB SITE</p><h1 id="crew-site-name">${esc(p.name)}</h1><p class="crew-muted">${esc(p.state)} · Plant ${esc(p.id)} · ${state.sites.length.toLocaleString()} available sites</p></div><div class="crew-hero-end">${contourArt()}<button class="crew-button secondary" data-action="change-site">Change site ${icon("switch")}</button></div></section>
     <section id="crew-site-picker" class="crew-card" hidden><div class="crew-coordinate-row"><div><label for="crew-site-query">Search plants</label><input id="crew-site-query" type="search" placeholder="Plant, operator, state or ID" autocomplete="off"></div><div><label for="crew-site-region">State / territory</label><select id="crew-site-region"><option value="">All states & territories</option>${[...new Set(state.sites.map(s=>s.state))].sort().map(s=>`<option>${esc(s)}</option>`).join('')}</select></div></div><p id="crew-search-count" class="crew-muted" role="status"></p><div id="crew-site-results" class="crew-site-results"></div></section>
     <nav class="crew-nav" aria-label="Crew screens">${[['status','Site & alerts'],['reports','Crew reports'],['briefing','Briefing']].map(([view,label])=>`<button data-view="${view}" aria-pressed="${state.view===view}">${icon({status:"site",reports:"report",briefing:"briefing"}[view])}<span>${label}</span></button>`).join('')}</nav>
     <div class="crew-alert" id="crew-alert"><div class="crew-row"><h2 id="crew-alert-title" aria-live="assertive" aria-atomic="true">Checking alerts…</h2><strong id="crew-countdown" aria-label="Time remaining in lightning hold"></strong></div><p id="crew-alert-detail"></p><small id="crew-stream"></small></div><div id="crew-flood-banner"></div><section id="crew-view"></section>
-    <p class="crew-footer">Plant reference: ${sourceLink(p.provenance)}. National reference snapshot: February 2025. <a href="crew-data/source.json" target="_blank" rel="noopener">Coverage & provenance ↗</a></p></main>`;
+    <p class="crew-footer">${config.dataMode==='mock'?`Plant reference: ${sourceLink(p.provenance)}. National reference snapshot: February 2025. <a href="crew-data/source.json" target="_blank" rel="noopener">Coverage & provenance ↗</a>`:`Site reference: ${sourceLink(p.provenance)}. Read each condition’s source and timestamp above.`}</p></main>`;
   $('#crew-site-query').addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(searchSites,120);});$('#crew-site-region').addEventListener('change',searchSites);searchSites();renderView();updateAlert();
 }
 function searchSites(){
@@ -101,10 +102,12 @@ function updateAlert(){
   const view=alertView(state.alert,state.connected,Date.now()+state.clockOffset);
   $('#crew-alert').dataset.tone=view.tone;if($('#crew-alert-title').textContent!==view.title)$('#crew-alert-title').textContent=view.title;if($('#crew-alert-detail').textContent!==view.detail)$('#crew-alert-detail').textContent=view.detail;
   $('#crew-countdown').textContent=view.seconds===null?'':`${String(Math.floor(view.seconds/60)).padStart(2,'0')}:${String(view.seconds%60).padStart(2,'0')}`;
-  $('#crew-stream').textContent=(state.connected?(config.dataMode==='mock'?'Sample stream connected':'Live updates connected'):'Updates disconnected · confirm with your supervisor')+(state.alert?.last_strike_at?' · Last strike: '+dateLabel(state.alert.last_strike_at):'');
+  $('#crew-stream').textContent=(state.connected?(config.dataMode==='mock'?'Sample stream connected':'Notifications connected · check reading timestamps'):'Updates disconnected · confirm with your supervisor')+(state.alert?.last_strike_at?' · Last strike: '+dateLabel(state.alert.last_strike_at):'');
   const flood=state.site?.flood;
-  const floodText=flood?.status==='warning'?'Flood-risk warning · '+(flood.message??''):'';
-  if($('#crew-flood-banner').textContent!==floodText)$('#crew-flood-banner').innerHTML=flood?.status==='warning'?`<p class="crew-flood-notice" role="alert"><strong>Flood-risk warning</strong> · ${esc(flood.message)}</p>`:'';
+  const banners=[];
+  if(flood?.status==='warning')banners.push(`<p class="crew-flood-notice" role="alert"><strong>Flood-risk warning</strong> · ${esc(flood.message)}</p>`);
+  for(const warning of state.site?.warnings||[]){if(warning.hazard_type==='flooding')continue;banners.push(`<p class="crew-flood-notice" role="alert"><strong>${esc(HAZARD_LABELS[warning.hazard_type]||'Site')} warning</strong> · ${esc(warning.message)}</p>`);}
+  const bannerHTML=banners.join('');if($('#crew-flood-banner').innerHTML!==bannerHTML)$('#crew-flood-banner').innerHTML=bannerHTML;
 }
 document.addEventListener('click',async event=>{
   const view=event.target.closest('[data-view]');if(view&&state.site){state.view=view.dataset.view;renderView();return;}

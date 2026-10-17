@@ -1,5 +1,18 @@
 # Frontend verification — October 17, 2026
 
+## Contract v1.1 adapter update — current checks
+
+- `node dev/check.mjs`: application JavaScript syntax passed.
+- `node --test`: **46 passed, 0 failed**.
+- `node dev/check-api.mjs`: read-only checks passed against Alan's running sample API. Three site summaries; site 9001 mapped to score 8.2, baseline 2.4, signed factors totaling 5.8, lightning deadline 2026-10-17T18:34:00Z, one report and a 2026-10-18 briefing. Site 9002 retained its flood warning.
+- Photo upload/view and report creation are absent from the sample server at this check. Simulated HTTP tests cover multipart then JSON sequencing, protected image blobs, retries and uncertain receipts; they do not prove live storage or sharing.
+- DeepSpace tests cover ID filtering, authoritative API refetch, new deadlines, matching clearance, report invalidation, reconnect token refresh and cleanup. Alan's actual SDK source is still required; the frontend no longer requests `/events`.
+- Browser demo: a nearby strike started 30:00; the hold persisted across crew tabs. A report without a photo or coordinates saved locally and displayed as a site-level report. Open/all/resolved filters rendered without archived status. The latest briefing rendered without preferences or email controls.
+- Phone check at 390 × 844: client and scroll widths both 375 px, with no horizontal overflow. Screenshot: `crew-contract-mobile.png` in the delivered outputs. Viewport override was reset.
+- Only files under `page/crew/` changed. Supervisor preview files, backend and shared contract were not edited. Default mock mode remains available. Auth0 and actual DeepSpace delivery require team configuration.
+
+The notes below describe earlier versions and historical checks. Superseded endpoint, preference, pagination and SSE descriptions do not describe the current adapter; see `BACKEND-CONNECTION.md`.
+
 ## Color theme update
 
 - Browser checks at 1280 × 1000, 390 × 844 and 320 × 740 viewport settings; document widths matched scroll widths, with no horizontal overflow.

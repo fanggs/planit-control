@@ -8,7 +8,7 @@ import {esc,dateLabel,sourceLink} from './crew-ui.js';
 import {nextSixPM,timezoneValid} from './crew-domain.js';
 export function mountBriefing(container,site,message){
   let disposed=false,detailVersion=0;
-  container.innerHTML='<section class="crew-card"><h1>Next-day briefing</h1><p>Loading briefing history and delivery settings…</p></section>';
+  container.innerHTML='<section class="crew-card"><h1>Next-day briefing</h1><p>Loading the latest briefing…</p></section>';
   async function start(){
     try{
       const preferencesEnabled=config.features.briefingPreferences;
