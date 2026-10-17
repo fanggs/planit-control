@@ -27,3 +27,4 @@ class HazardType(str, Enum):
     SOIL_SATURATION = "soil_saturation"
     WILDLIFE = "wildlife"
     OTHER = "other"
+
