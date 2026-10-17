@@ -47,7 +47,7 @@ For source attribution, the plant-data provenance is in `crew-data/atlas-source.
 
 ## Dark welcome and Auth0 entry
 
-The welcome page follows the sparse, near-black composition of the supplied Deepsec reference, with original PlanIT copy and code-native grid/network artwork. `crew-dark.css` keeps the same palette across login, crew, reports, briefings, and the separate supervisor preview. Severity wording stays visible independently of color.
+The welcome page follows the sparse, near-black composition of the supplied Deepsec reference, with original ForeSite copy and code-native grid/network artwork. `crew-dark.css` keeps the same palette across login, crew, reports, briefings, and the separate supervisor preview. Severity wording stays visible independently of color.
 
 `crew-entry.js` consumes the Auth0 callback and chooses the workspace from the account’s configured role claim. It imports the workspace in the same document, preserving the memory-only SDK session. Unknown roles get an access message; query parameters cannot grant roles. The backend remains responsible for authorization. See AUTH0-HANDOFF.md for application URLs and hosted-login branding.
 

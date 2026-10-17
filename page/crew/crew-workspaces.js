@@ -6,7 +6,7 @@ export async function mountWorkspace(workspace,{baseURL,siteId,document,history,
   const url=workspaceURL(workspace,baseURL),id=siteParameter(siteId);
   const filename=workspace==='supervisor'?'crew-supervisor':'crew';
   if(id)url.searchParams.set('site',id);
-  document.title='PlanIT Control · '+(workspace==='supervisor'?'Supervisor':'Crew');
+  document.title='ForeSite · '+(workspace==='supervisor'?'Supervisor':'Crew');
   document.getElementById('crew-access-root').id=filename+'-root';
   history.replaceState({},document.title,url);
   const app=await load('./'+filename+'.js');

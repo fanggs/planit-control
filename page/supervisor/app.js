@@ -5,18 +5,19 @@ import {alertFeedDisplay, loadDashboardFeeds} from './feeds.js';
 import {connectRealtime} from './realtime.js';
 import {createDeepSpaceSource} from '../realtime/deepspace-source.js';
 import {createRefreshQueue} from './refresh.js';
+import {createPhotoCache} from './photo-cache.js';
 import {bindPageLifecycle, changeSelectedSite, markDetailStale} from './lifecycle.js';
 import {assessScore, coordinates, countdown, finite, freshness, hasSupervisorRole, label, points,
-  isReplayAlert, rankSites, riskTone, safeSourceURL, siteHasReplayAlert, siteTime, summaryScore,
+  isReplayAlert, openReportPins, rankSites, riskTone, safeSourceURL, siteHasReplayAlert, siteTime, summaryScore,
   validFactors} from './domain.js';
 
 const $ = id => document.getElementById(id);
 const sample = config.mode === 'sample';
 const state = {sites: [], alerts: null, selected: null, detail: null, detailStale: false,
   reports: [], search: '', filter: 'all'};
-let api, auth, map, siteLayer, reportLayer, detailGeneration = 0;
+let api, auth, map, siteLayer, reportLayer, detailGeneration = 0, photoGeneration = 0;
 let stopRealtime, poll, countdownTimer, user, resolving = false;
-const photoURLs = new Set();
+const photos = createPhotoCache();
 const siteMarkers = new Map();
 const colors = {high: '#ffab94', medium: '#f1cf83', low: '#a1edcc', unknown: '#9cacb2'};
 
@@ -33,7 +34,7 @@ function showError(error) { $('error').textContent = error.message || String(err
 function clearError() { $('error').hidden = true; $('error').textContent = ''; }
 function ageText(value) { return freshness(value, Date.now(), config.staleAfterMinutes).text; }
 function section(title) { const node = el('section', null, 'detail-section'); node.append(el('h3', title)); return node; }
-function revokePhotos() { for (const url of photoURLs) URL.revokeObjectURL(url); photoURLs.clear(); }
+function revokePhotos() { photoGeneration++; photos.clear(); }
 function staleDetailNotice() {
   const warning = note('Site detail and crew reports could not be refreshed. Showing last successful data; hazards and report status may have changed.', true);
   warning.dataset.detailStale = 'true';
@@ -95,9 +96,8 @@ function renderMap(sites) {
 function renderReportPins() {
   if (!map) return;
   reportLayer.clearLayers();
-  for (const report of state.reports) {
+  for (const report of openReportPins(state.reports)) {
     const position = coordinates(report);
-    if (!position) continue;
     const content = el('div');
     content.append(el('strong', `${label(report.hazard_type)} · ${report.status}`), el('p', report.description));
     window.L.circleMarker(position, {radius: 6, color: '#add4ff', weight: 2, fillColor: '#1b3454', fillOpacity: 1})
@@ -229,20 +229,33 @@ function renderReports(detail) {
     if (!coordinates(report)) card.append(note('No report coordinates supplied; no report pin can be shown.'));
     const actions = el('div', null, 'report-actions');
     if (report.photo_key) {
-      const photo = el('button', sample ? 'Sample photo unavailable' : 'View private photo', 'planit-button');
-      photo.disabled = sample;
-      photo.addEventListener('click', async () => {
-        photo.disabled = true; photo.textContent = 'Loading photo…';
-        try {
-          const blob = await api.photo(report.photo_key);
-          if (!card.isConnected) return;
-          const objectURL = URL.createObjectURL(blob); photoURLs.add(objectURL);
-          const image = el('img', null, 'report-photo'); image.src = objectURL;
-          image.alt = `Crew photograph for ${label(report.hazard_type).toLowerCase()} report`;
-          card.append(image); photo.hidden = true;
-        } catch (error) { showError(error); photo.disabled = false; photo.textContent = 'Retry private photo'; }
-      });
-      actions.append(photo);
+      const showPhoto = objectURL => {
+        const image = el('img', null, 'report-photo'); image.src = objectURL;
+        image.alt = `Crew photograph for ${label(report.hazard_type).toLowerCase()} report`;
+        card.append(image);
+      };
+      const cached = photos.get(report.photo_key);
+      if (cached) showPhoto(cached);
+      else {
+        const photo = el('button', sample ? 'Sample photo unavailable' : 'View private photo', 'planit-button');
+        photo.disabled = sample;
+        photo.addEventListener('click', async () => {
+          photo.disabled = true; photo.textContent = 'Loading photo…';
+          const selected = state.selected;
+          const generation = photoGeneration;
+          try {
+            const blob = await api.photo(report.photo_key);
+            if (photoGeneration !== generation || state.selected !== selected
+              || !state.reports.some(item => item.photo_key === report.photo_key)) return;
+            const objectURL = photos.remember(report.photo_key, blob);
+            if (card.isConnected) { showPhoto(objectURL); photo.hidden = true; }
+            else renderDetail(); // A routine refresh replaced the card while the photo loaded.
+          } catch (error) {
+            if (card.isConnected) { showError(error); photo.disabled = false; photo.textContent = 'Retry private photo'; }
+          }
+        });
+        actions.append(photo);
+      }
     }
     if (report.status === 'open') {
       const resolve = el('button', sample ? 'Resolve · live mode only' : 'Resolve report', 'planit-button primary');
@@ -256,9 +269,9 @@ function renderReports(detail) {
   return container;
 }
 function renderDetail() {
-  revokePhotos();
   const detail = state.detail;
   if (!detail) return;
+  photos.retain(state.reports.map(report => report.photo_key).filter(Boolean));
   const header = el('div', null, 'detail-head');
   header.append(el('div', 'Selected site', 'planit-eyebrow'), el('h2', detail.name),
     el('p', `${detail.utility || 'Utility unavailable'} · ${detail.county || ''} ${detail.state || ''} · EIA ${detail.site_id}`));
@@ -319,11 +332,21 @@ const refresh = createRefreshQueue(fetchData);
 async function resolveReport(id, button) {
   if (sample || resolving || !hasSupervisorRole(user, config.auth.rolesClaim)) return;
   resolving = true; button.disabled = true; button.textContent = 'Resolving…';
+  const selected = state.selected;
+  let saved = false;
   try {
-    await api.resolve(id);
-    // Never claim success before the response. Reload map counts, warnings and report status.
+    const receipt = await api.resolve(id);
+    saved = true;
+    if (state.selected === selected) {
+      // The committed receipt prevents a stale card from offering a second PATCH
+      // if the following read fails. Counts and alerts still need a fresh read.
+      state.reports = state.reports.map(report => report.id === id ? receipt : report);
+      if (state.detail) renderDetail();
+    }
     await refresh();
-  } catch (error) { showError(error); }
+  } catch (error) {
+    showError(saved ? new Error('Report resolved, but the dashboard could not refresh. Verify current alerts and use Refresh before relying on counts.') : error);
+  }
   finally {
     resolving = false;
     if (state.detail) renderDetail();

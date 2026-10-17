@@ -12,6 +12,7 @@ from pydantic import BaseModel
 from sqlalchemy.exc import SQLAlchemyError
 from starlette.concurrency import run_in_threadpool
 
+from api import photo_tag
 from api.auth.hazard_auth import Principal, require_roles
 from api.routes.hazard_upload_limit import BodyLimitedHazardRoute
 from api.services.hazard_photo_service import (
@@ -22,6 +23,10 @@ from api.services.hazard_photo_service import (
 
 class PhotoUploadResponse(BaseModel):
     photo_key: str
+
+
+class PhotoSuggestionResponse(BaseModel):
+    suggestion: photo_tag.HazardSuggestion | None
 
 
 # Keep room for the multipart boundary and headers without allowing unbounded
@@ -105,5 +110,29 @@ def create_photo_router(
                 "Content-Disposition": f'inline; filename="photo.{extension}"',
             },
         )
+
+    @router.post("/photos/{photo_key}/suggestion", response_model=PhotoSuggestionResponse)
+    async def suggest_photo_hazard(
+        photo_key: str,
+        principal: Principal = Depends(get_principal),
+    ):
+        """Offer an optional Gemini category for an uploader's private photo.
+
+        The crew member, not Gemini, chooses the hazard type in POST /reports.
+        An unavailable model returns null without changing the stored upload.
+        """
+        require_roles(principal, "crew", "supervisor")
+        try:
+            photo = await run_in_threadpool(store.read, photo_key)
+        except PhotoNotFound:
+            raise HTTPException(404, "Photo not found") from None
+        # A report attachment grants teammates viewing access, not permission
+        # to send someone else's photograph to the suggestion model.
+        if photo.uploader_id != principal.sub:
+            raise HTTPException(404, "Photo not found")
+        suggestion = await run_in_threadpool(
+            photo_tag.suggest_hazard, photo.data, photo.content_type,
+        )
+        return PhotoSuggestionResponse(suggestion=suggestion)
 
     return router

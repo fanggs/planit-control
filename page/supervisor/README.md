@@ -42,6 +42,7 @@ Use that executable in place of `node`, or install Node locally.
 | `domain.js` | Pure score/ranking/freshness/coordinate/event validation functions. |
 | `realtime.js` | DeepSpace notice handling, reconnect and authorized API refetch. |
 | `refresh.js` | One active refresh plus one pending refresh, shared across burst callers. |
+| `photo-cache.js` | In-memory private photo URLs retained across same-site refreshes and revoked when no longer needed. |
 | `lifecycle.js` | Clear old selection state and reload cached history restores before restarting live work. |
 | `app.js` | Page interactions, Leaflet markers, waterfall, reports and private-photo rendering. |
 | `sample-data/*.json` | Exact sample sites/details/reports/alerts copied from `api/samples/`. |
@@ -59,10 +60,13 @@ the full breakdown. Zero is a valid score; missing/invalid data is not converted
 to zero.
 
 Reports are displayed separately from model scores, with pins only when both
-coordinates exist. Live private photos are requested with the bearer token and
+coordinates exist and the report is still open; resolved reports stay in the
+history panel without looking like active map hazards. Live private photos are requested with the bearer token and
 rendered from an in-memory Blob URL. Tokens and photo keys are never placed in
-public image URLs or query strings. Blob URLs are revoked when the selected
-detail changes or the page closes. Only JPEG/PNG responses under 5 MB are shown.
+public image URLs or query strings. Viewed photos stay open through routine
+same-site refreshes. Blob URLs are revoked when the selected site changes, a
+photo disappears from its report list, or the page closes. Only JPEG/PNG
+responses under 5 MB are shown.
 
 The resolution button calls `PATCH /reports/{id}` with exactly
 `{"status":"resolved"}`. The API must independently authorize this operation.

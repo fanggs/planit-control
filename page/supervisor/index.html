@@ -4,20 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta name="description" content="PlanIT Control supervisor workspace: ranked environmental risks, explainable site scores, and crew reports.">
-  <title>Supervisor · PlanIT Control</title>
+  <meta name="description" content="ForeSite supervisor workspace: ranked environmental risks, explainable site scores, and crew reports.">
+  <title>Supervisor · ForeSite</title>
   <link rel="stylesheet" href="../shared/planit.css">
   <link rel="stylesheet" href="../crew/crew-vendor/leaflet.css">
   <link rel="stylesheet" href="supervisor.css">
   <script defer src="../crew/crew-vendor/leaflet.js"></script>
   <script type="module" src="app.js"></script>
-</head>
+<link rel="stylesheet" href="../crew/crew-brand.css"><link rel="icon" type="image/svg+xml" href="../crew/crew-assets/foresite-icon.svg"></head>
 <body class="planit-app supervisor-app">
   <a class="skip" href="#workspace">Skip to workspace</a>
   <header class="topbar">
-    <a href="index.html" class="brand" aria-label="PlanIT Control supervisor home">
-      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 28 28" fill="none"><path d="M14 3 24 9v10l-10 6L4 19V9L14 3Z" stroke="currentColor" stroke-width="1.5"/><path d="m8 15 4 4 8-10" stroke="currentColor" stroke-width="2"/></svg></span>
-      <span>PlanIT <span class="brand-sub">Control</span></span>
+    <a href="index.html" class="brand" aria-label="ForeSite supervisor home">
+      <img class="foresite-logo" src="../crew/crew-assets/foresite-logo.svg" alt="ForeSite" width="540" height="280">
     </a>
     <nav aria-label="Workspaces"><span class="current-tab">Supervisor</span><a href="../crew/index.html">Crew workspace ↗</a></nav>
     <div class="session"><span id="identity">Loading workspace…</span><button id="auth-action" class="planit-button" hidden>Sign in</button></div>
@@ -52,12 +51,12 @@
         <div class="map-heading"><span class="planit-eyebrow">Geographic view</span><button id="fit-map" class="map-fit" aria-label="Fit all filtered sites on map">Fit sites</button></div>
         <div id="map" tabindex="0" aria-label="Interactive map; all sites also appear in the ranked list"></div>
         <div id="map-status" class="map-status" role="status" hidden></div>
-        <div class="map-key"><span><i class="dot high"></i>7–10</span><span><i class="dot medium"></i>4–&lt;7</span><span><i class="dot low"></i>0–&lt;4</span><span><i class="dot unknown"></i>No score</span><span><i class="report-dot"></i>Crew report</span></div>
+        <div class="map-key"><span><i class="dot high"></i>7–10</span><span><i class="dot medium"></i>4–&lt;7</span><span><i class="dot low"></i>0–&lt;4</span><span><i class="dot unknown"></i>No score</span><span><i class="report-dot"></i>Open crew report</span></div>
         <p class="map-footnote">Color bands aid scanning. They do not authorize work.</p>
       </section>
       <aside id="detail" class="detail-panel panel" aria-label="Selected site details" aria-busy="false"><p class="empty">Select a site to see its score explanation, alerts and crew reports.</p></aside>
     </div>
-    <footer><span>PlanIT Control <b>·</b> Supervisor workspace</span><span>24-hour forecast risk + on-the-ground observations</span></footer>
+    <footer><span>ForeSite <b>·</b> Supervisor workspace</span><span>24-hour forecast risk + on-the-ground observations</span></footer>
   </main>
   <noscript><div class="notice">JavaScript is required to load sites and validate sign-in.</div></noscript>
 </body>

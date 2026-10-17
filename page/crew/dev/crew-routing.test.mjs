@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {workspaceForUser, userRoles, siteParameter, workspaceURL, supervisorDashboardURL} from '../crew-routing.js';
+import {workspaceForUser, userRoles, siteParameter, workspaceURL, supervisorDashboardURL, supervisorNavigationURL, isLiveDeploymentURL} from '../crew-routing.js';
 const claim = 'https://planit-control/roles';
 
 test('verified role claims choose the workspace; unknown roles fail closed', () => {
@@ -40,4 +40,24 @@ test('supervisor handoff uses Aryan dashboard on the same origin without callbac
     assert.ok(target.pathname.endsWith('/supervisor/index.html'));
     assert.equal(target.search,'');assert.equal(target.hash,'');
   }
+});
+
+test('crew and atlas navigation use the live dashboard or an explicitly local sample preview',()=>{
+  for(const base of ['http://127.0.0.1:4174/crew/crew.html?site=621&code=secret',
+    'https://planit.example/crew/crew-atlas.html?site=621&returnTo=https://outside.example']){
+    const live=supervisorNavigationURL(base,'live');
+    assert.equal(live.href,supervisorDashboardURL(base).href);
+    assert.equal(live.search,'');
+    const mock=supervisorNavigationURL(base,'mock');
+    assert.equal(mock.origin,new URL(base).origin);
+    assert.ok(mock.pathname.endsWith('/crew/crew-supervisor.html'));
+    assert.equal(mock.search,'?demo=1');
+  }
+});
+
+test('live crew mode is limited to the exact HTTPS deployment origin',()=>{
+  assert.equal(isLiveDeploymentURL('https://foresite.work/crew/crew-config.js'),true);
+  for(const url of ['http://foresite.work/crew/crew-config.js','https://www.foresite.work/crew/crew-config.js',
+    'https://foresite.work.evil.test/crew/crew-config.js','http://127.0.0.1:4174/crew/crew-config.js',
+    'file:///crew/crew-config.js'])assert.equal(isLiveDeploymentURL(url),false);
 });

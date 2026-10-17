@@ -50,6 +50,7 @@ class HazardRegistrationTests(unittest.TestCase):
         self.assertEqual(endpoints, {
             ("/reports", "GET"), ("/reports", "POST"), ("/reports/{report_id}", "PATCH"),
             ("/photos", "POST"), ("/photos/{photo_key}", "GET"),
+            ("/photos/{photo_key}/suggestion", "POST"),
         })
 
     def test_registered_routes_require_authentication(self):
@@ -61,6 +62,9 @@ class HazardRegistrationTests(unittest.TestCase):
                     self.assertEqual(response.status_code, 401, response.text)
                     self.assertEqual(set(response.json()), {"error"})
                     self.assertEqual(response.headers["www-authenticate"], "Bearer")
+            suggestion = client.post("/photos/private_key/suggestion")
+            self.assertEqual(suggestion.status_code, 401)
+            self.assertEqual(suggestion.headers["www-authenticate"], "Bearer")
 
     def test_existing_report_or_photo_routes_prevent_registration(self):
         for path in ("/reports", "/reports/{id}", "/photos", "/photos/{photo_key}"):

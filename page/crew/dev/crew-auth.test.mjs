@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 
 // Exercise our callback behavior with an SDK double, without using a real tenant or token.
 globalThis.location = {href: 'http://127.0.0.1:4174/login.html?code=one-use&state=checked', search: '?code=one-use&state=checked'};
-globalThis.document = {title: 'PlanIT'};
+globalThis.document = {title: 'ForeSite'};
 let replaced, options, instances = 0, callbacks = 0, loginOptions;
 globalThis.history = {replaceState(_state, _title, url) { replaced = url; }};
 const user = {sub: 'sample-user', 'https://planit-control/roles': ['supervisor']};

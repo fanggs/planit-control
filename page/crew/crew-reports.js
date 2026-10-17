@@ -1,6 +1,7 @@
 /* Why: Confirm stored report receipts and preserve retry IDs; show site-local delivery preferences without pretending that a browser schedules server jobs. */
 import {config} from './crew-config.js';
 import {createHazardReportPayload,validateReportPhoto} from './crew-report-mapping.js';
+import {applySuggestedCategory,freezeReportInputs,mayApplySuggestion} from './crew-photo-suggestion.js';
 import {services} from './crew-services.js';
 import {esc,dateLabel,safeURL,makeMap} from './crew-ui.js';
 export function mountReports(container,site,message){
@@ -26,26 +27,69 @@ export function mountReports(container,site,message){
   }
   function newReport(){
     reportVersion++;cleanMap();if(photoURL)URL.revokeObjectURL(photoURL);photoURL=null;
-    editor.innerHTML=`<section class="crew-card"><div class="crew-row"><h2>Report what you see</h2><button class="crew-link" id="crew-cancel-report">Cancel</button></div><form id="crew-report-form"><label for="crew-photo">Hazard photo</label><input id="crew-photo" name="photo" type="file" accept="image/jpeg,image/png" capture="environment"><small>Optional · JPEG or PNG, up to 5 MB. Supported phones can open the rear camera.</small><img id="crew-photo-preview" alt="Your selected hazard photo" hidden><label for="crew-category">Hazard type</label><select id="crew-category" name="category">${['Wildlife','Flooding / standing water','Soil / access','Weather','Heat','Lightning','Wildfire / smoke','Other'].map(v=>`<option>${v}</option>`).join('')}</select><label for="crew-severity">How severe is the hazard?</label><select id="crew-severity" name="severity" required><option value="">Choose severity</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select><label for="crew-description">What should the next crew know?</label><textarea id="crew-description" name="description" rows="3" maxlength="2000" required placeholder="Describe the hazard and how to find it."></textarea><label>Pin the location</label><p class="crew-muted">Tap the map, drag the pin, or enter coordinates below.</p><div id="crew-pin-map" class="crew-map" aria-label="Hazard location map"></div><p id="crew-pin-map-status" role="status"></p><div class="crew-coordinate-row"><div><label for="crew-lat">Latitude</label><input id="crew-lat" name="latitude" type="number" min="-90" max="90" step="any" value="${site.latitude}"></div><div><label for="crew-lng">Longitude</label><input id="crew-lng" name="longitude" type="number" min="-180" max="180" step="any" value="${site.longitude}"></div></div><label class="crew-checkbox"><input type="checkbox" required><span>I checked the photo, description and map pin.</span></label><button class="crew-button" id="crew-submit" type="submit">${config.dataMode==='mock'?'Save sample report':'Submit to crew'}</button><p id="crew-upload-status" role="status"></p></form></section>`;
+    const categoryOptions=['Wildlife','Flooding / standing water','Soil / access','Weather','Heat','Lightning','Wildfire / smoke','Other'];
+    editor.innerHTML=`<section class="crew-card"><div class="crew-row"><h2>Report what you see</h2><button class="crew-link" id="crew-cancel-report">Cancel</button></div><form id="crew-report-form"><label for="crew-photo">Hazard photo</label><input id="crew-photo" name="photo" type="file" accept="image/jpeg,image/png" capture="environment"><small>Optional · JPEG or PNG, up to 5 MB. Supported phones can open the rear camera.</small><img id="crew-photo-preview" alt="Your selected hazard photo" hidden><label for="crew-category">Hazard type</label><select id="crew-category" name="category" required><option value="">Choose hazard type</option>${categoryOptions.map(v=>`<option>${v}</option>`).join('')}</select><p id="crew-photo-suggestion" role="status"></p><label for="crew-severity">How severe is the hazard?</label><select id="crew-severity" name="severity" required><option value="">Choose severity</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select><label for="crew-description">What should the next crew know?</label><textarea id="crew-description" name="description" rows="3" maxlength="2000" required placeholder="Describe the hazard and how to find it."></textarea><label>Pin the location</label><p class="crew-muted">Tap the map, drag the pin, or enter coordinates below.</p><div id="crew-pin-map" class="crew-map" aria-label="Hazard location map"></div><p id="crew-pin-map-status" role="status"></p><div class="crew-coordinate-row"><div><label for="crew-lat">Latitude</label><input id="crew-lat" name="latitude" type="number" min="-90" max="90" step="any" value="${site.latitude}"></div><div><label for="crew-lng">Longitude</label><input id="crew-lng" name="longitude" type="number" min="-180" max="180" step="any" value="${site.longitude}"></div></div><label class="crew-checkbox"><input type="checkbox" required><span>I checked the photo, description and map pin.</span></label><button class="crew-button" id="crew-submit" type="submit">${config.dataMode==='mock'?'Save sample report':'Submit to crew'}</button><p id="crew-upload-status" role="status"></p></form></section>`;
     const form=editor.querySelector('form'),file=editor.querySelector('#crew-photo'),preview=editor.querySelector('#crew-photo-preview');
-    file.addEventListener('change',()=>{if(photoURL)URL.revokeObjectURL(photoURL);preview.hidden=true;const photo=file.files[0];if(!photo)return;try{validateReportPhoto(photo);}catch(error){file.value='';message(error.message);return;}photoURL=URL.createObjectURL(photo);preview.src=photoURL;preview.hidden=false;});
+    const category=editor.querySelector('#crew-category'),suggestionStatus=editor.querySelector('#crew-photo-suggestion');
+    const confirmation=form.querySelector('.crew-checkbox input');
+    form.querySelector('.crew-checkbox span').textContent='I checked the hazard type, photo, description and map pin.';
+    if(config.dataMode==='live'&&config.transport==='http'){
+      const disclosure=document.createElement('small');
+      disclosure.textContent='Choosing a photo uploads it privately and asks Gemini for an optional hazard suggestion. You confirm the final category.';
+      file.insertAdjacentElement('afterend',disclosure);
+    }
+    const requestId=crypto.randomUUID(),version=reportVersion;
+    let userChoseCategory=false,photoSelection=0,submitting=false;
+    category.addEventListener('change',()=>{userChoseCategory=true;confirmation.checked=false;suggestionStatus.textContent='';});
+    file.addEventListener('change',async()=>{
+      const selection=++photoSelection;
+      if(photoURL)URL.revokeObjectURL(photoURL);
+      photoURL=null;preview.hidden=true;suggestionStatus.textContent='';confirmation.checked=false;
+      if(!userChoseCategory)category.value='';
+      const photo=file.files[0];
+      if(!photo)return;
+      try{validateReportPhoto(photo);}catch(error){file.value='';message(error.message);return;}
+      photoURL=URL.createObjectURL(photo);preview.src=photoURL;preview.hidden=false;
+      if(config.dataMode!=='live'||config.transport!=='http')return;
+      suggestionStatus.textContent='Uploading photo for an optional hazard suggestion…';
+      const currentForm=()=>!disposed&&!submitting&&version===reportVersion&&editor.contains(form);
+      const samePhoto=()=>selection===photoSelection&&file.files[0]===photo;
+      try{
+        const {suggestion}=await services.prepareReportPhoto(photo,requestId);
+        if(!currentForm()||!samePhoto())return;
+        if(!mayApplySuggestion({samePhoto:true,currentForm:true,userChoseCategory})){
+          suggestionStatus.textContent='Your hazard choice is kept. Confirm it before submitting.';
+          return;
+        }
+        const label=applySuggestedCategory(suggestion,category,confirmation);
+        if(!label){suggestionStatus.textContent='No photo suggestion is available. Choose the hazard type yourself.';return;}
+        const confidence=['low','medium','high'].includes(suggestion.confidence)?` (${suggestion.confidence} confidence)`:'';
+        const reason=typeof suggestion.reason==='string'?` ${suggestion.reason}`:'';
+        suggestionStatus.textContent=`Gemini suggests ${label}${confidence}.${reason} Confirm or change this choice before submitting.`;
+      }catch(error){
+        if(currentForm()&&samePhoto())suggestionStatus.textContent=`${error.message} Choose the hazard type yourself; the report flow will verify the photo on submit.`;
+      }
+    });
     map=makeMap('crew-pin-map',[site.latitude,site.longitude]);
     if(map){const icon=L.divIcon({className:'crew-location-pin',html:'<span><b>!</b></span>',iconSize:[32,40],iconAnchor:[16,40]});marker=L.marker([site.latitude,site.longitude],{draggable:true,icon,title:'Hazard location; drag to move'}).addTo(map);map.on('click',e=>setPin(e.latlng.lat,e.latlng.lng));marker.on('dragend',()=>{const point=marker.getLatLng();setPin(point.lat,point.lng);});}
     else editor.querySelector('#crew-pin-map-status').textContent='Map unavailable. Use latitude and longitude to place the pin.';
     function setPin(lat,lng){if(marker&&map&&!map.hasLayer(marker))marker.addTo(map);marker?.setLatLng([lat,lng]);editor.querySelector('#crew-lat').value=lat.toFixed(6);editor.querySelector('#crew-lng').value=lng.toFixed(6);editor.querySelector('#crew-pin-map-status').textContent=`Pin: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;}
     for(const id of ['crew-lat','crew-lng'])editor.querySelector('#'+id).addEventListener('change',()=>{const latText=editor.querySelector('#crew-lat').value,lngText=editor.querySelector('#crew-lng').value;if(!latText&&!lngText){marker?.remove();editor.querySelector('#crew-pin-map-status').textContent='No precise pin selected. This report applies to the site.';return;}if(!latText||!lngText)return;const lat=Number(latText),lng=Number(lngText);if(Number.isFinite(lat)&&Number.isFinite(lng)&&Math.abs(lat)<=90&&Math.abs(lng)<=180){setPin(lat,lng);map?.panTo([lat,lng]);}});
     editor.querySelector('#crew-cancel-report').addEventListener('click',()=>{reportVersion++;cleanMap();editor.innerHTML='';refresh();});
-    const requestId=crypto.randomUUID(),version=reportVersion;
     form.addEventListener('submit',async event=>{
-      event.preventDefault();const button=form.querySelector('#crew-submit');button.disabled=true;editor.querySelector('#crew-upload-status').textContent=config.dataMode==='mock'?'Saving photo and report locally…':'Uploading photo and saving report…';
+      event.preventDefault();if(submitting)return;
+      let unlock=()=>{};
       try{const data=new FormData(form),description=String(data.get('description')).trim(),latitude=String(data.get('latitude')??'').trim()===''?null:Number(data.get('latitude')),longitude=String(data.get('longitude')??'').trim()===''?null:Number(data.get('longitude')),photo=file.files[0]??null;
         validateReportPhoto(photo);createHazardReportPayload({site_id:site.id,category:data.get('category'),severity:data.get('severity'),description,latitude,longitude});
+        if(!confirmation.checked)throw new Error('Confirm the hazard type, photo, description and map pin.');
+        submitting=true;unlock=freezeReportInputs(form);
+        editor.querySelector('#crew-upload-status').textContent=config.dataMode==='mock'?'Saving photo and report locally…':'Uploading photo and saving report…';
         const receipt=await services.submitReport({site_id:site.id,category:data.get('category'),description,latitude,longitude,photo,severity:data.get('severity'),request_id:requestId});
         if(!receipt?.id||String(receipt.site_id)!==String(site.id))throw new Error('The service did not confirm a stored report for this site. Retry with this form.');
         if(disposed||version!==reportVersion){message('Report saved for '+site.name+'.');return;}
         cleanMap();if(photoURL)URL.revokeObjectURL(photoURL);photoURL=null;
         editor.innerHTML=`<section class="crew-card"><p class="crew-eyebrow">${config.dataMode==='mock'?'SAMPLE SAVED LOCALLY':'REPORT STORED'}</p><h2>${config.dataMode==='mock'?'Your report is saved on this browser.':'Your report was received.'}</h2><p>${config.dataMode==='mock'?'No upload to the team or other devices occurred.':receipt.shared===true?'The service confirmed team sharing.':'The report is stored. Team notification has not been confirmed.'}</p><small>Report ID: ${esc(receipt.id)}</small></section>`;await refresh();
-      }catch(error){if(!disposed&&version===reportVersion){editor.querySelector('#crew-upload-status').textContent=error.message;button.disabled=false;}else message(error.message);}
+      }catch(error){submitting=false;unlock();if(!disposed&&version===reportVersion){editor.querySelector('#crew-upload-status').textContent=error.message;}else message(error.message);}
     });
     file.focus();
   }

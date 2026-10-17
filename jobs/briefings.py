@@ -52,10 +52,21 @@ def current_alerts() -> list[dict]:
 
 
 def due(site: dict, saved: dict, now: datetime) -> bool:
-    local = now.astimezone(ZoneInfo(site["timezone"]))
+    """Past 6 PM local, and no briefing for tomorrow written since then.
+
+    A briefing written earlier in the day (a manual --now run) doesn't count:
+    the scheduled one uses the latest forecast at 6 PM.
+    """
+    tz = ZoneInfo(site["timezone"])
+    local = now.astimezone(tz)
+    if local.hour < SEND_HOUR:
+        return False
     tomorrow = (local.date() + timedelta(days=1)).isoformat()
     have = saved.get(str(site["site_id"]))
-    return local.hour >= SEND_HOUR and not (have and have["for_date"] == tomorrow)
+    if not have or have["for_date"] != tomorrow:
+        return True
+    sent_at = datetime.fromisoformat(have["generated_at"].replace("Z", "+00:00")).astimezone(tz)
+    return sent_at.date() != local.date() or sent_at.hour < SEND_HOUR
 
 
 def run_once(force: bool = False) -> int:

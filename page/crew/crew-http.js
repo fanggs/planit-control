@@ -6,6 +6,7 @@ import {createHazardReportPayload, validateReportPhoto, MAX_PHOTO_BYTES} from '.
 export const CONTRACT_ROUTES = Object.freeze({
   sites: '/sites', site: '/sites/{id}', alerts: '/alerts',
   reports: '/reports', photos: '/photos', photo: '/photos/{photo_key}',
+  photoSuggestion: '/photos/{photo_key}/suggestion',
   briefing: '/briefings/{id}'
 });
 export class CrewAPIError extends Error {
@@ -19,7 +20,8 @@ export function createHTTPAPI(settings, getToken, fetcher = fetch) {
   const mapper = createContractMapper();
   const getRealtimeSource = createCrewRealtimeProvider(settings);
   const briefingCache = new Map();
-  const uploads = new Map(), receipts = new Map(), uncertainReports = new Set(), submissions = new Map();
+  const uploads = new Map(), inFlightUploads = new Map();
+  const receipts = new Map(), uncertainReports = new Set(), submissions = new Map();
   function url(route, params = {}, query = {}) {
     if (!settings.baseURL) throw new Error('Set config.api.baseURL before using live HTTP mode.');
     const template = settings.routes?.[route] || CONTRACT_ROUTES[route];
@@ -28,7 +30,20 @@ export function createHTTPAPI(settings, getToken, fetcher = fetch) {
       if (params[key] == null) throw new Error(`Missing route parameter: ${key}`);
       return encodeURIComponent(params[key]);
     });
-    const base = new URL(settings.baseURL.endsWith('/') ? settings.baseURL : settings.baseURL + '/');
+    let base;
+    if (settings.baseURL === '/api' || settings.baseURL === '/api/') {
+      // A same-origin proxy can keep the API behind the website's /api path.
+      // Resolve it only from a secure page, never from a file or unsafe preview.
+      const pageURL = globalThis.location?.href && new URL(globalThis.location.href);
+      if (!pageURL || !(pageURL.protocol === 'https:'
+        || (pageURL.protocol === 'http:' && pageURL.hostname === '127.0.0.1'))) {
+        throw new Error('Relative /api requires an HTTPS page or http://127.0.0.1.');
+      }
+      base = new URL('/api/', pageURL);
+    } else {
+      if (settings.baseURL.startsWith('/')) throw new Error('Only /api may be used as a relative API URL.');
+      base = new URL(settings.baseURL.endsWith('/') ? settings.baseURL : settings.baseURL + '/');
+    }
     // Never send an access token to plain HTTP outside this machine, or to a
     // URL carrying credentials, a query string, or a fragment.
     if (base.username || base.password || base.search || base.hash
@@ -36,7 +51,9 @@ export function createHTTPAPI(settings, getToken, fetcher = fetch) {
       throw new Error('API URL must use HTTPS, or http://127.0.0.1 for local development.');
     }
     const result = new URL(path.replace(/^\//, ''), base);
-    if (result.origin !== base.origin) throw new Error('API routes must stay on the configured API origin.');
+    if (result.origin !== base.origin || !result.pathname.startsWith(base.pathname)) {
+      throw new Error('API routes must stay on the configured API origin and path.');
+    }
     for (const [key, value] of Object.entries(query)) if (value != null) result.searchParams.set(key, value);
     return result;
   }
@@ -123,6 +140,48 @@ export function createHTTPAPI(settings, getToken, fetcher = fetch) {
     return briefing;
   }
   function unsupported() { throw new Error('Briefing preferences are not part of API contract v1.1.'); }
+  async function uploadReportPhoto(photo, requestId) {
+    validateReportPhoto(photo);
+    if (!photo) throw new Error('Choose a photo before requesting a suggestion.');
+    const previous = requestId && uploads.get(requestId);
+    if (previous?.photo === photo) return previous.photoKey;
+    const active = requestId && inFlightUploads.get(requestId);
+    if (active?.photo === photo) return active.promise;
+    const promise = (async () => {
+      const form = new FormData();
+      form.append(settings.photoField || 'file', photo, photo.name || 'hazard-photo');
+      const uploaded = await request('photos', {method: 'POST', body: form});
+      if (typeof uploaded?.photo_key !== 'string' || !uploaded.photo_key) {
+        throw new Error('The photo service did not return photo_key.');
+      }
+      return uploaded.photo_key;
+    })();
+    const entry = {photo, promise};
+    if (requestId) inFlightUploads.set(requestId, entry);
+    try {
+      const photoKey = await promise;
+      // A previous file's slower upload must not replace the selected file.
+      if (requestId && inFlightUploads.get(requestId) === entry) {
+        uploads.set(requestId, {photo, photoKey});
+      }
+      return photoKey;
+    } finally {
+      if (requestId && inFlightUploads.get(requestId) === entry) inFlightUploads.delete(requestId);
+    }
+  }
+  async function prepareReportPhoto(photo, requestId) {
+    const photoKey = await uploadReportPhoto(photo, requestId);
+    try {
+      const result = await request('photoSuggestion', {
+        params: {photo_key: photoKey}, method: 'POST'
+      });
+      return {photo_key: photoKey, suggestion: result?.suggestion ?? null};
+    } catch (error) {
+      // Gemini is optional. Authentication failures still need a fresh sign-in.
+      if (error.status === 401 || error.status === 403) throw error;
+      return {photo_key: photoKey, suggestion: null};
+    }
+  }
   async function submitReport(report) {
     validateReportPhoto(report.photo);
     // Validate all metadata before uploading. A photo is optional; identity is server-owned.
@@ -134,18 +193,8 @@ export function createHTTPAPI(settings, getToken, fetcher = fetch) {
     const pending = (async () => {
       let photoKey = null;
       if (report.photo) {
-        const previous = key && uploads.get(key);
-        if (previous?.photo === report.photo) photoKey = previous.photoKey;
-        else {
-          const form = new FormData();
-          // Contract v1.1 does not name this multipart field; confirm with Aryan.
-          form.append(settings.photoField || 'file', report.photo, report.photo.name || 'hazard-photo');
-          const uploaded = await request('photos', {method: 'POST', body: form});
-          photoKey = uploaded?.photo_key;
-          if (typeof photoKey !== 'string' || !photoKey) throw new Error('The photo service did not return photo_key.');
-          createHazardReportPayload(report, photoKey);
-          if (key) uploads.set(key, {photo: report.photo, photoKey});
-        }
+        photoKey = await uploadReportPhoto(report.photo, key);
+        createHazardReportPayload(report, photoKey);
       }
       let raw;
       try { raw = await request('reports', {method: 'POST', body: createHazardReportPayload(report, photoKey)}); }
@@ -171,6 +220,6 @@ export function createHTTPAPI(settings, getToken, fetcher = fetch) {
       getToken, readSite, listSites, onEvent, onConnection,
       heartbeatMs: settings.heartbeatMs, timers: settings.timers || globalThis, retryBaseMs: settings.retryBaseMs});
   }
-  return {listSites, readSite, listReports, submitReport, listBriefings, readBriefing,
+  return {listSites, readSite, listReports, prepareReportPhoto, submitReport, listBriefings, readBriefing,
     readPreferences: unsupported, savePreferences: unsupported, subscribeEvents};
 }

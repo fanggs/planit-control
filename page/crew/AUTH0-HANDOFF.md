@@ -67,7 +67,7 @@ tenant's Branding → Universal Login customization, use these theme values:
 | Borders | `#293532` |
 | Error text | `#FFB9AA` |
 
-Use PlanIT Control as the application name and the team's hosted logo.
+Use ForeSite as the application name and the team's hosted logo.
 Verify sign-in, any verification/MFA prompt, and sign-out on the deployed domain.
 
 ## Demo and integration limits

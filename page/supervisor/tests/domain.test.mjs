@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-import {assessScore, summaryScore, rankSites, freshness, countdown, coordinates,
+import {assessScore, summaryScore, rankSites, freshness, countdown, coordinates, openReportPins,
   isReplayAlert, siteHasReplayAlert, validNotice, hasSupervisorRole, safeSourceURL} from '../domain.js';
 const sites = JSON.parse(await fs.readFile(new URL('../sample-data/sites.json', import.meta.url)));
 const details = JSON.parse(await fs.readFile(new URL('../sample-data/site_details.json', import.meta.url)));
@@ -40,6 +40,12 @@ test('rank/search/filter preserve no-data state and do not change site data', ()
   assert.equal(rankSites(rows, {filter: 'no-data'}).length, 1);
   assert.equal(rankSites(sites, {filter: 'reports'}).length, 1);
   assert.equal(rows[0], unknown);
+});
+test('only open reports with coordinates become active map pins', () => {
+  const open = {id: 'current', status: 'open', latitude: 25, longitude: -80};
+  const resolved = {id: 'history', status: 'resolved', latitude: 25, longitude: -80};
+  const missingPosition = {id: 'unplaced', status: 'open', latitude: null, longitude: -80};
+  assert.deepEqual(openReportPins([resolved, missingPosition, open]), [open]);
 });
 test('an expired countdown never gives all-clear; missing timestamp is unavailable', () => {
   const now = Date.parse('2026-10-17T18:35:00Z');

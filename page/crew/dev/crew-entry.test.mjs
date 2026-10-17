@@ -15,7 +15,7 @@ test('crew and legacy sample supervisor workspaces can mount without forwarding 
     const name=role==='supervisor'?'crew-supervisor':'crew';
     assert.equal(destination,`http://127.0.0.1:4177/${name}.html?site=621`);
     assert.equal(loaded,`./${name}.js`);assert.equal(finished,true);
-    assert.equal(document.title,'PlanIT Control · '+(role==='supervisor'?'Supervisor':'Crew'));
+    assert.equal(document.title,'ForeSite · '+(role==='supervisor'?'Supervisor':'Crew'));
   }
 });
 test('a URL role cannot select a workspace without a verified claim or trigger a module load',async()=>{

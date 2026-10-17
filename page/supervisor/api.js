@@ -61,9 +61,13 @@ export function createAPI({base, token, timeoutMs = 20000, fetcher = fetch}) {
       if (!Array.isArray(rows)) throw new Error('GET /alerts must return a list.');
       return rows;
     },
-    resolve(id) {
+    async resolve(id) {
       if (typeof id !== 'string' || !/^[0-9a-f-]{36}$/i.test(id)) throw new Error('A report UUID is required.');
-      return request(`/reports/${encodeURIComponent(id)}`, {method: 'PATCH', body: {status: 'resolved'}});
+      const saved = await request(`/reports/${encodeURIComponent(id)}`, {method: 'PATCH', body: {status: 'resolved'}});
+      if (saved?.id !== id || saved.status !== 'resolved') {
+        throw new Error('The resolution receipt could not be verified. Refresh the reports before retrying.');
+      }
+      return saved;
     },
     photo(key) {
       if (typeof key !== 'string' || !/^[A-Za-z0-9_-]{1,1024}$/.test(key)) throw new Error('Invalid private photo key.');
