@@ -11,9 +11,14 @@ returns the notices to publish. No network, no clock of its own, so it can be
 tested with fake strikes. `run()` at the bottom is the live loop that feeds it
 real GOES flashes and publishes each notice to the DeepSpace bridge.
 
-Safety: missing data is never "safe". If the lightning feed has been down
-since before a countdown would end, the alert is NOT cleared; it stays until
-fresh data shows 30 quiet minutes.
+Safety: missing data is never "safe". An alert only clears after 30 quiet
+minutes that the job actually watched: if the feed was down (or the job
+restarted) during the countdown, the alert stays until the feed has been up
+for a full 30 minutes with no new strike.
+
+Where alerts live: an AlertStore. MemoryStore for tests and file-only runs;
+jobs/lightning_store.TigerStore saves alerts and nearby strikes to Tiger Data,
+so they survive restarts and the API reads them from the database.
 """
 from __future__ import annotations
 
@@ -72,12 +77,35 @@ class ActiveAlert:
         }
 
 
+class MemoryStore:
+    """Alert IDs from a counter; nothing persisted. Tests and file-only runs."""
+
+    def __init__(self, first_alert_id: int = 1):
+        self._next_id = first_alert_id
+
+    def start(self, alert: ActiveAlert) -> int:
+        alert_id, self._next_id = self._next_id, self._next_id + 1
+        return alert_id
+
+    def update(self, alert: ActiveAlert) -> None:
+        pass
+
+    def end(self, alert: ActiveAlert, at: datetime) -> None:
+        pass
+
+
 class LightningRule:
-    def __init__(self, sites: list[dict], first_alert_id: int = 1, all_clear: timedelta = ALL_CLEAR):
+    def __init__(self, sites: list[dict], first_alert_id: int = 1, all_clear: timedelta = ALL_CLEAR,
+                 store=None):
         self.sites = sites
         self.active: dict[int, ActiveAlert] = {}  # site_id -> alert
-        self._next_id = first_alert_id
+        self.store = store or MemoryStore(first_alert_id)
         self.all_clear = all_clear  # shortened only by replay's demo speed
+
+    def resume(self, alerts: list[ActiveAlert]) -> None:
+        """Pick up alerts still active from before a restart."""
+        for alert in alerts:
+            self.active[alert.site_id] = alert
 
     def process(self, flashes: list[dict], now: datetime, feed_ok_since: datetime | None) -> list[dict]:
         """Apply new flashes, then expire countdowns.
@@ -108,25 +136,29 @@ class LightningRule:
 
             alert = self.active.get(sid)
             if alert is None:
-                alert = ActiveAlert(self._next_id, sid, started_at=struck_at, last_trigger_at=struck_at,
+                alert = ActiveAlert(0, sid, started_at=struck_at, last_trigger_at=struck_at,
                                     trigger=trigger, clear_at=struck_at + self.all_clear)
-                self._next_id += 1
+                alert.alert_id = self.store.start(alert)
                 self.active[sid] = alert
                 notices.append({"type": "alert.started", "site_id": sid, "alert_id": alert.alert_id})
             elif struck_at > alert.last_trigger_at:
                 alert.last_trigger_at = struck_at
                 alert.clear_at = struck_at + self.all_clear
                 alert.trigger = trigger
+                self.store.update(alert)
                 notices.append({"type": "alert.updated", "site_id": sid, "alert_id": alert.alert_id,
                                 "clear_at": _iso(alert.clear_at)})
 
         for sid, alert in list(self.active.items()):
-            if now < alert.clear_at:
+            # Clear only after 30 quiet minutes we actually watched: the feed must
+            # be up now and have been up for a full countdown since the later of
+            # the last strike and when the feed (or job) came back.
+            if feed_ok_since is None:
                 continue
-            # Only clear if we were watching the whole countdown window.
-            if feed_ok_since is None or feed_ok_since > alert.last_trigger_at:
+            if now < max(alert.clear_at, feed_ok_since + self.all_clear):
                 continue
             del self.active[sid]
+            self.store.end(alert, now)
             notices.append({"type": "alert.cleared", "site_id": sid, "alert_id": alert.alert_id})
 
         return notices
@@ -150,13 +182,26 @@ def write_live_alerts(rows: list[dict]) -> None:
     os.replace(tmp, LIVE_ALERTS)
 
 
+def _tiger_store(replay: bool):
+    """TigerStore when DATABASE_URL is set, else None (file-only)."""
+    from api import db
+    if not db.configured():
+        return None
+    from jobs.lightning_store import TigerStore
+    return TigerStore(replay=replay)
+
+
 # ---------------------------------------------------------------- live loop
 
 def run(sites: list[dict], poll_seconds: float = 20.0, publish=None) -> None:
     """Poll both GOES satellites forever, apply the rule, publish notices."""
     if publish is None:
         from api.realtime import publish
-    rule = LightningRule(sites)
+    store = _tiger_store(replay=False)
+    rule = LightningRule(sites, store=store)
+    if store is not None:
+        rule.resume(store.load_active(sites, all_clear=ALL_CLEAR))
+        log.info("resumed %d active lightning alerts from Tiger Data", len(rule.active))
     seen: dict[str, str] = {}  # satellite -> newest file key processed
     feed_ok_since: datetime | None = None
 
@@ -178,6 +223,8 @@ def run(sites: list[dict], poll_seconds: float = 20.0, publish=None) -> None:
             log.warning("lightning feed unavailable: %s", e)
             feed_ok_since = None
 
+        if store is not None and flashes:
+            store.save_strikes(flashes, sites)
         notices = rule.process(flashes, now, feed_ok_since)
         write_live_alerts(rule.alerts())  # before publishing, so screens fetch fresh data
         for notice in notices:

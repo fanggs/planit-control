@@ -85,6 +85,49 @@ class LightningRuleTest(unittest.TestCase):
         brazil = {"strike_id": "x", "struck_at": T0.isoformat(), "latitude": -8.0, "longitude": -62.7}
         self.assertEqual(self.rule.process([brazil], at(0), FEED_UP), [])
 
+    def test_feed_gap_clears_after_30_watched_minutes(self):
+        self.rule.process([strike(0, 6)], at(0), FEED_UP)
+        # Feed came back at minute 20: needs 30 watched quiet minutes, so 50.
+        self.assertEqual(self.rule.process([], at(49), at(20)), [])
+        self.assertEqual(self.rule.process([], at(50), at(20)),
+                         [{"type": "alert.cleared", "site_id": 9001, "alert_id": 1}])
+
+
+class RecordingStore:
+    def __init__(self):
+        self.calls = []
+
+    def start(self, alert):
+        self.calls.append(("start", alert.site_id))
+        return 500 + len(self.calls)
+
+    def update(self, alert):
+        self.calls.append(("update", alert.alert_id))
+
+    def end(self, alert, at):
+        self.calls.append(("end", alert.alert_id))
+
+
+class StoreTest(unittest.TestCase):
+    def test_rule_uses_store_ids_and_calls(self):
+        store = RecordingStore()
+        rule = LightningRule([SITE], store=store)
+        started = rule.process([strike(0, 6, n=1)], at(0), FEED_UP)
+        self.assertEqual(started[0]["alert_id"], 501)       # ID comes from the store
+        rule.process([strike(10, 7, n=2)], at(10), FEED_UP)
+        rule.process([], at(41), FEED_UP)
+        self.assertEqual(store.calls, [("start", 9001), ("update", 501), ("end", 501)])
+
+    def test_resumed_alert_keeps_counting_after_restart(self):
+        first = LightningRule([SITE])
+        first.process([strike(0, 6)], at(0), FEED_UP)
+        carried = list(first.active.values())
+        restarted = LightningRule([SITE])
+        restarted.resume(carried)
+        # Job restarted at minute 10: not clear at 31, clear at 40 (30 watched minutes).
+        self.assertEqual(restarted.process([], at(31), at(10)), [])
+        self.assertEqual(restarted.process([], at(40), at(10))[0]["type"], "alert.cleared")
+
 
 if __name__ == "__main__":
     unittest.main()
