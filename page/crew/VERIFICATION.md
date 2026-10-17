@@ -1,5 +1,30 @@
 # Frontend verification — October 17, 2026
 
+## New 60-plant Field Atlas
+
+- `node dev/check.mjs`: passed. `node --test`: **53 passed, 0 failed**.
+- Seven atlas tests verify the exact snapshot against Sid's current
+  `get_data/generated/sites.json`, six regions with ten plants each, all 60
+  projected coordinates, invalid-roster rejection, API score allowlisting,
+  unavailable values, filters, interpolation, pointer-anchored zoom and pin spread.
+- Browser: 60 list rows / 60 mapped sites in both 2D and 3D. The transition
+  entered its animated state and completed with the same 60 sites. Disabling
+  Motion switched modes immediately. No console errors appeared in the atlas.
+- Search located Rock Creek Wind (EIA 67769). Region filtering returned 10 / 60;
+  clearing filters restored 60 / 60. Selecting a row showed its actual metadata.
+- Crew navigation round trip preserved Choctaw County (55706) as the return site
+  while the atlas used only its approved roster. Unsupported IDs cannot add map
+  sites; a direct map visit defaults to Turkey Point (621).
+- Checked desktop 1280 × 720 / 1440 × 1000, phone 390 × 900 / 320 × 740, and
+  landscape 844 × 390. All 60 mapped locations loaded; no page overflow appeared.
+  Phone search drawer, view controls and motion toggle worked.
+- Default configuration uses actual location metadata and no invented scores.
+  Hollow beacons have a documented fixed display height. No live API, Auth0
+  configuration, real-device gestures or DeepSpace delivery are claimed by these
+  browser checks. Live scores use the existing authenticated bulk adapter.
+- Only `page/crew/` changed. The supervisor app and shared contract are untouched.
+  See `CREW-ATLAS.md` for roster refresh and integration instructions.
+
 ## Contract v1.1 adapter update — current checks
 
 - `node dev/check.mjs`: application JavaScript syntax passed.

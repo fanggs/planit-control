@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080c10"><meta name="description" content="Explore PlanIT's 60 verified power plants in two or three dimensions.">
+  <title>PlanIT Control · Field Atlas</title>
+  <link rel="stylesheet" href="crew-atlas.css"><script type="module" src="crew-atlas.js"></script>
+</head><body class="planit-atlas">
+  <a class="atlas-skip" href="#atlas-search">Skip to plant search</a>
+  <header class="atlas-header"><a class="atlas-brand" href="index.html" aria-label="PlanIT Control home"><span class="atlas-brand-icon" aria-hidden="true">P<span></span></span>PLANIT <span>CONTROL</span></a><span class="atlas-header-section">FIELD ATLAS <i></i> MONITORED NETWORK</span><a id="atlas-crew-link" href="crew.html?demo=1">Crew workspace <span aria-hidden="true">↗</span></a></header>
+  <main class="atlas-stage" id="atlas-main">
+    <canvas id="atlas-canvas" tabindex="0" role="img" aria-label="Power plant map. Arrow keys pan; plus and minus zoom. N and P select plants. Use the search and plant list as an alternative."></canvas>
+    <div class="atlas-loading" id="atlas-loading" role="status"><span class="atlas-orbit" aria-hidden="true"></span><p>Mapping the monitored network…</p></div>
+    <section class="atlas-intro"><p class="atlas-eyebrow">PLANIT CONTROL / THE FIELD, IN FOCUS</p><h1>Every site.<br><em>Within reach.</em></h1><p>60 real power plants. Six hazard regions.<br>One perspective on the field.</p><button id="atlas-toggle-panel" class="atlas-text-button" aria-controls="atlas-sidebar" aria-expanded="true">Search the network <span aria-hidden="true">↘</span></button></section>
+    <div class="atlas-scope" aria-label="Map coverage"><span>UNITED STATES</span><strong>60</strong><small>monitored plants</small><i aria-hidden="true"></i></div>
+    <aside class="atlas-sidebar" id="atlas-sidebar" aria-label="Monitored plant search">
+      <div class="atlas-panel-title"><span>THE MONITORED NETWORK</span><strong id="atlas-result-count">60 / 60</strong></div>
+      <div class="atlas-search-controls"><label class="atlas-sr" for="atlas-search">Search the 60 plants</label><div class="atlas-search-box"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6"></circle><path d="m15 15 5 5"></path></svg><input id="atlas-search" type="search" autocomplete="off" placeholder="Plant, utility, state or EIA ID"></div><label class="atlas-sr" for="atlas-region">Hazard region</label><select id="atlas-region"><option value="">All six hazard regions</option></select></div>
+      <div id="atlas-plants" class="atlas-plant-list" aria-label="Plants"></div>
+      <section class="atlas-inspection" aria-label="Selected plant" id="atlas-inspection"><p class="atlas-eyebrow">SELECT A BEACON TO INSPECT</p></section>
+    </aside>
+    <div class="atlas-view-controls" role="group" aria-label="Map view"><button data-atlas-mode="2d" aria-pressed="true">2D</button><button data-atlas-mode="3d" aria-pressed="false">3D</button><span></span><button data-atlas-action="overview">Overview</button><button data-atlas-action="out" aria-label="Zoom out">−</button><button data-atlas-action="in" aria-label="Zoom in">+</button><button class="atlas-mobile-motion" data-atlas-action="motion" aria-label="Motion effects" aria-pressed="true">Motion</button></div>
+    <aside class="atlas-legend" aria-label="Map legend"><p class="atlas-eyebrow">SIX REGIONS. ONE NETWORK.</p><div id="atlas-region-key"></div><div class="atlas-symbol-key"><span class="atlas-ring"></span><p>Hollow beacon <strong>No hazard score yet</strong></p></div><p class="atlas-height-note">Scored beams rise with the 0–10 index. Unscored location beacons use a fixed height.</p><div class="atlas-legend-footer"><label><input type="checkbox" id="atlas-motion" checked> Motion</label><button id="atlas-data-refresh" hidden>Refresh scores ↻</button></div></aside>
+    <div class="atlas-caption"><span class="atlas-caption-dot"></span><span id="atlas-data-status">60 VERIFIED LOCATIONS / SCORES UNAVAILABLE</span><span class="atlas-caption-divider">/</span><span id="atlas-view-status" role="status">2D GEOGRAPHIC VIEW</span></div>
+    <p class="atlas-gesture" id="atlas-gesture">Drag to pan · Scroll to zoom · N / P to select a plant</p>
+    <div class="atlas-compass" aria-hidden="true"><span>N</span><i id="atlas-compass-needle"></i><small>US</small></div>
+    <p class="atlas-credit">Geography: U.S. Census Bureau · Plant locations: EIA-860M</p>
+    <span id="atlas-announcement" class="atlas-sr" role="status" aria-live="polite"></span>
+  </main>
+</body></html>

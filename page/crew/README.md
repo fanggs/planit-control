@@ -16,6 +16,13 @@ Open http://127.0.0.1:4174/ for the welcome page. **Log in** starts the Auth0 ha
 
 ## Included
 
+The new **Field Atlas** opens from the crew screen's **Explore the 60 monitored
+plants** link. It is a separate 2D/3D map using only Sid's verified roster, with
+animated perspective changes, region-colored beacons, search, plant inspection
+and phone controls. It starts with actual locations and unavailable scores;
+existing live configuration can add API scores. See **CREW-ATLAS.md** for data
+ownership, roster refresh, controls and backend integration.
+
 1. **National site picker:** 13,446 actual EIA-derived power plant records, searchable by name, state, operator or ID. Includes all 50 states, DC and Puerto Rico in the source snapshot.
 2. **Combined site picture:** weather, extreme heat, lightning, flooding, wildfire, soil saturation and wildlife cards, each with status, advice, observation time and source.
 3. **Lightning alerts:** a persistent alert across all crew tabs, absolute 30-minute deadline, event ordering, reconnect/disconnect states and server-confirmed clear. Demo scenarios exercise strikes within and beyond 10 miles and reset the hold on another nearby strike.
