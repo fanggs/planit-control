@@ -74,3 +74,57 @@ class HazardReportCreate(BaseModel):
             return value.strip()
         return value
 
+    @field_validator("photo_key")
+    @classmethod
+    def validate_photo_key(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        if value != value.strip():
+            raise ValueError("photo_key cannot have surrounding whitespace")
+        if any(ord(character) < 32 or ord(character) == 127 for character in value):
+            raise ValueError("photo_key cannot contain control characters")
+        if value.startswith("//") or re.match(r"^[A-Za-z][A-Za-z0-9+.-]*:", value):
+            raise ValueError("photo_key must be an opaque key, not a URL")
+        return value
+
+    @model_validator(mode="after")
+    def require_coordinate_pair(self) -> HazardReportCreate:
+        if (self.latitude is None) != (self.longitude is None):
+            raise ValueError("provide both latitude and longitude, or neither")
+        return self
+
+
+class HazardReportResolve(BaseModel):
+    """The only body accepted by supervisor PATCH /reports/{id}."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    status: Literal["resolved"]
+
+class HazardReportRead(HazardReportCreate):
+    """A stored report returned to an authorized caller."""
+
+    id: UUID
+    reporter_id: str
+    status: ReportStatus
+    created_at: datetime
+    resolved_at: datetime | None
+    resolved_by: str | None
+
+    @field_validator("reporter_id", "resolved_by")
+    @classmethod
+    def check_backend_subject(cls, value: str | None) -> str | None:
+        return None if value is None else validate_reporter_id(value)
+
+    @field_validator("created_at", "resolved_at")
+    @classmethod
+    def return_utc(cls, value: datetime | None) -> datetime | None:
+        if value is None:
+            return None
+        # PostgreSQL TIMESTAMPTZ is aware; SQLite test fixtures may be naive UTC.
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        return value.astimezone(timezone.utc)
+
+
+
+
