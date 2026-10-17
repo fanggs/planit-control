@@ -24,9 +24,9 @@ test('ranking puts missing or invalid scores last and supports search, region an
   assert.equal(rankSites(sites,{query:'Texas'}).length,1);assert.equal(validScore('8'),false);assert.equal(validScore(0),true);
 });
 test('site revisions prevent stale or cross-site responses from replacing state',()=>{const previous={id:'1',revision:4};assert.equal(acceptSnapshot(previous,{id:'2',revision:8},'1'),previous);assert.equal(acceptSnapshot(previous,{id:'1',revision:3},'1'),previous);assert.equal(acceptSnapshot(previous,{id:'1',revision:5},'1').revision,5);});
-test('national reference meets coverage and coordinate invariants',async()=>{
-  const rows=JSON.parse(await fs.readFile(new URL('../crew-data/plants.json',import.meta.url)));
-  assert.equal(rows.length,13446);assert.equal(new Set(rows.map(r=>r.id)).size,rows.length);
-  assert.ok(new Set(rows.map(r=>r.state)).size>=51);assert.equal(hazards.length,7);
-  assert.ok(rows.every(r=>r.id&&r.name&&Number.isFinite(r.lat)&&Number.isFinite(r.lng)&&Math.abs(r.lat)<=90&&Math.abs(r.lng)<=180));
+test('monitored reference meets coverage and coordinate invariants',async()=>{
+  const rows=JSON.parse(await fs.readFile(new URL('../crew-data/monitored-sites.json',import.meta.url)));
+  assert.equal(rows.length,60);assert.equal(new Set(rows.map(r=>r.site_id)).size,rows.length);
+  assert.equal(new Set(rows.map(r=>r.hazard_region)).size,6);assert.equal(hazards.length,7);
+  assert.ok(rows.every(r=>r.site_id&&r.name&&Number.isFinite(r.latitude)&&Number.isFinite(r.longitude)&&Math.abs(r.latitude)<=90&&Math.abs(r.longitude)<=180));
 });

@@ -1,5 +1,5 @@
-# National site reference
+# Monitored plant locations
 
-Frontend part 1. Commit: `feat(crew): establish national sites and safety state`.
+`monitored-sites.json` is an exact copy of Sid’s 60 approved EIA-860M sites. The primary map and demo crew site picker both use this roster. `atlas-source.json` records its origin.
 
-This folder preserves actual plant locations independently from synthetic demo conditions. `source.json` records provenance, the February 2025 snapshot and coverage limitations. JSON files remain valid data, without embedded code comments.
+The former national demo catalog was retired; it is not loaded by any screen. Existing browser-saved hazard reports are preserved. Demo conditions and scores remain synthetic and clearly labeled.
