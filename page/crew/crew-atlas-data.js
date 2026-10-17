@@ -1,12 +1,21 @@
 import {validScore} from './crew-domain.js';
 
+// Match the crew score bands. A missing reading never becomes a safe score.
+export const RISK_BANDS=Object.freeze([
+  {key:'lower',label:'Lower',range:'0–3.9',color:'#8dd1a2'},
+  {key:'elevated',label:'Elevated',range:'4–6.9',color:'#e8bd6c'},
+  {key:'high',label:'High',range:'7–10',color:'#f6997b'},
+  {key:'unknown',label:'No score',range:'Unavailable',color:'#829087'}
+]);
+export function atlasRisk(score){return RISK_BANDS[!validScore(score)?3:score>=7?2:score>=4?1:0];}
+export function atlasRank(sites){return sites.slice().sort((a,b)=>(validScore(b.score)?b.score:-1)-(validScore(a.score)?a.score:-1)||a.name.localeCompare(b.name));}
 export const REGIONS=Object.freeze({
-  western_wildfire:{label:'Western wildfire',short:'West',color:'#b1a2ff'},
-  southwest_heat:{label:'Southwest heat',short:'Southwest',color:'#efbd76'},
-  plains_storms:{label:'Plains storms',short:'Plains',color:'#87c8ee'},
-  mississippi_valley:{label:'Mississippi Valley',short:'Mississippi',color:'#8dd6b2'},
-  florida_gulf:{label:'Florida & Gulf',short:'Gulf',color:'#ed9fb6'},
-  eastern_storms:{label:'Eastern storms',short:'East',color:'#c5d58c'}
+  western_wildfire:{label:'Western wildfire',short:'West'},
+  southwest_heat:{label:'Southwest heat',short:'Southwest'},
+  plains_storms:{label:'Plains storms',short:'Plains'},
+  mississippi_valley:{label:'Mississippi Valley',short:'Mississippi'},
+  florida_gulf:{label:'Florida & Gulf',short:'Gulf'},
+  eastern_storms:{label:'Eastern storms',short:'East'}
 });
 
 export function atlasRoster(rows) {

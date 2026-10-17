@@ -1,6 +1,6 @@
 # PlanIT Control — complete frontend package
 
-Dark welcome page, role-aware Auth0 entry, crew workspace, and separate supervisor integration preview. All six challenge capabilities have frontend screens and service connections. Actual environmental feeds, trained ML, shared storage, Auth0 tenant configuration, notification delivery and 6 PM background jobs must be provided by the backend.
+Dark welcome page, role-aware Auth0 entry, crew workspace, and primary 60-site 2D/3D map. All six challenge capabilities have frontend screens and service connections. Actual environmental feeds, trained ML, shared storage, Auth0 tenant configuration, notification delivery and 6 PM background jobs must be provided by the backend.
 
 The visual theme uses near-black surfaces, mint/cyan accents, restrained hazard tints, original grid/contour artwork, icon navigation and a score ring. `crew-dark.css` supplies the shared dark palette inside Isaiah’s package. Category tints are independent from risk: the labeled severity badges and alert colors retain a consistent vocabulary. `crew-theme.css` keeps these changes scoped, and `crew-visuals.js` contains the original inline SVG artwork without external asset dependencies.
 
@@ -12,18 +12,17 @@ Install Node.js 20 or newer. No package installation or build is required.
 node dev/serve.mjs
 ```
 
-Open http://127.0.0.1:4174/ for the welcome page. **Log in** starts the Auth0 handoff; **Explore the demo** offers separate crew and supervisor previews. Read **AUTH0-HANDOFF.md** for callback URLs, role configuration and hosted-login colors, and **BACKEND-CONNECTION.md** for the contract v1.1 adapter. Supervisor preview: http://127.0.0.1:4174/crew-supervisor.html?demo=1. If port 4174 is already serving this package, reload it. To use a different port set the `PORT` environment variable first. Serve over HTTP/HTTPS; opening HTML directly as a file will not load modules or the plant catalog correctly.
+Open http://127.0.0.1:4174/ for the welcome page. **Log in** starts the Auth0 handoff; **Site map** opens the primary 2D/3D map; **Explore the demo** offers the crew view and site map. Read **AUTH0-HANDOFF.md** for callback URLs, role configuration and hosted-login colors, and **BACKEND-CONNECTION.md** for the contract v1.1 adapter. Primary map: http://127.0.0.1:4174/crew-atlas.html. If port 4174 is already serving this package, reload it. To use a different port set the `PORT` environment variable first. Serve over HTTP/HTTPS; opening HTML directly as a file will not load modules or the plant catalog correctly.
 
 ## Included
 
-The new **Field Atlas** opens from the crew screen's **Explore the 60 monitored
-plants** link. It is a separate 2D/3D map using only Sid's verified roster, with
-animated perspective changes, region-colored beacons, search, plant inspection
-and phone controls. It starts with actual locations and unavailable scores;
-existing live configuration can add API scores. See **CREW-ATLAS.md** for data
-ownership, roster refresh, controls and backend integration.
+The **Site map** is the main map throughout this frontend. It uses Sid’s 60
+verified plants, animated 2D/3D transitions, hazard-score colors, risk ranking,
+search, inspection and phone controls. Mock mode shows labeled sample scores;
+live mode uses authenticated API scores and leaves unavailable scores gray.
+See **CREW-ATLAS.md** for roster refresh, controls and integration.
 
-1. **National site picker:** 13,446 actual EIA-derived power plant records, searchable by name, state, operator or ID. Includes all 50 states, DC and Puerto Rico in the source snapshot.
+1. **Monitored site picker and primary map:** Sid’s 60 actual EIA-860M power plants, searchable by name, state, utility or ID, with six hazard regions. The 2D/3D map ranks and colors plants by hazard score.
 2. **Combined site picture:** weather, extreme heat, lightning, flooding, wildfire, soil saturation and wildlife cards, each with status, advice, observation time and source.
 3. **Lightning alerts:** a persistent alert across all crew tabs, absolute 30-minute deadline, event ordering, reconnect/disconnect states and server-confirmed clear. Demo scenarios exercise strikes within and beyond 10 miles and reset the hold on another nearby strike.
 4. **Flood warnings:** river proximity, overnight rain, observation window, rule explanation and a warning banner across crew views. Grand Gulf (6072) has a Mississippi River demonstration scenario. Real flood criteria remain backend-owned.
@@ -46,7 +45,7 @@ Read **BACKEND-CONNECTION.md** first. An adapter is a small translation layer be
 
 ## Local demonstration limits
 
-Plant locations are real references; all conditions, scores, forecasts and model details are synthetic. The location snapshot is **February 2025**, retrieved October 17, 2026. EIA's survey scope generally covers plants with at least 1 MW of combined nameplate capacity; this does not include every rooftop or small distributed generator. Provenance and exact coverage are in `crew-data/source.json`.
+Plant locations are real references; all conditions, scores, forecasts and model details are synthetic. The location roster is Sid’s **60 monitored plants** from the August 2026 EIA-860M data. Provenance and coverage are in `crew-data/atlas-source.json`.
 
 Demo reports and actual image files are stored in **IndexedDB**, the browser's local database. They survive reloads on this browser and origin, subject to browser storage limits. **BroadcastChannel** sends demo changes to other tabs on that same browser/origin. This is not cross-device sync, shared Tiger Data storage or a DeepSpace upload. Local demo strike deadlines are also retained. No real crews are notified. No daily delivery job is created. Real model training and flood decisions are backend responsibilities.
 
@@ -54,11 +53,11 @@ Auth0 needs its configured tenant and internet connection. Map tiles need OpenSt
 
 ## File ownership and integration
 
-The package stays under `crew-*` and does not edit Aryan's dashboard or shared stylesheet. `crew-supervisor.html/js` is a separate, optional handoff preview. Aryan can reuse its components or keep his dashboard. Shared theme tokens are inherited when `themeStylesheet` is configured; the temporary fallback styles stay inside `.planit-crew`.
+The package stays under `crew-*` and does not edit Aryan's dashboard or shared stylesheet. `crew-supervisor.html/js` is a compatibility entry for the primary map; the former national preview and catalog have been retired. Aryan’s separate dashboard is unchanged. Shared theme tokens are inherited when `themeStylesheet` is configured; the temporary fallback styles stay inside `.planit-crew`.
 
 Keep `crew-data/` and `crew-vendor/` with the pages when copying them into `page/crew/`. The root `dev/` scripts are development tools, not backend services. See CREW-DEVELOPMENT.md for the staged Git integration and implementation rationale. Deployment and backend connection are separate steps.
 
-For static hosting, publish the **contents of `page/crew/`** as the web root. Its `index.html` opens the crew login. Configure HTTPS and Auth0 origins/callbacks for the production domain. Keep the FastAPI service URL in config; a website root that returns API JSON is not a frontend deployment.
+For static hosting, publish the **contents of `page/crew/`** as the web root. Its `index.html` opens the welcome page with login and site-map links. Configure HTTPS and Auth0 origins/callbacks for the production domain. Keep the FastAPI service URL in config; a website root that returns API JSON is not a frontend deployment.
 
 ## Checks
 

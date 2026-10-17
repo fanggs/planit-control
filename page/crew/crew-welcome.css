@@ -140,3 +140,6 @@
   .planit-crew .score-explanation table { font-size: 11px; }
   .planit-crew .score-explanation th, .planit-crew .score-explanation td { padding: 10px 4px; }
 }
+
+/* Keep the primary map one tap away on phones. */
+@media(max-width:600px){.planit-crew .welcome-header{gap:10px;padding-inline:14px}.planit-crew .welcome-header nav{gap:12px}.planit-crew .welcome-header .crew-brand{font-size:17px;gap:5px}.planit-crew .welcome-map-link{display:inline-flex;align-items:center;min-height:44px;white-space:nowrap;font-size:11px}.planit-crew .welcome-login-link{gap:8px;padding-inline:10px}}

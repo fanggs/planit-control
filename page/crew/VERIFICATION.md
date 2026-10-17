@@ -54,7 +54,7 @@ The notes below describe earlier versions and historical checks. Superseded endp
 
 The original 17 tests are retained. Five more tests check the current strict backend report payload: enum/ID conversion, an explicit severity choice, omission of client identity and retry ID from JSON, invalid coordinates/description/storage keys, and preservation of opaque key identity with rejection of URLs/control characters. The new selector is a small form extension; live submission still needs the actual upload/report endpoints.
 
-Coverage: 10-mile lightning boundary, distant-strike exclusion, old strike/deadline handling, countdown after tab sleep, ordered per-site alerts, explicit server clear, disconnected/unknown states, DST transitions for 6 PM previews, ranking with missing/out-of-range scores, monotonic site revisions, 13,446 unique plant references with valid coordinates, bearer authentication, cursor pagination, multipart photo upload, permission errors and fragmented/multiline SSE messages.
+Coverage: 10-mile lightning boundary, distant-strike exclusion, old strike/deadline handling, countdown after tab sleep, ordered per-site alerts, explicit server clear, disconnected/unknown states, DST transitions for 6 PM previews, ranking with missing/out-of-range scores, monotonic site revisions, 60 unique monitored plant references with valid coordinates, bearer authentication, cursor pagination, multipart photo upload, permission errors and fragmented/multiline SSE messages.
 
 ## Browser checks with the local sample adapter
 
@@ -66,7 +66,7 @@ Coverage: 10-mile lightning boundary, distant-strike exclusion, old strike/deadl
 - Briefing preferences used America/Chicago for Grand Gulf; saving showed a local-only receipt rather than claiming delivery.
 - Selected a test image (a UI screenshot, not a real hazard), changed the report pin's latitude, reviewed and submitted. The photo, description, pin and report ID appeared in history.
 - Navigated/reloaded and reopened reports: the saved photo and coordinates remained available.
-- The supervisor preview showed all 13,446 sites, a paginated ranking and search filters. Selected Grand Gulf; its saved report appeared in the site observations. The report marker's map popup displayed its description and retained photo.
+- Historical check of the now-retired national preview: it showed the previous national catalog, a paginated ranking and search filters. Selected Grand Gulf; its saved report appeared in the site observations. The report marker's map popup displayed its description and retained photo.
 - Desktop at a 1280 × 900 viewport: 1265 px document width after scrollbar, no horizontal overflow; map and ranking used separate columns.
 - Crew at a 390 × 844 viewport: 375 px document width after scrollbar, no horizontal overflow. Supervisor narrow layout also stacked the filters and map/ranking.
 
@@ -85,3 +85,19 @@ Auth0 login/role claims, API CORS, actual feeds/10-mile server decisions, DeepSp
 - Dark surfaces checked on both workspaces and form controls. Existing stop-work, warning and unavailable states remain distinct.
 - Welcome verified at desktop, 390 × 844 and 320 × 740. Supervisor, report form and briefing verified at 390 px. No horizontal overflow in these checks.
 - Hosted Auth0 branding and real login remain pending team-provided public application settings. Live API adapter alignment with CONTRACT v1.1 is still required.
+
+
+## Primary map update · October 17, 2026
+
+- `node dev/check.mjs`: passed. `node --test`: 56 passed, none failed.
+- Desktop and 390 × 844 phone previews: exactly 60 mapped plants; hazard-score
+  colors and ranking agree with crew demo scores. No horizontal phone overflow.
+- Selected Rock Creek Wind (67769), opened its crew view, and confirmed its
+  name, sample score 9.4, timezone, provenance, and 60-site picker.
+- Tested 2D → 3D → 2D transitions, phone plant-list expansion and six-region
+  filter (10 plants), then cleared it (60 plants).
+- The retired crew-supervisor URL now mounts the primary map and preserves
+  the selected plant and view. The phone home-page Site map link opens it.
+- No browser console errors in the final preview. Live Auth0/API operation
+  was not exercised; demo scores are explicitly synthetic.
+- Aryan’s dashboard and all files outside page/crew were untouched.

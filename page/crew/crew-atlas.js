@@ -1,7 +1,8 @@
 import {config} from './crew-config.js';
+import {brandMark} from './crew-visuals.js';
 import {validScore} from './crew-domain.js';
 import {esc,dateLabel} from './crew-ui.js';
-import {REGIONS,atlasRoster,atlasSummaries,atlasFilter,atlasPoint,atlasZoom,atlasEase,spreadAtlasPins} from './crew-atlas-data.js';
+import {REGIONS,RISK_BANDS,atlasRisk,atlasRank,atlasRoster,atlasSummaries,atlasFilter,atlasPoint,atlasZoom,atlasEase,spreadAtlasPins} from './crew-atlas-data.js';
 
 const $=selector=>document.querySelector(selector),canvas=$('#atlas-canvas'),ctx=canvas.getContext('2d');
 const reduced=matchMedia('(prefers-reduced-motion: reduce)'),abort=new AbortController();
@@ -54,11 +55,11 @@ function draw(now){
   ctx.clearRect(0,0,width,height);
   const c=Math.cos(camera.yaw),s=Math.sin(camera.yaw),cos=Math.cos(camera.tilt);
   ctx.save();ctx.transform(c*camera.zoom,s*cos*camera.zoom,-s*camera.zoom,c*cos*camera.zoom,...point(0,0));
-  ctx.fillStyle='#17242e';ctx.strokeStyle='#394a57';ctx.lineWidth=.65/camera.zoom;
+  ctx.fillStyle='#172a22';ctx.strokeStyle='#3a5548';ctx.lineWidth=.65/camera.zoom;
   for(const feature of ground){ctx.fill(feature.path);ctx.stroke(feature.path);}
-  ctx.strokeStyle='#b2d5e51a';ctx.lineWidth=.5/camera.zoom;ctx.stroke(grid);
+  ctx.strokeStyle='#b7f7d415';ctx.lineWidth=.5/camera.zoom;ctx.stroke(grid);
   const names=new Set(['California','Texas','Montana','Florida','New York','Colorado','Mississippi','Washington']);
-  ctx.font=`${8/Math.max(1,camera.zoom*.55)}px ui-monospace,monospace`;ctx.textAlign='center';ctx.fillStyle='#788c9977';
+  ctx.font=`${8/Math.max(1,camera.zoom*.55)}px ui-monospace,monospace`;ctx.textAlign='center';ctx.fillStyle='#9bb0a477';
   if(width>700)for(const feature of ground)if(names.has(feature.name)&&feature.center.every(Number.isFinite))ctx.fillText(feature.name.toUpperCase(),...feature.center);
   ctx.restore();
   const pins=positions.map(p=>{
@@ -69,7 +70,7 @@ function draw(now){
   hits=spreadAtlasPins(pins,width,height);
   // Lines and halos are local canvas effects. No frame can request API data.
   for(const p of hits){
-    const color=REGIONS[p.site.hazard_region].color;
+    const color=atlasRisk(p.site.score).color;
     ctx.save();ctx.strokeStyle=color;ctx.lineWidth=p.selected?1.6:1;ctx.globalAlpha=p.selected?.9:.5;
     ctx.beginPath();ctx.moveTo(...p.base);ctx.lineTo(p.anchorX,p.anchorY);ctx.stroke();
     if(p.displaced){ctx.globalAlpha=.4;ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(p.anchorX,p.anchorY);ctx.lineTo(p.x,p.y);ctx.stroke();}
@@ -77,8 +78,8 @@ function draw(now){
   }
   const ordered=hits.slice().sort((a,b)=>Number(a.selected)-Number(b.selected));
   for(const p of ordered){
-    const color=REGIONS[p.site.hazard_region].color,hot=p.site.id===state.hover||p.selected,r=hot?4.8:3.2;
-    ctx.save();ctx.shadowColor=color;ctx.shadowBlur=hot?14:7;ctx.strokeStyle=color;ctx.fillStyle='#0e1822';ctx.lineWidth=hot?1.7:1;
+    const color=atlasRisk(p.site.score).color,hot=p.site.id===state.hover||p.selected,r=hot?4.8:3.2;
+    ctx.save();ctx.shadowColor=color;ctx.shadowBlur=hot?14:7;ctx.strokeStyle=color;ctx.fillStyle='#101916';ctx.lineWidth=hot?1.7:1;
     ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fill();ctx.stroke();
     if(validScore(p.site.score)){ctx.beginPath();ctx.arc(p.x,p.y,hot?2.4:1.5,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
     ctx.shadowBlur=0;
@@ -92,7 +93,7 @@ function draw(now){
     while(ctx.measureText(text).width>max-18&&text.length>8)text=text.slice(0,-2)+'…';
     const w=ctx.measureText(text).width+18,h=24,x=Math.max(8,Math.min(width-w-8,p.x-w/2)),y=Math.max(8,Math.min(height-h-8,p.y-34));
     const overlaps=seen.some(a=>x<a.x+a.w&&x+w>a.x&&y<a.y+h&&y+h>a.y);
-    if(!overlaps||p.selected||p.site.id===state.hover){ctx.fillStyle='#0c151eea';ctx.strokeStyle=REGIONS[p.site.hazard_region].color+'77';ctx.lineWidth=.6;ctx.beginPath();ctx.roundRect(x,y,w,h,6);ctx.fill();ctx.stroke();ctx.fillStyle='#e4ecee';ctx.textAlign='left';ctx.fillText(text,x+9,y+16);seen.push({x,y,w});}ctx.restore();
+    if(!overlaps||p.selected||p.site.id===state.hover){ctx.fillStyle='#0c1712ee';ctx.strokeStyle=atlasRisk(p.site.score).color+'77';ctx.lineWidth=.6;ctx.beginPath();ctx.roundRect(x,y,w,h,6);ctx.fill();ctx.stroke();ctx.fillStyle='#e4ecee';ctx.textAlign='left';ctx.fillText(text,x+9,y+16);seen.push({x,y,w});}ctx.restore();
   }
   canvas.dataset.view=state.mode;canvas.dataset.zoom=camera.zoom.toFixed(2);canvas.dataset.transitioning=String(Boolean(animation));
   $('#atlas-compass-needle').style.transform=`rotate(${-camera.yaw*180/Math.PI}deg)`;
@@ -101,12 +102,14 @@ function draw(now){
 }
 function renderList(){
   $('#atlas-result-count').textContent=`${state.visible.length} / 60`;
-  $('#atlas-plants').innerHTML=state.visible.map(s=>`<button class="atlas-plant" data-plant="${s.id}" aria-pressed="${s.id===state.selected}" style="--region:${REGIONS[s.hazard_region].color}"><span class="atlas-plant-dot" aria-hidden="true"></span><span><span class="atlas-plant-name">${esc(s.name)}</span><span class="atlas-plant-meta">${esc(s.state)} · EIA ${s.site_id} · ${REGIONS[s.hazard_region].short}</span></span><span class="atlas-plant-score">${validScore(s.score)?s.score.toFixed(1):'—'}</span></button>`).join('')||'<p class="atlas-empty">No matching monitored plants. Try a state, utility or plant name.</p>';
-  $('#atlas-region-key').innerHTML=Object.entries(REGIONS).map(([key,r])=>`<div class="atlas-region-key-row" style="--region:${r.color}"><i aria-hidden="true"></i><span>${r.label}</span><strong>${state.visible.filter(s=>s.hazard_region===key).length} / 10</strong></div>`).join('');
+  $('#atlas-plants').innerHTML=state.visible.map(s=>`<button class="atlas-plant" data-plant="${s.id}" aria-pressed="${s.id===state.selected}" style="--risk:${atlasRisk(s.score).color}" data-risk="${atlasRisk(s.score).key}"><span class="atlas-plant-dot" aria-hidden="true"></span><span><span class="atlas-plant-name">${esc(s.name)}</span><span class="atlas-plant-meta">${esc(s.state)} · EIA ${s.site_id} · ${REGIONS[s.hazard_region].short}</span></span><span class="atlas-plant-score" aria-label="${atlasRisk(s.score).label} hazard score">${validScore(s.score)?s.score.toFixed(1):'—'}</span></button>`).join('')||'<p class="atlas-empty">No matching monitored plants. Try a state, utility or plant name.</p>';
+  $('#atlas-risk-key').innerHTML=RISK_BANDS.map(r=>`<div class="atlas-risk-key-row" style="--risk:${r.color}"><i aria-hidden="true"></i><span>${r.label} <small>${r.range}</small></span><strong>${state.visible.filter(s=>atlasRisk(s.score).key===r.key).length}</strong></div>`).join('');
+  $('#atlas-mobile-risk').innerHTML=RISK_BANDS.map(r=>`<span style="color:${r.color}" title="${r.range}">${state.visible.filter(s=>atlasRisk(s.score).key===r.key).length} ${r.label.toLowerCase()}</span>`).join('<span aria-hidden="true"> · </span>');
 }
+function crewLink(id){const url=new URL('crew.html',location.href);url.searchParams.set('site',id);if(config.dataMode==='mock')url.searchParams.set('demo','1');return url.href;}
 function renderInspection(){
   const site=selected();if(!site)return;
-  $('#atlas-inspection').innerHTML=`<p class="atlas-eyebrow">SELECTED PLANT / ${esc(REGIONS[site.hazard_region].label.toUpperCase())}</p><h2>${esc(site.name)}</h2><p class="atlas-selected-meta">${esc(site.county)}, ${esc(site.state)} · EIA ${site.site_id}</p><p class="atlas-selected-utility">${esc(site.utility)}</p><div class="atlas-selected-score"><strong>${validScore(site.score)?site.score.toFixed(1):'—'}</strong><div><small>${validScore(site.score)?'HAZARD INDEX / 10':'HAZARD SCORE UNAVAILABLE'}</small><small>${validScore(site.score)?'Scored '+esc(dateLabel(site.score_updated_at)):'Verified location · no score inferred'}</small></div><button class="atlas-detail-button" data-atlas-action="focus">Locate ↗</button></div>`;
+  $('#atlas-inspection').innerHTML=`<p class="atlas-eyebrow">SELECTED PLANT / ${esc(REGIONS[site.hazard_region].label.toUpperCase())}</p><h2>${esc(site.name)}</h2><p class="atlas-selected-meta">${esc(site.county)}, ${esc(site.state)} · EIA ${site.site_id}</p><p class="atlas-selected-utility">${esc(site.utility)}</p><div class="atlas-selected-score" style="--risk:${atlasRisk(site.score).color}"><strong>${validScore(site.score)?site.score.toFixed(1):'—'}</strong><div><small>${validScore(site.score)?atlasRisk(site.score).label.toUpperCase()+' HAZARD INDEX / 10':'HAZARD SCORE UNAVAILABLE'}</small><small>${validScore(site.score)?(config.dataMode==='mock'?'Sample score · ':'Scored ')+esc(dateLabel(site.score_updated_at,site.timezone)):'Verified location · no score inferred'}</small></div><button class="atlas-detail-button" data-atlas-action="focus">Locate ↗</button></div><a class="atlas-open-site" href="${esc(crewLink(site.id))}">Open crew site <span aria-hidden="true">↗</span></a>`;
 }
 function selectSite(id,{focus=false}={}){
   if(!state.sites.some(s=>s.id===String(id)))return;
@@ -117,7 +120,7 @@ function selectSite(id,{focus=false}={}){
   request();
 }
 function filter(){
-  state.visible=atlasFilter(state.sites,{query:$('#atlas-search').value,region:$('#atlas-region').value});
+  state.visible=atlasRank(atlasFilter(state.sites,{query:$('#atlas-search').value,region:$('#atlas-region').value}));
   if(state.visible.length&&!state.visible.some(s=>s.id===state.selected))state.selected=state.visible[0].id;
   renderList();renderInspection();rebuildPositions();announce(`${state.visible.length} of 60 monitored plants match your filters.`);
 }
@@ -170,9 +173,10 @@ on(window,'pagehide',()=>{cancelAnimationFrame(raf);raf=0;});on(window,'pageshow
 async function refreshScores(){
   const button=$('#atlas-data-refresh');button.disabled=true;
   try{
-    if(!sourceAPI){const auth=await import('./crew-auth.js');await auth.initAuth();const user=await auth.session();const {userRoles}=await import('./crew-routing.js');if(!user||!userRoles(user,config.authRoleClaim).length){button.textContent='Sign in for scores ↗';button.onclick=()=>{location.href='login.html?start=1&site='+encodeURIComponent(state.selected);};throw new Error('Sign in to load scores. Location data remains available.');}sourceAPI=(await import('./crew-services.js')).services;}
+    if(config.dataMode==='live'&&!sourceAPI){const auth=await import('./crew-auth.js');await auth.initAuth();const user=await auth.session();const {userRoles}=await import('./crew-routing.js');if(!user||!userRoles(user,config.authRoleClaim).length){button.textContent='Sign in for scores ↗';button.onclick=()=>{location.href='login.html?start=1&site='+encodeURIComponent(state.selected);};throw new Error('Sign in to load scores. Location data remains available.');}sourceAPI=(await import('./crew-services.js')).services;}
+    sourceAPI??=(await import('./crew-services.js')).services;
     state.sites=atlasSummaries(state.roster,await sourceAPI.listSites());state.scoreState='connected';filter();
-    const scored=state.sites.filter(s=>validScore(s.score)).length;$('#atlas-data-status').textContent=`EIA LOCATIONS / ${scored} OF 60 SCORES AVAILABLE`;button.textContent='Refresh scores ↻';
+    const scored=state.sites.filter(s=>validScore(s.score)).length;$('#atlas-data-status').textContent=config.dataMode==='mock'?`SAMPLE SCORES · ${scored} REAL PLANT LOCATIONS`:`EIA LOCATIONS / ${scored} OF 60 SCORES AVAILABLE`;button.textContent='Refresh scores ↻';
   }catch(error){state.sites=atlasSummaries(state.roster,[]);state.scoreState='unavailable';filter();$('#atlas-data-status').textContent='VERIFIED LOCATIONS / SCORE FEED UNAVAILABLE';announce(error.message);}
   finally{button.disabled=false;}
 }
@@ -180,14 +184,16 @@ on($('#atlas-data-refresh'),'click',()=>{if(!$('#atlas-data-refresh').onclick)re
 async function getJSON(path){const response=await fetch(new URL(path,import.meta.url));if(!response.ok)throw new Error('A required map data file could not be loaded.');return response.json();}
 async function boot(){
   try{
-    state.roster=atlasRoster(await getJSON('./crew-data/monitored-sites.json'));state.sites=state.roster.slice();state.visible=state.sites;
+    state.roster=atlasRoster(await getJSON('./crew-data/monitored-sites.json'));state.sites=state.roster.slice();state.visible=atlasRank(state.sites);
     state.selected=state.sites.some(s=>s.id===query.get('site'))?query.get('site'):'621';
+    $('.atlas-brand-icon').innerHTML=brandMark();
+    $('#atlas-sample-note').hidden=config.dataMode!=='mock';
     $('#atlas-region').insertAdjacentHTML('beforeend',Object.entries(REGIONS).map(([key,r])=>`<option value="${key}">${r.label}</option>`).join(''));
     const crewURL=new URL('crew.html',location.href);crewURL.searchParams.set('site',returnId);if(config.dataMode==='mock')crewURL.searchParams.set('demo','1');$('#atlas-crew-link').href=crewURL.href;
     $('#atlas-toggle-panel').setAttribute('aria-expanded',String(innerWidth>900));renderList();renderInspection();motion();
     const [,states]=await Promise.all([import('./crew-vendor/d3-7.9.0.min.js'),getJSON('./crew-data/atlas-us-states.json')]);d3=globalThis.d3;geography=states;build();$('#atlas-loading').hidden=true;
     if(query.get('view')==='3d')switchMode('3d');saveView();
-    if(config.dataMode==='live'){$('#atlas-data-refresh').hidden=false;await refreshScores();}
+    $('#atlas-data-refresh').hidden=false;await refreshScores();
   }catch(error){$('#atlas-loading').hidden=false;$('#atlas-loading').textContent=error.message+' The plant list remains available if the roster loaded.';announce(error.message);}
 }
 boot();

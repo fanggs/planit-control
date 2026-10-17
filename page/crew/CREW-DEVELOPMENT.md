@@ -42,7 +42,7 @@ node dev/serve.mjs
 
 Core/transport/report-mapping tests validate behavior rather than UI copy. The checks are also run against each committed snapshot, so untracked files cannot accidentally hide a missing dependency. Live Auth0, backend storage, environmental feeds, trained ML and scheduled delivery still require team configuration. Current status belongs in VERIFICATION.md and BACKEND-CONNECTION.md.
 
-For source attribution, the plant-data provenance is in `crew-data/source.json`; vendored Leaflet keeps its original license. No CivicLens source, private team handoff documents, credentials, database files or raw secret configuration are included in these commits.
+For source attribution, the plant-data provenance is in `crew-data/atlas-source.json`; vendored Leaflet keeps its original license. No CivicLens source, private team handoff documents, credentials, database files or raw secret configuration are included in these commits.
 
 
 ## Dark welcome and Auth0 entry

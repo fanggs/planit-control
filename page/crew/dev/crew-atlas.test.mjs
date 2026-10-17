@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-import {REGIONS,atlasRoster,atlasSummaries,atlasFilter,atlasPoint,atlasZoom,atlasEase,spreadAtlasPins} from '../crew-atlas-data.js';
+import {REGIONS,atlasRisk,atlasRank,atlasRoster,atlasSummaries,atlasFilter,atlasPoint,atlasZoom,atlasEase,spreadAtlasPins} from '../crew-atlas-data.js';
 const snapshot=JSON.parse(await fs.readFile(new URL('../crew-data/monitored-sites.json',import.meta.url)));
 
 test('atlas snapshot matches Sid’s exact 60 monitored plants and six ten-plant regions',async()=>{
@@ -57,4 +57,17 @@ test('all 60 actual coordinates project into the national view',async()=>{
   const mainland={type:'FeatureCollection',features:geography.features.filter(f=>!['02','15','60','66','69','72','78'].includes(f.id))};
   const projection=globalThis.d3.geoAlbersUsa().fitExtent([[20,40],[1000,600]],mainland);
   assert.equal(atlasRoster(snapshot).filter(s=>projection([s.longitude,s.latitude])?.every(Number.isFinite)).length,60);
+});
+
+test('hazard colors respect exact band boundaries and never label missing readings as lower risk',()=>{
+  for(const score of [0,1,3.9])assert.equal(atlasRisk(score).key,'lower');
+  for(const score of [4,5.7,6.99])assert.equal(atlasRisk(score).key,'elevated');
+  for(const score of [7,8.2,10])assert.equal(atlasRisk(score).key,'high');
+  for(const score of [null,undefined,NaN,-1,11,'8'])assert.equal(atlasRisk(score).key,'unknown');
+  assert.equal(new Set([0,4,7,null].map(s=>atlasRisk(s).color)).size,4);
+});
+test('primary map ranks by risk with true zero ahead of missing scores and stable name ties',()=>{
+  const rows=[{name:'Missing',score:null},{name:'Zero',score:0},{name:'Z',score:8},{name:'A',score:8},{name:'Bad',score:12}];
+  assert.deepEqual(atlasRank(rows).map(s=>s.name),['A','Z','Zero','Bad','Missing']);
+  assert.equal(rows[0].name,'Missing');
 });

@@ -15,5 +15,5 @@
     "processing": "Simplified state rings from the existing local map geometry asset. Display only; not suitable for distance or boundary decisions.",
     "license_file": "ATLAS-GEOGRAPHY-LICENSE"
   },
-  "scores": "Location-only by default. Existing authenticated API adapter can add scores for these 60 IDs in live mode. Unavailable scores remain null; no synthetic scores are generated."
+  "scores": "Mock mode: explicitly labeled synthetic scores shared with crew screens. Live mode: authenticated bulk API scores only; missing values remain null."
 }
