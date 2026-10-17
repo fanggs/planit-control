@@ -5,6 +5,15 @@ export function changeSelectedSite(state, siteId) {
   state.selected = siteId;
   state.detail = null;
   state.reports = [];
+  state.detailStale = false;
+  return true;
+}
+
+// Keep last-known data visible after a failed same-site refresh, but never
+// allow it to look current or leak into a different site's panel.
+export function markDetailStale(state, siteId) {
+  if (state.selected !== siteId || state.detail?.site_id !== siteId) return false;
+  state.detailStale = true;
   return true;
 }
 
