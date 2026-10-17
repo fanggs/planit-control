@@ -4,7 +4,7 @@ import {mountWorkspace} from '../crew-workspaces.js';
 import {workspaceForUser} from '../crew-routing.js';
 const claim='https://planit-control/roles';
 
-test('verified crew and supervisor workspaces mount in the existing document without forwarding callback secrets',async()=>{
+test('crew and legacy sample supervisor workspaces can mount without forwarding callback secrets',async()=>{
   for(const role of ['crew','supervisor']){
     const root={id:'crew-access-root'},document={getElementById:()=>root};
     let destination,loaded,finished=false;

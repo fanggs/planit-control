@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime, timezone
 import inspect
 from uuid import UUID, uuid4
 
@@ -23,6 +22,7 @@ from sqlalchemy import (
     Table,
     Text,
     Uuid,
+    func,
     insert,
     select,
     update,
@@ -208,7 +208,9 @@ def resolve_report(
         .where(_reports.c.id == report_id, _reports.c.status == ReportStatus.OPEN.value)
         .values(
             status=ReportStatus.RESOLVED.value,
-            resolved_at=datetime.now(timezone.utc),
+            # Use the same database clock that supplied created_at. A client's
+            # Python clock can be behind Tiger Data and violate alert checks.
+            resolved_at=func.current_timestamp(),
             resolved_by=resolved_by,
         )
         .returning(*_reports.c)

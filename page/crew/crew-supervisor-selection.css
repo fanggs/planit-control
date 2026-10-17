@@ -1,0 +1,38 @@
+/* Supervisor site selection: keep map, summary and ranking in sync visually. */
+.planit-crew .crew-map-card > .crew-row { flex-wrap:wrap; gap:10px; }
+.planit-crew .crew-map-card > .crew-row h2 { margin-right:auto; }
+.planit-crew #preview-selected { padding:0 0 22px; margin:0 0 20px; border-bottom:1px solid #354a40; scroll-margin-top:90px; }
+.planit-crew #preview-selected h2 { font-size:23px; line-height:1.2; margin:0 0 8px; }
+.planit-crew #preview-selected .crew-eyebrow { color:#a7edc9; font-size:10px; letter-spacing:1.6px; margin:0 0 16px; }
+.planit-crew .preview-selection-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+.planit-crew .preview-selection-heading p { font-size:12px; color:#9faea7; margin:0; }
+.planit-crew .preview-score { color:#a7edc9; display:flex; flex-direction:column; align-items:center; min-width:58px; }
+.planit-crew .preview-score strong { font-size:36px; font-weight:500; line-height:1; }
+.planit-crew .preview-score span { color:#9faea7; font-size:11px; margin-top:6px; }
+.planit-crew .preview-score[data-risk=high] { color:#f6997b; }
+.planit-crew .preview-score[data-risk=elevated] { color:#e8bd6c; }
+.planit-crew .preview-score[data-risk=unknown] { color:#829087; }
+.planit-crew .preview-badges { display:flex; flex-wrap:wrap; gap:8px; margin-top:15px; }
+.planit-crew .preview-alert { background:#1b251e; border-left:2px solid #8a9f8f; padding:9px 12px; font-size:11px; color:#c9d3cd; margin:16px 0; }
+.planit-crew .preview-alert[data-tone=hold] { background:#2b1718; border-color:#ff9988; color:#ffd2c9; }
+.planit-crew .preview-readings { margin:0 0 14px; }
+.planit-crew .preview-readings > div { display:grid; grid-template-columns:70px 1fr; gap:10px; padding:8px 0; border-bottom:1px solid #25352d; font-size:12px; }
+.planit-crew .preview-readings dt { color:#a2b1ad; }
+.planit-crew .preview-readings dd { margin:0; color:#edf3f1; }
+.planit-crew #preview-selected > small { font-size:10px; color:#9faea7; }
+.planit-crew .preview-selected-actions { display:flex; align-items:center; gap:14px; margin-top:18px; flex-wrap:wrap; }
+.planit-crew .preview-selected-actions .crew-button { padding:8px 13px; font-size:11px; }
+.planit-crew .preview-selected-actions .crew-link { font-size:11px; }
+.planit-crew #supervisor-ranked-list { max-height:260px; }
+.planit-crew .crew-ranked-site[aria-pressed=true] { background:#203b2e; box-shadow:inset 3px 0 #a7edc9; padding-left:10px; }
+.planit-crew .preview-plant-marker { background:transparent; border:0; display:grid; place-items:center; }
+.planit-crew .preview-plant-marker > span { display:block; width:10px; height:10px; border-radius:50%; background:var(--plant-color); border:1.5px solid #eaffef; box-shadow:0 0 9px var(--plant-color),0 0 0 4px #080b0c66; transition:width .18s,height .18s,box-shadow .18s; }
+.planit-crew .preview-plant-marker:hover > span { width:14px; height:14px; }
+.planit-crew .preview-plant-marker.is-selected > span { width:15px; height:15px; border:2px solid white; box-shadow:0 0 0 5px #080b0c,0 0 0 7px var(--plant-color),0 0 24px var(--plant-color); }
+.planit-crew .preview-plant-marker:focus-visible { outline:2px solid white; border-radius:50%; outline-offset:3px; }
+.planit-crew .leaflet-tooltip { background:#10221b; color:#eaffef; border:1px solid #52705e; box-shadow:0 4px 20px #0005; }
+.planit-crew #supervisor-detail { scroll-margin-top:85px; }
+.planit-crew .crew-dashboard-grid { scroll-margin-top:85px; }
+.planit-crew #preview-selected[aria-busy=true] { opacity:.7; }
+@media(min-width:1000px) { .planit-crew #supervisor-map { height:700px; } }
+@media(prefers-reduced-motion:reduce) { .planit-crew .preview-plant-marker > span { transition:none; } }

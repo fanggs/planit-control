@@ -1,6 +1,6 @@
 // Public browser settings only. Never place client secrets or API keys here.
 export const config = Object.freeze({
-  mode: 'sample', // Change to 'live' after the backend and Auth0 are configured.
+  mode: 'live', // The labeled sample adapter remains available for offline development.
   apiBase: 'http://127.0.0.1:8010',
   requestTimeoutMs: 20000,
   pollMs: 30000,

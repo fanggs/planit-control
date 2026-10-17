@@ -19,3 +19,4 @@ data/raw/*
 
 # Live job state shared with the API
 data/live/
+data/private_photos/

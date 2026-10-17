@@ -89,6 +89,15 @@ def _live_lightning() -> list[dict] | None:
 
 def _alerts() -> list[dict]:
     live = _live_lightning()
+    if site_data.mode() == "database":
+        # Lightning still uses the local live-feed file. Report warnings are
+        # committed to Tiger Data with their report and must appear beside it.
+        warnings = db.query("""
+            SELECT id, site_id, hazard_type, level, message, started_at,
+                   last_trigger_at, clear_at, trigger
+            FROM public.alerts WHERE ended_at IS NULL
+            ORDER BY started_at DESC, id DESC""")
+        return warnings + (live or [])
     if site_data.mode() != "sample":
         return live or []
     # Sample mode: sample alerts, with lightning replaced by live state if any.
@@ -104,7 +113,12 @@ def _site_alerts(site_id: int, rows: list[dict]) -> list[dict]:
 
 
 def _reports() -> list[dict]:
-    # Real reports arrive with Aryan's database-backed routes.
+    if site_data.mode() == "database":
+        return db.query("""
+            SELECT id, site_id, reporter_id, hazard_type, severity, description,
+                   latitude, longitude, photo_key, status, created_at,
+                   resolved_at, resolved_by
+            FROM public.hazard_reports ORDER BY created_at DESC, id DESC""")
     return site_data.sample("reports") if site_data.mode() == "sample" else []
 
 
@@ -215,7 +229,25 @@ def briefing(site_id: int):
     return found
 
 
-# Response model comes from Aryan's hazard report schema once it has one.
-@app.get("/reports", dependencies=[Depends(_require_data_viewer)])
-def reports(site_id: int | None = None):
-    return [r for r in _reports() if site_id is None or r["site_id"] == site_id]
+if site_data.mode() == "database" and _auth0_config is not None:
+    # The real report/photo endpoints replace the old sample-only GET route.
+    # Both routes and site summaries use the same Tiger Data service.
+    from api.hazard_reporting import register_hazard_reporting
+    from api.realtime import publish
+    from api.services.hazard_warning_service import clear_report_warning, start_report_warning
+
+    register_hazard_reporting(
+        app,
+        get_db=db.get_db,
+        start_warning=start_report_warning,
+        clear_warning=clear_report_warning,
+        publish_event=publish,
+        photo_directory=os.environ.get("PLANIT_PRIVATE_PHOTOS_DIR") or site_data.ROOT / "data" / "private_photos",
+        auth_config=_auth0_config,
+    )
+else:
+    # Keep the explicit offline/sample preview usable without a database.
+    # Missing Auth0 settings still fail closed via _require_data_viewer.
+    @app.get("/reports", dependencies=[Depends(_require_data_viewer)])
+    def reports(site_id: int | None = None):
+        return [r for r in _reports() if site_id is None or r["site_id"] == site_id]
