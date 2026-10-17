@@ -84,3 +84,63 @@ class WarningAlertIntegrationMissing(RuntimeError):
 class ReportNotFound(LookupError):
     """No report has the requested ID."""
 
+
+
+@dataclass(frozen=True)
+class ReportChange:
+    """A stored report plus the alert ID needed for post-commit events.
+
+    After commit, the FastAPI route returns `report` as its JSON response.
+    `changed` is false when a resolve request repeats an already resolved ID.
+    No event should be sent for that no-op.
+    """
+
+    report: HazardReportRead
+    warning_alert_id: AlertId | None = None
+    changed: bool = True
+
+
+def save_report(
+    db: Session,
+    report: HazardReportCreate,
+    *,
+    reporter_id: str,
+    verify_photo: PhotoVerifier | None = None,
+    start_warning: WarningWriter | None = None,
+) -> ReportChange:
+    """Insert an open report and, if high severity, its warning alert.
+
+    The route first checks Auth0, role, site existence, and site access. The
+    reporter ID must come from the validated token's `sub`. A photo key needs
+    server-side verification against private upload metadata. The warning
+    writer must use `db` so report and alert commit or roll back together.
+    Publish report.created and any alert.started only after `db.commit()`.
+    """
+    reporter_id = validate_reporter_id(reporter_id)
+    report = HazardReportCreate.model_validate(report.model_dump())
+
+    if report.photo_key is not None:
+        if verify_photo is None or verify_photo(
+            db, report.photo_key, reporter_id, report.site_id
+        ) is not True:
+            raise PhotoReferenceNotAuthorized("photo is not a verified private upload")
+    if report.severity is Severity.HIGH and start_warning is None:
+        raise WarningAlertIntegrationMissing("high-severity reports need start_warning")
+
+    statement = (
+        insert(_reports)
+        .values(
+            id=uuid4(),
+            site_id=report.site_id,
+            reporter_id=reporter_id,
+            hazard_type=report.hazard_type.value,
+            severity=report.severity.value,
+            description=report.description,
+            latitude=report.latitude,
+            longitude=report.longitude,
+            photo_key=report.photo_key,
+            status=ReportStatus.OPEN.value,
+            # created_at is assigned by the database DEFAULT.
+        )
+        .returning(*_reports.c)
+    )
