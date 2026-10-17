@@ -21,6 +21,13 @@ review. Publishing to the team repository is a separate approval step.
 
 ## Model direction
 
+Interval 5 status: five fixed candidates trained and exported; no weather model
+met the predeclared validation acceptance rule. Logistic regression leads mean
+validation ranking, but probability reliability is not established. The forecast
+pilot remains sealed. See `README.md` and `generated/experiment-results.json`.
+Interval 6 must retain this research-only status until new evidence supports
+promotion; exact explanations alone do not establish predictive accuracy.
+
 Sid explicitly rejected choosing or defending an 8/2 weather/wildlife weighting.
 Experiments will not optimize toward that ratio. Accuracy must be measured
 against a stated target and held-out evidence; it cannot be promised in advance.

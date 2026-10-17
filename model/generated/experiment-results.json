@@ -1,0 +1,3853 @@
+{
+  "candidate_hashes": {
+    "constant_prior": "c8e336a0ab4c56fa3de5b967b6b60015cbd3e39bc7b560edc73f6b3309c877ae",
+    "logistic": "5a8f8404ef3130cb7bbd9c2598242177ecf74fe0c9b063d9071db220d5c9f367",
+    "month_only": "ccc89c3b271352fd3f6cdae254f8a355ecdd261c62d57a29c9fe40ade00ad7bb",
+    "random_forest": "4ee5c1e91dbb986c05152ce7aa633b5c52e7285e4d12eb703faa15bac957d335",
+    "shallow_tree": "e247ea50f3b5b8f04f98aa8d7580ff4f6c5bd8cf6296b42e057e9d320ca24bfa"
+  },
+  "code_hashes": {
+    "model/data.py": "a0a8d228c86907a647bf429958ee42606a0eb3b77b065046e9cf9cc8ebb2d83a",
+    "model/experiments.py": "b591f10fe3127eabc798a050ee3c7ff5d7397a58899851ee257787685bb6ebd0"
+  },
+  "configurations": {
+    "constant_prior": {
+      "constant": null,
+      "random_state": null,
+      "strategy": "prior"
+    },
+    "logistic": {
+      "C": 1.0,
+      "class_weight": null,
+      "dual": false,
+      "fit_intercept": true,
+      "intercept_scaling": 1,
+      "l1_ratio": null,
+      "max_iter": 3000,
+      "multi_class": "deprecated",
+      "n_jobs": null,
+      "penalty": "l2",
+      "random_state": 20261017,
+      "solver": "lbfgs",
+      "tol": 0.0001,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "month_only": {
+      "C": 1.0,
+      "class_weight": null,
+      "dual": false,
+      "fit_intercept": true,
+      "intercept_scaling": 1,
+      "l1_ratio": null,
+      "max_iter": 3000,
+      "multi_class": "deprecated",
+      "n_jobs": null,
+      "penalty": "l2",
+      "random_state": 20261017,
+      "solver": "lbfgs",
+      "tol": 0.0001,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "random_forest": {
+      "bootstrap": true,
+      "ccp_alpha": 0.0,
+      "class_weight": null,
+      "criterion": "gini",
+      "max_depth": 8,
+      "max_features": 0.8,
+      "max_leaf_nodes": null,
+      "max_samples": null,
+      "min_impurity_decrease": 0.0,
+      "min_samples_leaf": 30,
+      "min_samples_split": 2,
+      "min_weight_fraction_leaf": 0.0,
+      "monotonic_cst": null,
+      "n_estimators": 128,
+      "n_jobs": 1,
+      "oob_score": false,
+      "random_state": 20261017,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "shallow_tree": {
+      "ccp_alpha": 0.0,
+      "class_weight": null,
+      "criterion": "gini",
+      "max_depth": 4,
+      "max_features": null,
+      "max_leaf_nodes": null,
+      "min_impurity_decrease": 0.0,
+      "min_samples_leaf": 40,
+      "min_samples_split": 2,
+      "min_weight_fraction_leaf": 0.0,
+      "monotonic_cst": null,
+      "random_state": 20261017,
+      "splitter": "best"
+    }
+  },
+  "created_at": "20261017T200812380365Z",
+  "environment": {
+    "numpy": "2.5.4",
+    "python": "3.12.1",
+    "scipy": "1.18.1",
+    "sklearn": "1.7.2"
+  },
+  "experiment_version": "weather-association-v1",
+  "final_test": {
+    "constant_prior": {
+      "geographic_test": {
+        "average_precision": 0.03571428571428571,
+        "brier": 0.0346557725133745,
+        "calibration_bins": [
+          {
+            "count": 1092,
+            "lower": 0,
+            "mean_prediction": 0.05044510385756677,
+            "reported_fraction": 0.03571428571428571,
+            "upper": 0.1
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          1053,
+          0,
+          39,
+          0
+        ],
+        "daily_review": {
+          "budget": "ceil(10% of evaluated sites per UTC day)",
+          "precision": 0.038461538461538464,
+          "recall": 0.1794871794871795,
+          "selected": 182,
+          "selected_fraction": 0.16666666666666666
+        },
+        "log_loss": 0.15658720783493077,
+        "positives": 39,
+        "precision_at_0_5": 0.0,
+        "prevalence": 0.03571428571428571,
+        "recall_at_0_5": 0.0,
+        "regions": {
+          "eastern_storms": {
+            "average_precision": null,
+            "brier": 0.002544708503200695,
+            "calibration_bins": [
+              {
+                "count": 182,
+                "lower": 0,
+                "mean_prediction": 0.05044510385756677,
+                "reported_fraction": 0.0,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              182,
+              0,
+              0,
+              0
+            ],
+            "log_loss": 0.051761934558589455,
+            "positives": 0,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.0,
+            "recall_at_0_5": null,
+            "roc_auc": null,
+            "rows": 182
+          },
+          "florida_gulf": {
+            "average_precision": 0.016483516483516484,
+            "brier": 0.017365199584819375,
+            "calibration_bins": [
+              {
+                "count": 182,
+                "lower": 0,
+                "mean_prediction": 0.05044510385756677,
+                "reported_fraction": 0.016483516483516484,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              179,
+              0,
+              3,
+              0
+            ],
+            "log_loss": 0.10014282991690084,
+            "positives": 3,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.016483516483516484,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 182
+          },
+          "mississippi_valley": {
+            "average_precision": 0.01098901098901099,
+            "brier": 0.012425035890946477,
+            "calibration_bins": [
+              {
+                "count": 182,
+                "lower": 0,
+                "mean_prediction": 0.05044510385756677,
+                "reported_fraction": 0.01098901098901099,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              180,
+              0,
+              2,
+              0
+            ],
+            "log_loss": 0.08401586479746372,
+            "positives": 2,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.01098901098901099,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 182
+          },
+          "plains_storms": {
+            "average_precision": 0.005494505494505495,
+            "brier": 0.007484872197073587,
+            "calibration_bins": [
+              {
+                "count": 182,
+                "lower": 0,
+                "mean_prediction": 0.05044510385756677,
+                "reported_fraction": 0.005494505494505495,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              181,
+              0,
+              1,
+              0
+            ],
+            "log_loss": 0.06788889967802658,
+            "positives": 1,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.005494505494505495,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 182
+          },
+          "southwest_heat": {
+            "average_precision": 0.005494505494505495,
+            "brier": 0.007484872197073587,
+            "calibration_bins": [
+              {
+                "count": 182,
+                "lower": 0,
+                "mean_prediction": 0.05044510385756677,
+                "reported_fraction": 0.005494505494505495,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              181,
+              0,
+              1,
+              0
+            ],
+            "log_loss": 0.06788889967802658,
+            "positives": 1,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.005494505494505495,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 182
+          },
+          "western_wildfire": {
+            "average_precision": 0.17582417582417584,
+            "brier": 0.16062994670713326,
+            "calibration_bins": [
+              {
+                "count": 182,
+                "lower": 0,
+                "mean_prediction": 0.05044510385756677,
+                "reported_fraction": 0.17582417582417584,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              150,
+              0,
+              32,
+              0
+            ],
+            "log_loss": 0.5678248183805774,
+            "positives": 32,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.17582417582417584,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 182
+          }
+        },
+        "roc_auc": 0.5,
+        "rows": 1092
+      },
+      "temporal_test": {
+        "average_precision": 0.03216911764705882,
+        "brier": 0.03146827718883518,
+        "calibration_bins": [
+          {
+            "count": 3264,
+            "lower": 0,
+            "mean_prediction": 0.05044510385756677,
+            "reported_fraction": 0.03216911764705882,
+            "upper": 0.1
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          3159,
+          0,
+          105,
+          0
+        ],
+        "daily_review": {
+          "budget": "ceil(10% of evaluated sites per UTC day)",
+          "precision": 0.02197802197802198,
+          "recall": 0.0761904761904762,
+          "selected": 364,
+          "selected_fraction": 0.11151960784313726
+        },
+        "log_loss": 0.14618175791411747,
+        "positives": 105,
+        "precision_at_0_5": 0.0,
+        "prevalence": 0.03216911764705882,
+        "recall_at_0_5": 0.0,
+        "regions": {
+          "eastern_storms": {
+            "average_precision": 0.01098901098901099,
+            "brier": 0.012425035890946479,
+            "calibration_bins": [
+              {
+                "count": 546,
+                "lower": 0,
+                "mean_prediction": 0.05044510385756677,
+                "reported_fraction": 0.01098901098901099,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              540,
+              0,
+              6,
+              0
+            ],
+            "log_loss": 0.08401586479746372,
+            "positives": 6,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.01098901098901099,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 546
+          },
+          "florida_gulf": {
+            "average_precision": 0.0018726591760299626,
+            "brier": 0.004228434705981343,
+            "calibration_bins": [
+              {
+                "count": 534,
+                "lower": 0,
+                "mean_prediction": 0.050445103857566766,
+                "reported_fraction": 0.0018726591760299626,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              533,
+              0,
+              1,
+              0
+            ],
+            "log_loss": 0.05725839083525155,
+            "positives": 1,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.0018726591760299626,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 534
+          },
+          "mississippi_valley": {
+            "average_precision": 0.009157509157509158,
+            "brier": 0.010778314659655517,
+            "calibration_bins": [
+              {
+                "count": 546,
+                "lower": 0,
+                "mean_prediction": 0.05044510385756677,
+                "reported_fraction": 0.009157509157509158,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              541,
+              0,
+              5,
+              0
+            ],
+            "log_loss": 0.07864020975765135,
+            "positives": 5,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.009157509157509158,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 546
+          },
+          "plains_storms": {
+            "average_precision": 0.10622710622710622,
+            "brier": 0.09805453991807661,
+            "calibration_bins": [
+              {
+                "count": 546,
+                "lower": 0,
+                "mean_prediction": 0.05044510385756677,
+                "reported_fraction": 0.10622710622710622,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              488,
+              0,
+              58,
+              0
+            ],
+            "log_loss": 0.36354992686770726,
+            "positives": 58,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.10622710622710622,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 546
+          },
+          "southwest_heat": {
+            "average_precision": 0.045787545787545784,
+            "brier": 0.0437127392854748,
+            "calibration_bins": [
+              {
+                "count": 546,
+                "lower": 0,
+                "mean_prediction": 0.05044510385756677,
+                "reported_fraction": 0.045787545787545784,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              521,
+              0,
+              25,
+              0
+            ],
+            "log_loss": 0.1861533105538988,
+            "positives": 25,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.045787545787545784,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 546
+          },
+          "western_wildfire": {
+            "average_precision": 0.018315018315018316,
+            "brier": 0.019011920816110334,
+            "calibration_bins": [
+              {
+                "count": 546,
+                "lower": 0,
+                "mean_prediction": 0.05044510385756677,
+                "reported_fraction": 0.018315018315018316,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              536,
+              0,
+              10,
+              0
+            ],
+            "log_loss": 0.10551848495671322,
+            "positives": 10,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.018315018315018316,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 546
+          }
+        },
+        "roc_auc": 0.5,
+        "rows": 3264
+      }
+    },
+    "month_only": {
+      "geographic_test": {
+        "average_precision": 0.0548992673992674,
+        "brier": 0.03423106979636324,
+        "calibration_bins": [
+          {
+            "count": 1092,
+            "lower": 0,
+            "mean_prediction": 0.04070655919263942,
+            "reported_fraction": 0.03571428571428571,
+            "upper": 0.1
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          1053,
+          0,
+          39,
+          0
+        ],
+        "daily_review": {
+          "budget": "ceil(10% of evaluated sites per UTC day)",
+          "precision": 0.038461538461538464,
+          "recall": 0.1794871794871795,
+          "selected": 182,
+          "selected_fraction": 0.16666666666666666
+        },
+        "log_loss": 0.1517217488741794,
+        "positives": 39,
+        "precision_at_0_5": 0.0,
+        "prevalence": 0.03571428571428571,
+        "recall_at_0_5": 0.0,
+        "regions": {
+          "eastern_storms": {
+            "average_precision": null,
+            "brier": 0.0017880252934829458,
+            "calibration_bins": [
+              {
+                "count": 182,
+                "lower": 0,
+                "mean_prediction": 0.04070655919263942,
+                "reported_fraction": 0.0,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              182,
+              0,
+              0,
+              0
+            ],
+            "log_loss": 0.04162958657400988,
+            "positives": 0,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.0,
+            "recall_at_0_5": null,
+            "roc_auc": null,
+            "rows": 182
+          },
+          "florida_gulf": {
+            "average_precision": 0.016605616605616602,
+            "brier": 0.016924839778639972,
+            "calibration_bins": [
+              {
+                "count": 182,
+                "lower": 0,
+                "mean_prediction": 0.04070655919263942,
+                "reported_fraction": 0.016483516483516484,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              179,
+              0,
+              3,
+              0
+            ],
+            "log_loss": 0.0943083799606766,
+            "positives": 3,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.016483516483516484,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5037243947858473,
+            "rows": 182
+          },
+          "mississippi_valley": {
+            "average_precision": 0.016666666666666666,
+            "brier": 0.011735833525990134,
+            "calibration_bins": [
+              {
+                "count": 182,
+                "lower": 0,
+                "mean_prediction": 0.04070655919263942,
+                "reported_fraction": 0.01098901098901099,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              180,
+              0,
+              2,
+              0
+            ],
+            "log_loss": 0.07477810756075728,
+            "positives": 2,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.01098901098901099,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.6722222222222223,
+            "rows": 182
+          },
+          "plains_storms": {
+            "average_precision": 0.016666666666666666,
+            "brier": 0.006671204688147812,
+            "calibration_bins": [
+              {
+                "count": 182,
+                "lower": 0,
+                "mean_prediction": 0.04070655919263942,
+                "reported_fraction": 0.005494505494505495,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              181,
+              0,
+              1,
+              0
+            ],
+            "log_loss": 0.05718883143314051,
+            "positives": 1,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.005494505494505495,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.8370165745856354,
+            "rows": 182
+          },
+          "southwest_heat": {
+            "average_precision": 0.005494505494505495,
+            "brier": 0.006977031546132782,
+            "calibration_bins": [
+              {
+                "count": 182,
+                "lower": 0,
+                "mean_prediction": 0.04070655919263942,
+                "reported_fraction": 0.005494505494505495,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              181,
+              0,
+              1,
+              0
+            ],
+            "log_loss": 0.06115985897392918,
+            "positives": 1,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.005494505494505495,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.1685082872928177,
+            "rows": 182
+          },
+          "western_wildfire": {
+            "average_precision": 0.2903617216117216,
+            "brier": 0.1612894839457858,
+            "calibration_bins": [
+              {
+                "count": 182,
+                "lower": 0,
+                "mean_prediction": 0.04070655919263942,
+                "reported_fraction": 0.17582417582417584,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              150,
+              0,
+              32,
+              0
+            ],
+            "log_loss": 0.5812657287425629,
+            "positives": 32,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.17582417582417584,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.6420833333333333,
+            "rows": 182
+          }
+        },
+        "roc_auc": 0.60913872452334,
+        "rows": 1092
+      },
+      "temporal_test": {
+        "average_precision": 0.02694577901777747,
+        "brier": 0.031642334373630045,
+        "calibration_bins": [
+          {
+            "count": 3264,
+            "lower": 0,
+            "mean_prediction": 0.04065169111950392,
+            "reported_fraction": 0.03216911764705882,
+            "upper": 0.1
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          3159,
+          0,
+          105,
+          0
+        ],
+        "daily_review": {
+          "budget": "ceil(10% of evaluated sites per UTC day)",
+          "precision": 0.02197802197802198,
+          "recall": 0.0761904761904762,
+          "selected": 364,
+          "selected_fraction": 0.11151960784313726
+        },
+        "log_loss": 0.14867519641726673,
+        "positives": 105,
+        "precision_at_0_5": 0.0,
+        "prevalence": 0.03216911764705882,
+        "recall_at_0_5": 0.0,
+        "regions": {
+          "eastern_storms": {
+            "average_precision": 0.009177859177859179,
+            "brier": 0.012083119522244282,
+            "calibration_bins": [
+              {
+                "count": 546,
+                "lower": 0,
+                "mean_prediction": 0.04070655919263942,
+                "reported_fraction": 0.01098901098901099,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              540,
+              0,
+              6,
+              0
+            ],
+            "log_loss": 0.07939613385898012,
+            "positives": 6,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.01098901098901099,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.2796296296296296,
+            "rows": 546
+          },
+          "florida_gulf": {
+            "average_precision": 0.005952380952380952,
+            "brier": 0.003422964786413999,
+            "calibration_bins": [
+              {
+                "count": 534,
+                "lower": 0,
+                "mean_prediction": 0.040371185801788674,
+                "reported_fraction": 0.0018726591760299626,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              533,
+              0,
+              1,
+              0
+            ],
+            "log_loss": 0.046581800318018445,
+            "positives": 1,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.0018726591760299626,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.8433395872420263,
+            "rows": 534
+          },
+          "mississippi_valley": {
+            "average_precision": 0.009157509157509158,
+            "brier": 0.010436369047899342,
+            "calibration_bins": [
+              {
+                "count": 546,
+                "lower": 0,
+                "mean_prediction": 0.04070655919263942,
+                "reported_fraction": 0.009157509157509158,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              541,
+              0,
+              5,
+              0
+            ],
+            "log_loss": 0.07418004057387538,
+            "positives": 5,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.009157509157509158,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.16728280961182995,
+            "rows": 546
+          },
+          "plains_storms": {
+            "average_precision": 0.08728264073091659,
+            "brier": 0.10061090433498984,
+            "calibration_bins": [
+              {
+                "count": 546,
+                "lower": 0,
+                "mean_prediction": 0.04070655919263942,
+                "reported_fraction": 0.10622710622710622,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              488,
+              0,
+              58,
+              0
+            ],
+            "log_loss": 0.39824378774600516,
+            "positives": 58,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.10622710622710622,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.33709016393442626,
+            "rows": 546
+          },
+          "southwest_heat": {
+            "average_precision": 0.0437020757020757,
+            "brier": 0.043965450947989974,
+            "calibration_bins": [
+              {
+                "count": 546,
+                "lower": 0,
+                "mean_prediction": 0.04070655919263942,
+                "reported_fraction": 0.045787545787545784,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              521,
+              0,
+              25,
+              0
+            ],
+            "log_loss": 0.1899104572532959,
+            "positives": 25,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.045787545787545784,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.46176583493282153,
+            "rows": 546
+          },
+          "western_wildfire": {
+            "average_precision": 0.016214896214896215,
+            "brier": 0.01871499167724907,
+            "calibration_bins": [
+              {
+                "count": 546,
+                "lower": 0,
+                "mean_prediction": 0.04070655919263942,
+                "reported_fraction": 0.018315018315018316,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              536,
+              0,
+              10,
+              0
+            ],
+            "log_loss": 0.10149514785014506,
+            "positives": 10,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.018315018315018316,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.4361940298507463,
+            "rows": 546
+          }
+        },
+        "roc_auc": 0.37704969927192145,
+        "rows": 3264
+      }
+    }
+  },
+  "limitations": [
+    "Target is a documented county/zone event report, not plant injury or confirmed safe/unsafe conditions.",
+    "Inputs are realized reanalysis during the outcome window; this tests associations, not forecast skill.",
+    "One partial year, 60 selected sites, correlated weather episodes and reporting bias limit generalization.",
+    "Final tests share seasons and may share storms; they are not independent replications.",
+    "Zero means no applicable published report, not absence of hazard.",
+    "No wildlife absence labels, combined hazard score, 8/2 weights or direct soil-saturation outcome.",
+    "Forecast pilot remains sealed; publication latency and input-distribution shift remain unresolved.",
+    "Permutation importance is validation association, not causal or per-hazard attribution.",
+    "Threshold 0.5 and 10% review budget are diagnostics, not approved safety or alert policies.",
+    "Do not tune on the final tests after reading this report; a new claim needs fresh held-out evidence."
+  ],
+  "local_output_directory": "data/raw/model/runs/20261017T200812380365Z",
+  "model_promotion_eligible": false,
+  "provenance": {
+    "build_directory": "data/raw/history/builds/20261017T195909484873Z",
+    "data_sha256": "a8e3963f1922cc72f041c82efe8aad4d152e91f2f3215f6075ddaec89c5e3971",
+    "eligible_rows": 17136,
+    "excluded": {
+      "missing_core_features": 7,
+      "unknown_label": 77
+    },
+    "input_rows": 17220,
+    "manifest_sha256": "d3183ca669355e8f2d631c0c0f4a119e50e650886357030215073f662e2e6fa3",
+    "model_promotion_eligible": false,
+    "pilot_opened": false,
+    "site_catalog_sha256": "734782bbcb28858ee231d4613544c69a396e326bbc0c285f44f2c8cf7fb94785",
+    "target_definition": "Any of the documented NOAA weather-event types reported in the plant county or an intersecting public forecast zone during (UTC noon, next UTC noon]."
+  },
+  "selected_candidate": null,
+  "selection_policy": "Require AP above both constant and month-only baselines, and Brier below the constant baseline on EACH validation set. Of qualifying weather models, maximize mean validation AP; break ties by mean Brier then candidate name. If none qualify, report no supported winner. No tuning or refit using test or forecast-pilot data.",
+  "selection_record_sha256": "42057f691746af1ebf4b7da88ec415da410b6378cb9ab1639fa3c6f981e2d8c5",
+  "split_audit": {
+    "county_roles": {
+      "01089": "geographic_test",
+      "01099": "geographic_validation",
+      "04003": "geographic_validation",
+      "04017": "development",
+      "04027": "development",
+      "05003": "geographic_validation",
+      "05007": "development",
+      "06007": "geographic_test",
+      "06025": "development",
+      "06027": "development",
+      "06083": "development",
+      "06089": "geographic_validation",
+      "08075": "geographic_test",
+      "08109": "geographic_validation",
+      "12073": "development",
+      "12086": "geographic_validation",
+      "12117": "development",
+      "13087": "development",
+      "16021": "geographic_test",
+      "16041": "development",
+      "17031": "geographic_test",
+      "20037": "development",
+      "21127": "development",
+      "22017": "geographic_test",
+      "22019": "development",
+      "22051": "development",
+      "23003": "geographic_validation",
+      "23005": "development",
+      "26053": "geographic_validation",
+      "26069": "development",
+      "27049": "development",
+      "27119": "geographic_validation",
+      "28021": "development",
+      "28033": "development",
+      "29005": "geographic_test",
+      "29183": "development",
+      "30055": "geographic_test",
+      "30089": "development",
+      "31089": "development",
+      "32023": "development",
+      "32031": "development",
+      "35009": "geographic_test",
+      "36111": "development",
+      "37133": "geographic_test",
+      "38067": "development",
+      "39061": "development",
+      "41001": "development",
+      "41039": "geographic_validation",
+      "45077": "development",
+      "47103": "development",
+      "48061": "geographic_validation",
+      "48141": "geographic_validation",
+      "48351": "development",
+      "48421": "geographic_test",
+      "49003": "development",
+      "49017": "development",
+      "53027": "development",
+      "54057": "geographic_test",
+      "55029": "development",
+      "56007": "development"
+    },
+    "date_gap": "Train ends July 28; validation August 1\u2013September 27; test October 1\u2013December 30, 2025.",
+    "partition_counts": {
+      "geographic_test": {
+        "counties": 12,
+        "positives": 39,
+        "rows": 1092
+      },
+      "geographic_validation": {
+        "counties": 12,
+        "positives": 45,
+        "rows": 691
+      },
+      "temporal_test": {
+        "counties": 36,
+        "positives": 105,
+        "rows": 3264
+      },
+      "temporal_validation": {
+        "counties": 36,
+        "positives": 98,
+        "rows": 2075
+      },
+      "train": {
+        "counties": 36,
+        "positives": 238,
+        "rows": 4718
+      }
+    },
+    "purged_rows": {
+      "geographic_validation": 0,
+      "temporal_validation": 0,
+      "train": 0
+    },
+    "seed": 20261017
+  },
+  "validation": {
+    "constant_prior": {
+      "geographic_validation": {
+        "average_precision": 0.06512301013024602,
+        "brier": 0.06109744461437144,
+        "calibration_bins": [
+          {
+            "count": 691,
+            "lower": 0,
+            "mean_prediction": 0.05044510385756677,
+            "reported_fraction": 0.06512301013024602,
+            "upper": 0.1
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          646,
+          0,
+          45,
+          0
+        ],
+        "daily_review": {
+          "budget": "ceil(10% of evaluated sites per UTC day)",
+          "precision": 0.05172413793103448,
+          "recall": 0.13333333333333333,
+          "selected": 116,
+          "selected_fraction": 0.1678726483357453
+        },
+        "log_loss": 0.24290497989605694,
+        "positives": 45,
+        "precision_at_0_5": 0.0,
+        "prevalence": 0.06512301013024602,
+        "recall_at_0_5": 0.0,
+        "regions": {
+          "eastern_storms": {
+            "average_precision": 0.04310344827586207,
+            "brier": 0.0412994409292725,
+            "calibration_bins": [
+              {
+                "count": 116,
+                "lower": 0,
+                "mean_prediction": 0.050445103857566766,
+                "reported_fraction": 0.04310344827586207,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              111,
+              0,
+              5,
+              0
+            ],
+            "log_loss": 0.17827519540934617,
+            "positives": 5,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.04310344827586207,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 116
+          },
+          "florida_gulf": {
+            "average_precision": 0.05405405405405406,
+            "brier": 0.05114523781589616,
+            "calibration_bins": [
+              {
+                "count": 111,
+                "lower": 0,
+                "mean_prediction": 0.05044510385756677,
+                "reported_fraction": 0.05405405405405406,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              105,
+              0,
+              6,
+              0
+            ],
+            "log_loss": 0.21041640222007887,
+            "positives": 6,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.05405405405405406,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 111
+          },
+          "mississippi_valley": {
+            "average_precision": 0.008620689655172414,
+            "brier": 0.010295654988415056,
+            "calibration_bins": [
+              {
+                "count": 116,
+                "lower": 0,
+                "mean_prediction": 0.050445103857566766,
+                "reported_fraction": 0.008620689655172414,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              115,
+              0,
+              1,
+              0
+            ],
+            "log_loss": 0.07706458672874082,
+            "positives": 1,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.008620689655172414,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 116
+          },
+          "plains_storms": {
+            "average_precision": 0.05172413793103448,
+            "brier": 0.04905038741448687,
+            "calibration_bins": [
+              {
+                "count": 116,
+                "lower": 0,
+                "mean_prediction": 0.050445103857566766,
+                "reported_fraction": 0.05172413793103448,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              110,
+              0,
+              6,
+              0
+            ],
+            "log_loss": 0.20357784757949748,
+            "positives": 6,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.05172413793103448,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 116
+          },
+          "southwest_heat": {
+            "average_precision": 0.08620689655172414,
+            "brier": 0.08005417335534437,
+            "calibration_bins": [
+              {
+                "count": 116,
+                "lower": 0,
+                "mean_prediction": 0.050445103857566766,
+                "reported_fraction": 0.08620689655172414,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              106,
+              0,
+              10,
+              0
+            ],
+            "log_loss": 0.30478845626010304,
+            "positives": 10,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.08620689655172414,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 116
+          },
+          "western_wildfire": {
+            "average_precision": 0.14655172413793102,
+            "brier": 0.13431079875184498,
+            "calibration_bins": [
+              {
+                "count": 116,
+                "lower": 0,
+                "mean_prediction": 0.050445103857566766,
+                "reported_fraction": 0.14655172413793102,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              99,
+              0,
+              17,
+              0
+            ],
+            "log_loss": 0.48190702145116243,
+            "positives": 17,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.14655172413793102,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 116
+          }
+        },
+        "roc_auc": 0.5,
+        "rows": 691
+      },
+      "temporal_validation": {
+        "average_precision": 0.047228915662650604,
+        "brier": 0.04500868905448595,
+        "calibration_bins": [
+          {
+            "count": 2075,
+            "lower": 0,
+            "mean_prediction": 0.05044510385756676,
+            "reported_fraction": 0.047228915662650604,
+            "upper": 0.1
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          1977,
+          0,
+          98,
+          0
+        ],
+        "daily_review": {
+          "budget": "ceil(10% of evaluated sites per UTC day)",
+          "precision": 0.07327586206896551,
+          "recall": 0.17346938775510204,
+          "selected": 232,
+          "selected_fraction": 0.11180722891566265
+        },
+        "log_loss": 0.19038388630330297,
+        "positives": 98,
+        "precision_at_0_5": 0.0,
+        "prevalence": 0.047228915662650604,
+        "recall_at_0_5": 0.0,
+        "regions": {
+          "eastern_storms": {
+            "average_precision": 0.014367816091954023,
+            "brier": 0.015462952645224636,
+            "calibration_bins": [
+              {
+                "count": 348,
+                "lower": 0,
+                "mean_prediction": 0.05044510385756677,
+                "reported_fraction": 0.014367816091954023,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              343,
+              0,
+              5,
+              0
+            ],
+            "log_loss": 0.09393302150884171,
+            "positives": 5,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.014367816091954023,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 348
+          },
+          "florida_gulf": {
+            "average_precision": 0.02976190476190476,
+            "brier": 0.029303928511678855,
+            "calibration_bins": [
+              {
+                "count": 336,
+                "lower": 0,
+                "mean_prediction": 0.05044510385756678,
+                "reported_fraction": 0.02976190476190476,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              326,
+              0,
+              10,
+              0
+            ],
+            "log_loss": 0.13911632895554055,
+            "positives": 10,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.02976190476190476,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 336
+          },
+          "mississippi_valley": {
+            "average_precision": 0.02586206896551724,
+            "brier": 0.025797547958843786,
+            "calibration_bins": [
+              {
+                "count": 348,
+                "lower": 0,
+                "mean_prediction": 0.05044510385756677,
+                "reported_fraction": 0.02586206896551724,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              339,
+              0,
+              9,
+              0
+            ],
+            "log_loss": 0.1276698910690435,
+            "positives": 9,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.02586206896551724,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 348
+          },
+          "plains_storms": {
+            "average_precision": 0.011494252873563218,
+            "brier": 0.012879303816819851,
+            "calibration_bins": [
+              {
+                "count": 348,
+                "lower": 0,
+                "mean_prediction": 0.05044510385756677,
+                "reported_fraction": 0.011494252873563218,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              344,
+              0,
+              4,
+              0
+            ],
+            "log_loss": 0.08549880411879127,
+            "positives": 4,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.011494252873563218,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 348
+          },
+          "southwest_heat": {
+            "average_precision": 0.07492795389048991,
+            "brier": 0.06991316556200912,
+            "calibration_bins": [
+              {
+                "count": 347,
+                "lower": 0,
+                "mean_prediction": 0.05044510385756677,
+                "reported_fraction": 0.07492795389048991,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              321,
+              0,
+              26,
+              0
+            ],
+            "log_loss": 0.2716835453516052,
+            "positives": 26,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.07492795389048991,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 347
+          },
+          "western_wildfire": {
+            "average_precision": 0.12643678160919541,
+            "brier": 0.11622525695301139,
+            "calibration_bins": [
+              {
+                "count": 348,
+                "lower": 0,
+                "mean_prediction": 0.05044510385756677,
+                "reported_fraction": 0.12643678160919541,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              304,
+              0,
+              44,
+              0
+            ],
+            "log_loss": 0.4228674997208092,
+            "positives": 44,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.12643678160919541,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5,
+            "rows": 348
+          }
+        },
+        "roc_auc": 0.5,
+        "rows": 2075
+      }
+    },
+    "logistic": {
+      "geographic_validation": {
+        "average_precision": 0.18707150845751921,
+        "brier": 0.05884458837527636,
+        "calibration_bins": [
+          {
+            "count": 624,
+            "lower": 0,
+            "mean_prediction": 0.030301580624115657,
+            "reported_fraction": 0.060897435897435896,
+            "upper": 0.1
+          },
+          {
+            "count": 63,
+            "lower": 0.1,
+            "mean_prediction": 0.12679752757705598,
+            "reported_fraction": 0.06349206349206349,
+            "upper": 0.2
+          },
+          {
+            "count": 4,
+            "lower": 0.2,
+            "mean_prediction": 0.27172823713954836,
+            "reported_fraction": 0.75,
+            "upper": 0.4
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          646,
+          0,
+          45,
+          0
+        ],
+        "daily_review": {
+          "budget": "ceil(10% of evaluated sites per UTC day)",
+          "precision": 0.09482758620689655,
+          "recall": 0.24444444444444444,
+          "selected": 116,
+          "selected_fraction": 0.1678726483357453
+        },
+        "log_loss": 0.22494809370650903,
+        "positives": 45,
+        "precision_at_0_5": 0.0,
+        "prevalence": 0.06512301013024602,
+        "recall_at_0_5": 0.0,
+        "regions": {
+          "eastern_storms": {
+            "average_precision": 0.33710391911611426,
+            "brier": 0.03786947106626107,
+            "calibration_bins": [
+              {
+                "count": 113,
+                "lower": 0,
+                "mean_prediction": 0.02178337656292401,
+                "reported_fraction": 0.035398230088495575,
+                "upper": 0.1
+              },
+              {
+                "count": 2,
+                "lower": 0.1,
+                "mean_prediction": 0.12921274250776976,
+                "reported_fraction": 0.0,
+                "upper": 0.2
+              },
+              {
+                "count": 1,
+                "lower": 0.2,
+                "mean_prediction": 0.21585532597213986,
+                "reported_fraction": 1.0,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              111,
+              0,
+              5,
+              0
+            ],
+            "log_loss": 0.14579838665824013,
+            "positives": 5,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.04310344827586207,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.8666666666666667,
+            "rows": 116
+          },
+          "florida_gulf": {
+            "average_precision": 0.24036259079083294,
+            "brier": 0.048038663349719686,
+            "calibration_bins": [
+              {
+                "count": 97,
+                "lower": 0,
+                "mean_prediction": 0.03808651765118995,
+                "reported_fraction": 0.05154639175257732,
+                "upper": 0.1
+              },
+              {
+                "count": 12,
+                "lower": 0.1,
+                "mean_prediction": 0.1285092587511776,
+                "reported_fraction": 0.0,
+                "upper": 0.2
+              },
+              {
+                "count": 2,
+                "lower": 0.2,
+                "mean_prediction": 0.29180062973482,
+                "reported_fraction": 0.5,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              105,
+              0,
+              6,
+              0
+            ],
+            "log_loss": 0.1951361560564829,
+            "positives": 6,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.05405405405405406,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.6698412698412698,
+            "rows": 111
+          },
+          "mississippi_valley": {
+            "average_precision": 0.03571428571428571,
+            "brier": 0.009859887610820982,
+            "calibration_bins": [
+              {
+                "count": 109,
+                "lower": 0,
+                "mean_prediction": 0.02729972774433792,
+                "reported_fraction": 0.009174311926605505,
+                "upper": 0.1
+              },
+              {
+                "count": 7,
+                "lower": 0.1,
+                "mean_prediction": 0.11422307402492304,
+                "reported_fraction": 0.0,
+                "upper": 0.2
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              115,
+              0,
+              1,
+              0
+            ],
+            "log_loss": 0.05929588962524069,
+            "positives": 1,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.008620689655172414,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.7652173913043478,
+            "rows": 116
+          },
+          "plains_storms": {
+            "average_precision": 0.04214676398083902,
+            "brier": 0.053585330950475664,
+            "calibration_bins": [
+              {
+                "count": 91,
+                "lower": 0,
+                "mean_prediction": 0.04091835252088186,
+                "reported_fraction": 0.06593406593406594,
+                "upper": 0.1
+              },
+              {
+                "count": 25,
+                "lower": 0.1,
+                "mean_prediction": 0.12720911757103096,
+                "reported_fraction": 0.0,
+                "upper": 0.2
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              110,
+              0,
+              6,
+              0
+            ],
+            "log_loss": 0.24535008833156982,
+            "positives": 6,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.05172413793103448,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.32575757575757575,
+            "rows": 116
+          },
+          "southwest_heat": {
+            "average_precision": 0.1740289746306127,
+            "brier": 0.07980966812720064,
+            "calibration_bins": [
+              {
+                "count": 107,
+                "lower": 0,
+                "mean_prediction": 0.026235528362993754,
+                "reported_fraction": 0.08411214953271028,
+                "upper": 0.1
+              },
+              {
+                "count": 9,
+                "lower": 0.1,
+                "mean_prediction": 0.13160199891195537,
+                "reported_fraction": 0.1111111111111111,
+                "upper": 0.2
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              106,
+              0,
+              10,
+              0
+            ],
+            "log_loss": 0.30515109463325163,
+            "positives": 10,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.08620689655172414,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.719811320754717,
+            "rows": 116
+          },
+          "western_wildfire": {
+            "average_precision": 0.5483721992408935,
+            "brier": 0.1234387365167682,
+            "calibration_bins": [
+              {
+                "count": 107,
+                "lower": 0,
+                "mean_prediction": 0.03033486548877492,
+                "reported_fraction": 0.12149532710280374,
+                "upper": 0.1
+              },
+              {
+                "count": 8,
+                "lower": 0.1,
+                "mean_prediction": 0.12793752495837757,
+                "reported_fraction": 0.375,
+                "upper": 0.2
+              },
+              {
+                "count": 1,
+                "lower": 0.2,
+                "mean_prediction": 0.2874563631164136,
+                "reported_fraction": 1.0,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              99,
+              0,
+              17,
+              0
+            ],
+            "log_loss": 0.39767194962176805,
+            "positives": 17,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.14655172413793102,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.916815210932858,
+            "rows": 116
+          }
+        },
+        "roc_auc": 0.7431028551771586,
+        "rows": 691
+      },
+      "temporal_validation": {
+        "average_precision": 0.07830404395290119,
+        "brier": 0.04596114113919647,
+        "calibration_bins": [
+          {
+            "count": 1894,
+            "lower": 0,
+            "mean_prediction": 0.026974401938015563,
+            "reported_fraction": 0.04276663146779303,
+            "upper": 0.1
+          },
+          {
+            "count": 147,
+            "lower": 0.1,
+            "mean_prediction": 0.13094902670231265,
+            "reported_fraction": 0.08843537414965986,
+            "upper": 0.2
+          },
+          {
+            "count": 29,
+            "lower": 0.2,
+            "mean_prediction": 0.256082019485689,
+            "reported_fraction": 0.13793103448275862,
+            "upper": 0.4
+          },
+          {
+            "count": 4,
+            "lower": 0.4,
+            "mean_prediction": 0.4816877566958,
+            "reported_fraction": 0.0,
+            "upper": 0.6
+          },
+          {
+            "count": 1,
+            "lower": 0.8,
+            "mean_prediction": 0.8598350572630935,
+            "reported_fraction": 0.0,
+            "upper": 1
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          1974,
+          3,
+          98,
+          0
+        ],
+        "daily_review": {
+          "budget": "ceil(10% of evaluated sites per UTC day)",
+          "precision": 0.07758620689655173,
+          "recall": 0.1836734693877551,
+          "selected": 232,
+          "selected_fraction": 0.11180722891566265
+        },
+        "log_loss": 0.19257594179332307,
+        "positives": 98,
+        "precision_at_0_5": 0.0,
+        "prevalence": 0.047228915662650604,
+        "recall_at_0_5": 0.0,
+        "regions": {
+          "eastern_storms": {
+            "average_precision": 0.03625605833260109,
+            "brier": 0.01625860019978804,
+            "calibration_bins": [
+              {
+                "count": 336,
+                "lower": 0,
+                "mean_prediction": 0.021403296563040658,
+                "reported_fraction": 0.01488095238095238,
+                "upper": 0.1
+              },
+              {
+                "count": 9,
+                "lower": 0.1,
+                "mean_prediction": 0.13108407164991046,
+                "reported_fraction": 0.0,
+                "upper": 0.2
+              },
+              {
+                "count": 1,
+                "lower": 0.2,
+                "mean_prediction": 0.33621375460958874,
+                "reported_fraction": 0.0,
+                "upper": 0.4
+              },
+              {
+                "count": 2,
+                "lower": 0.4,
+                "mean_prediction": 0.49087550960134224,
+                "reported_fraction": 0.0,
+                "upper": 0.6
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              342,
+              1,
+              5,
+              0
+            ],
+            "log_loss": 0.08070888605128654,
+            "positives": 5,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.014367816091954023,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.6635568513119534,
+            "rows": 348
+          },
+          "florida_gulf": {
+            "average_precision": 0.04442151615607362,
+            "brier": 0.030387723397350068,
+            "calibration_bins": [
+              {
+                "count": 314,
+                "lower": 0,
+                "mean_prediction": 0.031076359239054593,
+                "reported_fraction": 0.03184713375796178,
+                "upper": 0.1
+              },
+              {
+                "count": 19,
+                "lower": 0.1,
+                "mean_prediction": 0.13133625872898522,
+                "reported_fraction": 0.0,
+                "upper": 0.2
+              },
+              {
+                "count": 3,
+                "lower": 0.2,
+                "mean_prediction": 0.30817238274976916,
+                "reported_fraction": 0.0,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              326,
+              0,
+              10,
+              0
+            ],
+            "log_loss": 0.13758821911070618,
+            "positives": 10,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.02976190476190476,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.6322085889570552,
+            "rows": 336
+          },
+          "mississippi_valley": {
+            "average_precision": 0.13375185344650192,
+            "brier": 0.02614323240261231,
+            "calibration_bins": [
+              {
+                "count": 336,
+                "lower": 0,
+                "mean_prediction": 0.01749511377891349,
+                "reported_fraction": 0.020833333333333332,
+                "upper": 0.1
+              },
+              {
+                "count": 11,
+                "lower": 0.1,
+                "mean_prediction": 0.12471219006191842,
+                "reported_fraction": 0.18181818181818182,
+                "upper": 0.2
+              },
+              {
+                "count": 1,
+                "lower": 0.8,
+                "mean_prediction": 0.8598350572630935,
+                "reported_fraction": 0.0,
+                "upper": 1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              338,
+              1,
+              9,
+              0
+            ],
+            "log_loss": 0.10457679973490745,
+            "positives": 9,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.02586206896551724,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.8872500819403474,
+            "rows": 348
+          },
+          "plains_storms": {
+            "average_precision": 0.05477622305677059,
+            "brier": 0.013689791293507269,
+            "calibration_bins": [
+              {
+                "count": 324,
+                "lower": 0,
+                "mean_prediction": 0.02470058951248105,
+                "reported_fraction": 0.009259259259259259,
+                "upper": 0.1
+              },
+              {
+                "count": 19,
+                "lower": 0.1,
+                "mean_prediction": 0.13335268831763267,
+                "reported_fraction": 0.05263157894736842,
+                "upper": 0.2
+              },
+              {
+                "count": 3,
+                "lower": 0.2,
+                "mean_prediction": 0.2521801142357245,
+                "reported_fraction": 0.0,
+                "upper": 0.4
+              },
+              {
+                "count": 2,
+                "lower": 0.4,
+                "mean_prediction": 0.4725000037902577,
+                "reported_fraction": 0.0,
+                "upper": 0.6
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              343,
+              1,
+              4,
+              0
+            ],
+            "log_loss": 0.07272414896130742,
+            "positives": 4,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.011494252873563218,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.6875,
+            "rows": 348
+          },
+          "southwest_heat": {
+            "average_precision": 0.13318823104818603,
+            "brier": 0.06864072604614321,
+            "calibration_bins": [
+              {
+                "count": 270,
+                "lower": 0,
+                "mean_prediction": 0.039269597626099564,
+                "reported_fraction": 0.05925925925925926,
+                "upper": 0.1
+              },
+              {
+                "count": 63,
+                "lower": 0.1,
+                "mean_prediction": 0.13317163637414517,
+                "reported_fraction": 0.09523809523809523,
+                "upper": 0.2
+              },
+              {
+                "count": 14,
+                "lower": 0.2,
+                "mean_prediction": 0.2481216476811663,
+                "reported_fraction": 0.2857142857142857,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              321,
+              0,
+              26,
+              0
+            ],
+            "log_loss": 0.26434886124341567,
+            "positives": 26,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.07492795389048991,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.6386292834890965,
+            "rows": 347
+          },
+          "western_wildfire": {
+            "average_precision": 0.12928435329960997,
+            "brier": 0.1201749303118837,
+            "calibration_bins": [
+              {
+                "count": 314,
+                "lower": 0,
+                "mean_prediction": 0.030751249151436285,
+                "reported_fraction": 0.12738853503184713,
+                "upper": 0.1
+              },
+              {
+                "count": 26,
+                "lower": 0.1,
+                "mean_prediction": 0.1261158886251069,
+                "reported_fraction": 0.15384615384615385,
+                "upper": 0.2
+              },
+              {
+                "count": 8,
+                "lower": 0.2,
+                "mean_prediction": 0.2419255314978228,
+                "reported_fraction": 0.0,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              304,
+              0,
+              44,
+              0
+            ],
+            "log_loss": 0.49381885131135744,
+            "positives": 44,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.12643678160919541,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.4961124401913875,
+            "rows": 348
+          }
+        },
+        "roc_auc": 0.6547438398728231,
+        "rows": 2075
+      }
+    },
+    "month_only": {
+      "geographic_validation": {
+        "average_precision": 0.08747575159420251,
+        "brier": 0.06077636811522286,
+        "calibration_bins": [
+          {
+            "count": 691,
+            "lower": 0,
+            "mean_prediction": 0.07745812507966432,
+            "reported_fraction": 0.06512301013024602,
+            "upper": 0.1
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          646,
+          0,
+          45,
+          0
+        ],
+        "daily_review": {
+          "budget": "ceil(10% of evaluated sites per UTC day)",
+          "precision": 0.05172413793103448,
+          "recall": 0.13333333333333333,
+          "selected": 116,
+          "selected_fraction": 0.1678726483357453
+        },
+        "log_loss": 0.24012767757434944,
+        "positives": 45,
+        "precision_at_0_5": 0.0,
+        "prevalence": 0.06512301013024602,
+        "recall_at_0_5": 0.0,
+        "regions": {
+          "eastern_storms": {
+            "average_precision": 0.08333333333333333,
+            "brier": 0.042068126517965834,
+            "calibration_bins": [
+              {
+                "count": 116,
+                "lower": 0,
+                "mean_prediction": 0.07743734765248478,
+                "reported_fraction": 0.04310344827586207,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              111,
+              0,
+              5,
+              0
+            ],
+            "log_loss": 0.1848381130188123,
+            "positives": 5,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.04310344827586207,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.7522522522522522,
+            "rows": 116
+          },
+          "florida_gulf": {
+            "average_precision": 0.0478699038021072,
+            "brier": 0.052062483760970155,
+            "calibration_bins": [
+              {
+                "count": 111,
+                "lower": 0,
+                "mean_prediction": 0.0775666918162783,
+                "reported_fraction": 0.05405405405405406,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              105,
+              0,
+              6,
+              0
+            ],
+            "log_loss": 0.21718099748487937,
+            "positives": 6,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.05405405405405406,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.30714285714285716,
+            "rows": 111
+          },
+          "mississippi_valley": {
+            "average_precision": 0.016666666666666666,
+            "brier": 0.013227225202447745,
+            "calibration_bins": [
+              {
+                "count": 116,
+                "lower": 0,
+                "mean_prediction": 0.07743734765248478,
+                "reported_fraction": 0.008620689655172414,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              115,
+              0,
+              1,
+              0
+            ],
+            "log_loss": 0.1014572263550086,
+            "positives": 1,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.008620689655172414,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.7434782608695651,
+            "rows": 116
+          },
+          "plains_storms": {
+            "average_precision": 0.061685823754789273,
+            "brier": 0.04959046493773842,
+            "calibration_bins": [
+              {
+                "count": 116,
+                "lower": 0,
+                "mean_prediction": 0.07743734765248478,
+                "reported_fraction": 0.05172413793103448,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              110,
+              0,
+              6,
+              0
+            ],
+            "log_loss": 0.2078741075199309,
+            "positives": 6,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.05172413793103448,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5787878787878789,
+            "rows": 116
+          },
+          "southwest_heat": {
+            "average_precision": 0.09448275862068967,
+            "brier": 0.0787434793441496,
+            "calibration_bins": [
+              {
+                "count": 116,
+                "lower": 0,
+                "mean_prediction": 0.07743734765248478,
+                "reported_fraction": 0.08620689655172414,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              106,
+              0,
+              10,
+              0
+            ],
+            "log_loss": 0.2934457670189025,
+            "positives": 10,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.08620689655172414,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5452830188679245,
+            "rows": 116
+          },
+          "western_wildfire": {
+            "average_precision": 0.2833333333333333,
+            "brier": 0.12859083046452008,
+            "calibration_bins": [
+              {
+                "count": 116,
+                "lower": 0,
+                "mean_prediction": 0.07743734765248478,
+                "reported_fraction": 0.14655172413793102,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              99,
+              0,
+              17,
+              0
+            ],
+            "log_loss": 0.434980773010224,
+            "positives": 17,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.14655172413793102,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.7828282828282829,
+            "rows": 116
+          }
+        },
+        "roc_auc": 0.6262297901616787,
+        "rows": 691
+      },
+      "temporal_validation": {
+        "average_precision": 0.06253802658761931,
+        "brier": 0.0457392242345642,
+        "calibration_bins": [
+          {
+            "count": 2075,
+            "lower": 0,
+            "mean_prediction": 0.07745359257480595,
+            "reported_fraction": 0.047228915662650604,
+            "upper": 0.1
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          1977,
+          0,
+          98,
+          0
+        ],
+        "daily_review": {
+          "budget": "ceil(10% of evaluated sites per UTC day)",
+          "precision": 0.07327586206896551,
+          "recall": 0.17346938775510204,
+          "selected": 232,
+          "selected_fraction": 0.11180722891566265
+        },
+        "log_loss": 0.19636218888697007,
+        "positives": 98,
+        "precision_at_0_5": 0.0,
+        "prevalence": 0.047228915662650604,
+        "recall_at_0_5": 0.0,
+        "regions": {
+          "eastern_storms": {
+            "average_precision": 0.01574712643678161,
+            "brier": 0.018138079785331784,
+            "calibration_bins": [
+              {
+                "count": 348,
+                "lower": 0,
+                "mean_prediction": 0.07743734765248476,
+                "reported_fraction": 0.014367816091954023,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              343,
+              0,
+              5,
+              0
+            ],
+            "log_loss": 0.11608429841069848,
+            "positives": 5,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.014367816091954023,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5419825072886297,
+            "rows": 348
+          },
+          "florida_gulf": {
+            "average_precision": 0.041907437132156236,
+            "brier": 0.03103471386966029,
+            "calibration_bins": [
+              {
+                "count": 336,
+                "lower": 0,
+                "mean_prediction": 0.07755067442953523,
+                "reported_fraction": 0.02976190476190476,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              326,
+              0,
+              10,
+              0
+            ],
+            "log_loss": 0.15345680847898763,
+            "positives": 10,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.02976190476190476,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.6392638036809817,
+            "rows": 336
+          },
+          "mississippi_valley": {
+            "average_precision": 0.04237973605789698,
+            "brier": 0.02769969470868897,
+            "calibration_bins": [
+              {
+                "count": 348,
+                "lower": 0,
+                "mean_prediction": 0.07743734765248476,
+                "reported_fraction": 0.02586206896551724,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              339,
+              0,
+              9,
+              0
+            ],
+            "log_loss": 0.1435127984927718,
+            "positives": 9,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.02586206896551724,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.6907571288102261,
+            "rows": 348
+          },
+          "plains_storms": {
+            "average_precision": 0.015373563218390805,
+            "brier": 0.015682652493889764,
+            "calibration_bins": [
+              {
+                "count": 348,
+                "lower": 0,
+                "mean_prediction": 0.07743734765248476,
+                "reported_fraction": 0.011494252873563218,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              344,
+              0,
+              4,
+              0
+            ],
+            "log_loss": 0.10877076238285355,
+            "positives": 4,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.011494252873563218,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.6177325581395349,
+            "rows": 348
+          },
+          "southwest_heat": {
+            "average_precision": 0.08004579742380202,
+            "brier": 0.06925761189033082,
+            "calibration_bins": [
+              {
+                "count": 347,
+                "lower": 0,
+                "mean_prediction": 0.07742475519348618,
+                "reported_fraction": 0.07492795389048991,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              321,
+              0,
+              26,
+              0
+            ],
+            "log_loss": 0.26580556671342614,
+            "positives": 26,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.07492795389048991,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5330098250658999,
+            "rows": 347
+          },
+          "western_wildfire": {
+            "average_precision": 0.1866248693834901,
+            "brier": 0.11218312215165863,
+            "calibration_bins": [
+              {
+                "count": 348,
+                "lower": 0,
+                "mean_prediction": 0.07743734765248476,
+                "reported_fraction": 0.12643678160919541,
+                "upper": 0.1
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              304,
+              0,
+              44,
+              0
+            ],
+            "log_loss": 0.38926295290322843,
+            "positives": 44,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.12643678160919541,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.6722488038277513,
+            "rows": 348
+          }
+        },
+        "roc_auc": 0.6185288986611337,
+        "rows": 2075
+      }
+    },
+    "random_forest": {
+      "geographic_validation": {
+        "average_precision": 0.10035454483468954,
+        "brier": 0.06171905790805268,
+        "calibration_bins": [
+          {
+            "count": 545,
+            "lower": 0,
+            "mean_prediction": 0.03162830841709141,
+            "reported_fraction": 0.05871559633027523,
+            "upper": 0.1
+          },
+          {
+            "count": 114,
+            "lower": 0.1,
+            "mean_prediction": 0.14677001226943168,
+            "reported_fraction": 0.10526315789473684,
+            "upper": 0.2
+          },
+          {
+            "count": 32,
+            "lower": 0.2,
+            "mean_prediction": 0.23733758142186817,
+            "reported_fraction": 0.03125,
+            "upper": 0.4
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          646,
+          0,
+          45,
+          0
+        ],
+        "daily_review": {
+          "budget": "ceil(10% of evaluated sites per UTC day)",
+          "precision": 0.06896551724137931,
+          "recall": 0.17777777777777778,
+          "selected": 116,
+          "selected_fraction": 0.1678726483357453
+        },
+        "log_loss": 0.23338983337559638,
+        "positives": 45,
+        "precision_at_0_5": 0.0,
+        "prevalence": 0.06512301013024602,
+        "recall_at_0_5": 0.0,
+        "regions": {
+          "eastern_storms": {
+            "average_precision": 0.2250966107063668,
+            "brier": 0.039433812104868064,
+            "calibration_bins": [
+              {
+                "count": 113,
+                "lower": 0,
+                "mean_prediction": 0.01783108227169585,
+                "reported_fraction": 0.035398230088495575,
+                "upper": 0.1
+              },
+              {
+                "count": 3,
+                "lower": 0.1,
+                "mean_prediction": 0.13667177757895904,
+                "reported_fraction": 0.3333333333333333,
+                "upper": 0.2
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              111,
+              0,
+              5,
+              0
+            ],
+            "log_loss": 0.155779713537678,
+            "positives": 5,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.04310344827586207,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.827027027027027,
+            "rows": 116
+          },
+          "florida_gulf": {
+            "average_precision": 0.10709483267622802,
+            "brier": 0.05556566375170141,
+            "calibration_bins": [
+              {
+                "count": 52,
+                "lower": 0,
+                "mean_prediction": 0.03325047516128812,
+                "reported_fraction": 0.0,
+                "upper": 0.1
+              },
+              {
+                "count": 39,
+                "lower": 0.1,
+                "mean_prediction": 0.14765429585214315,
+                "reported_fraction": 0.1282051282051282,
+                "upper": 0.2
+              },
+              {
+                "count": 20,
+                "lower": 0.2,
+                "mean_prediction": 0.2504862329202488,
+                "reported_fraction": 0.05,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              105,
+              0,
+              6,
+              0
+            ],
+            "log_loss": 0.209837070599542,
+            "positives": 6,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.05405405405405406,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.7365079365079366,
+            "rows": 111
+          },
+          "mississippi_valley": {
+            "average_precision": 0.038461538461538464,
+            "brier": 0.012181241913769972,
+            "calibration_bins": [
+              {
+                "count": 100,
+                "lower": 0,
+                "mean_prediction": 0.02348297439991484,
+                "reported_fraction": 0.01,
+                "upper": 0.1
+              },
+              {
+                "count": 12,
+                "lower": 0.1,
+                "mean_prediction": 0.13558559733688078,
+                "reported_fraction": 0.0,
+                "upper": 0.2
+              },
+              {
+                "count": 4,
+                "lower": 0.2,
+                "mean_prediction": 0.2272595636404565,
+                "reported_fraction": 0.0,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              115,
+              0,
+              1,
+              0
+            ],
+            "log_loss": 0.06683527649904315,
+            "positives": 1,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.008620689655172414,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.782608695652174,
+            "rows": 116
+          },
+          "plains_storms": {
+            "average_precision": 0.043100744200229864,
+            "brier": 0.05876126032928738,
+            "calibration_bins": [
+              {
+                "count": 72,
+                "lower": 0,
+                "mean_prediction": 0.04440510332805666,
+                "reported_fraction": 0.06944444444444445,
+                "upper": 0.1
+              },
+              {
+                "count": 36,
+                "lower": 0.1,
+                "mean_prediction": 0.16325757616333794,
+                "reported_fraction": 0.027777777777777776,
+                "upper": 0.2
+              },
+              {
+                "count": 8,
+                "lower": 0.2,
+                "mean_prediction": 0.20950496156662263,
+                "reported_fraction": 0.0,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              110,
+              0,
+              6,
+              0
+            ],
+            "log_loss": 0.25936080530354755,
+            "positives": 6,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.05172413793103448,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.33484848484848484,
+            "rows": 116
+          },
+          "southwest_heat": {
+            "average_precision": 0.14379879563754655,
+            "brier": 0.07847016654644388,
+            "calibration_bins": [
+              {
+                "count": 95,
+                "lower": 0,
+                "mean_prediction": 0.04404458952910438,
+                "reported_fraction": 0.08421052631578947,
+                "upper": 0.1
+              },
+              {
+                "count": 21,
+                "lower": 0.1,
+                "mean_prediction": 0.12743193700452649,
+                "reported_fraction": 0.09523809523809523,
+                "upper": 0.2
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              106,
+              0,
+              10,
+              0
+            ],
+            "log_loss": 0.3019728644873803,
+            "positives": 10,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.08620689655172414,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.6349056603773585,
+            "rows": 116
+          },
+          "western_wildfire": {
+            "average_precision": 0.6307552579777259,
+            "brier": 0.12563697029550605,
+            "calibration_bins": [
+              {
+                "count": 113,
+                "lower": 0,
+                "mean_prediction": 0.03330787785265245,
+                "reported_fraction": 0.12389380530973451,
+                "upper": 0.1
+              },
+              {
+                "count": 3,
+                "lower": 0.1,
+                "mean_prediction": 0.12762598024232044,
+                "reported_fraction": 1.0,
+                "upper": 0.2
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              99,
+              0,
+              17,
+              0
+            ],
+            "log_loss": 0.40553806453431607,
+            "positives": 17,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.14655172413793102,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.8906714200831849,
+            "rows": 116
+          }
+        },
+        "roc_auc": 0.6944616443068455,
+        "rows": 691
+      },
+      "temporal_validation": {
+        "average_precision": 0.08790842214155684,
+        "brier": 0.04511163533322409,
+        "calibration_bins": [
+          {
+            "count": 1781,
+            "lower": 0,
+            "mean_prediction": 0.028002756171435706,
+            "reported_fraction": 0.03874227961819203,
+            "upper": 0.1
+          },
+          {
+            "count": 248,
+            "lower": 0.1,
+            "mean_prediction": 0.1369333592681809,
+            "reported_fraction": 0.0967741935483871,
+            "upper": 0.2
+          },
+          {
+            "count": 46,
+            "lower": 0.2,
+            "mean_prediction": 0.24456336231067444,
+            "reported_fraction": 0.10869565217391304,
+            "upper": 0.4
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          1977,
+          0,
+          98,
+          0
+        ],
+        "daily_review": {
+          "budget": "ceil(10% of evaluated sites per UTC day)",
+          "precision": 0.07758620689655173,
+          "recall": 0.1836734693877551,
+          "selected": 232,
+          "selected_fraction": 0.11180722891566265
+        },
+        "log_loss": 0.20803231514609782,
+        "positives": 98,
+        "precision_at_0_5": 0.0,
+        "prevalence": 0.047228915662650604,
+        "recall_at_0_5": 0.0,
+        "regions": {
+          "eastern_storms": {
+            "average_precision": 0.0743194404198461,
+            "brier": 0.014519201275441325,
+            "calibration_bins": [
+              {
+                "count": 325,
+                "lower": 0,
+                "mean_prediction": 0.017705891817004344,
+                "reported_fraction": 0.012307692307692308,
+                "upper": 0.1
+              },
+              {
+                "count": 20,
+                "lower": 0.1,
+                "mean_prediction": 0.13888786234186085,
+                "reported_fraction": 0.05,
+                "upper": 0.2
+              },
+              {
+                "count": 3,
+                "lower": 0.2,
+                "mean_prediction": 0.23673325234678813,
+                "reported_fraction": 0.0,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              343,
+              0,
+              5,
+              0
+            ],
+            "log_loss": 0.06473686461487858,
+            "positives": 5,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.014367816091954023,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.8822157434402332,
+            "rows": 348
+          },
+          "florida_gulf": {
+            "average_precision": 0.0866924540245492,
+            "brier": 0.03158889208270651,
+            "calibration_bins": [
+              {
+                "count": 251,
+                "lower": 0,
+                "mean_prediction": 0.0292789412891472,
+                "reported_fraction": 0.01593625498007968,
+                "upper": 0.1
+              },
+              {
+                "count": 63,
+                "lower": 0.1,
+                "mean_prediction": 0.14368975154573296,
+                "reported_fraction": 0.07936507936507936,
+                "upper": 0.2
+              },
+              {
+                "count": 22,
+                "lower": 0.2,
+                "mean_prediction": 0.2413210877984332,
+                "reported_fraction": 0.045454545454545456,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              326,
+              0,
+              10,
+              0
+            ],
+            "log_loss": 0.13701928039966832,
+            "positives": 10,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.02976190476190476,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.7438650306748467,
+            "rows": 336
+          },
+          "mississippi_valley": {
+            "average_precision": 0.40804710686733164,
+            "brier": 0.020357780844760927,
+            "calibration_bins": [
+              {
+                "count": 316,
+                "lower": 0,
+                "mean_prediction": 0.015595605496931468,
+                "reported_fraction": 0.006329113924050633,
+                "upper": 0.1
+              },
+              {
+                "count": 27,
+                "lower": 0.1,
+                "mean_prediction": 0.13908131281654484,
+                "reported_fraction": 0.14814814814814814,
+                "upper": 0.2
+              },
+              {
+                "count": 5,
+                "lower": 0.2,
+                "mean_prediction": 0.2738318566211201,
+                "reported_fraction": 0.6,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              339,
+              0,
+              9,
+              0
+            ],
+            "log_loss": 0.07653263498311622,
+            "positives": 9,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.02586206896551724,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.9511635529334643,
+            "rows": 348
+          },
+          "plains_storms": {
+            "average_precision": 0.09781880059815397,
+            "brier": 0.012734575149321027,
+            "calibration_bins": [
+              {
+                "count": 314,
+                "lower": 0,
+                "mean_prediction": 0.02586731692502721,
+                "reported_fraction": 0.009554140127388535,
+                "upper": 0.1
+              },
+              {
+                "count": 26,
+                "lower": 0.1,
+                "mean_prediction": 0.14087500223995097,
+                "reported_fraction": 0.0,
+                "upper": 0.2
+              },
+              {
+                "count": 8,
+                "lower": 0.2,
+                "mean_prediction": 0.2303634016961188,
+                "reported_fraction": 0.125,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              344,
+              0,
+              4,
+              0
+            ],
+            "log_loss": 0.06536438041633913,
+            "positives": 4,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.011494252873563218,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.9026162790697674,
+            "rows": 348
+          },
+          "southwest_heat": {
+            "average_precision": 0.10698082529137261,
+            "brier": 0.06967276593897075,
+            "calibration_bins": [
+              {
+                "count": 267,
+                "lower": 0,
+                "mean_prediction": 0.052865083583374994,
+                "reported_fraction": 0.0599250936329588,
+                "upper": 0.1
+              },
+              {
+                "count": 74,
+                "lower": 0.1,
+                "mean_prediction": 0.13352120426488062,
+                "reported_fraction": 0.13513513513513514,
+                "upper": 0.2
+              },
+              {
+                "count": 6,
+                "lower": 0.2,
+                "mean_prediction": 0.2491089975510649,
+                "reported_fraction": 0.0,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              321,
+              0,
+              26,
+              0
+            ],
+            "log_loss": 0.2674545785359146,
+            "positives": 26,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.07492795389048991,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5886652288521447,
+            "rows": 347
+          },
+          "western_wildfire": {
+            "average_precision": 0.11936465858836597,
+            "brier": 0.12140087317825762,
+            "calibration_bins": [
+              {
+                "count": 308,
+                "lower": 0,
+                "mean_prediction": 0.031181667107060464,
+                "reported_fraction": 0.12987012987012986,
+                "upper": 0.1
+              },
+              {
+                "count": 38,
+                "lower": 0.1,
+                "mean_prediction": 0.12712491801062836,
+                "reported_fraction": 0.10526315789473684,
+                "upper": 0.2
+              },
+              {
+                "count": 2,
+                "lower": 0.2,
+                "mean_prediction": 0.2619652478520934,
+                "reported_fraction": 0.0,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              304,
+              0,
+              44,
+              0
+            ],
+            "log_loss": 0.634808180221017,
+            "positives": 44,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.12643678160919541,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.4160062799043063,
+            "rows": 348
+          }
+        },
+        "roc_auc": 0.6291949253145871,
+        "rows": 2075
+      }
+    },
+    "shallow_tree": {
+      "geographic_validation": {
+        "average_precision": 0.0986056432758468,
+        "brier": 0.06113691999825375,
+        "calibration_bins": [
+          {
+            "count": 549,
+            "lower": 0,
+            "mean_prediction": 0.02314659353755455,
+            "reported_fraction": 0.04735883424408015,
+            "upper": 0.1
+          },
+          {
+            "count": 125,
+            "lower": 0.1,
+            "mean_prediction": 0.14315471354611134,
+            "reported_fraction": 0.136,
+            "upper": 0.2
+          },
+          {
+            "count": 17,
+            "lower": 0.2,
+            "mean_prediction": 0.32146044624746456,
+            "reported_fraction": 0.11764705882352941,
+            "upper": 0.4
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          646,
+          0,
+          45,
+          0
+        ],
+        "daily_review": {
+          "budget": "ceil(10% of evaluated sites per UTC day)",
+          "precision": 0.1206896551724138,
+          "recall": 0.3111111111111111,
+          "selected": 116,
+          "selected_fraction": 0.1678726483357453
+        },
+        "log_loss": 0.24644126592779964,
+        "positives": 45,
+        "precision_at_0_5": 0.0,
+        "prevalence": 0.06512301013024602,
+        "recall_at_0_5": 0.0,
+        "regions": {
+          "eastern_storms": {
+            "average_precision": 0.08448275862068966,
+            "brier": 0.0415889709986818,
+            "calibration_bins": [
+              {
+                "count": 112,
+                "lower": 0,
+                "mean_prediction": 0.014946351560655697,
+                "reported_fraction": 0.03571428571428571,
+                "upper": 0.1
+              },
+              {
+                "count": 3,
+                "lower": 0.1,
+                "mean_prediction": 0.1503179947624392,
+                "reported_fraction": 0.3333333333333333,
+                "upper": 0.2
+              },
+              {
+                "count": 1,
+                "lower": 0.2,
+                "mean_prediction": 0.3448275862068966,
+                "reported_fraction": 0.0,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              111,
+              0,
+              5,
+              0
+            ],
+            "log_loss": 0.18369784892167063,
+            "positives": 5,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.04310344827586207,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.5657657657657658,
+            "rows": 116
+          },
+          "florida_gulf": {
+            "average_precision": 0.1597222222222222,
+            "brier": 0.050284558342237835,
+            "calibration_bins": [
+              {
+                "count": 43,
+                "lower": 0,
+                "mean_prediction": 0.01603425601249147,
+                "reported_fraction": 0.0,
+                "upper": 0.1
+              },
+              {
+                "count": 65,
+                "lower": 0.1,
+                "mean_prediction": 0.14300473719828555,
+                "reported_fraction": 0.07692307692307693,
+                "upper": 0.2
+              },
+              {
+                "count": 3,
+                "lower": 0.2,
+                "mean_prediction": 0.32,
+                "reported_fraction": 0.3333333333333333,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              105,
+              0,
+              6,
+              0
+            ],
+            "log_loss": 0.1945685010076273,
+            "positives": 6,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.05405405405405406,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.8119047619047619,
+            "rows": 111
+          },
+          "mississippi_valley": {
+            "average_precision": 0.008620689655172414,
+            "brier": 0.013549769014091818,
+            "calibration_bins": [
+              {
+                "count": 88,
+                "lower": 0,
+                "mean_prediction": 0.01579471423537989,
+                "reported_fraction": 0.011363636363636364,
+                "upper": 0.1
+              },
+              {
+                "count": 28,
+                "lower": 0.1,
+                "mean_prediction": 0.14328833004908276,
+                "reported_fraction": 0.0,
+                "upper": 0.2
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              115,
+              0,
+              1,
+              0
+            ],
+            "log_loss": 0.08576355742359222,
+            "positives": 1,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.008620689655172414,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.36086956521739133,
+            "rows": 116
+          },
+          "plains_storms": {
+            "average_precision": 0.05585027998821103,
+            "brier": 0.058231687326727906,
+            "calibration_bins": [
+              {
+                "count": 96,
+                "lower": 0,
+                "mean_prediction": 0.03665180199182192,
+                "reported_fraction": 0.052083333333333336,
+                "upper": 0.1
+              },
+              {
+                "count": 7,
+                "lower": 0.1,
+                "mean_prediction": 0.14261026991441736,
+                "reported_fraction": 0.0,
+                "upper": 0.2
+              },
+              {
+                "count": 13,
+                "lower": 0.2,
+                "mean_prediction": 0.31999999999999995,
+                "reported_fraction": 0.07692307692307693,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              110,
+              0,
+              6,
+              0
+            ],
+            "log_loss": 0.25849554561458143,
+            "positives": 6,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.05172413793103448,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.3909090909090909,
+            "rows": 116
+          },
+          "southwest_heat": {
+            "average_precision": 0.33481889307447116,
+            "brier": 0.0768920408869329,
+            "calibration_bins": [
+              {
+                "count": 111,
+                "lower": 0,
+                "mean_prediction": 0.029862973139881736,
+                "reported_fraction": 0.06306306306306306,
+                "upper": 0.1
+              },
+              {
+                "count": 5,
+                "lower": 0.1,
+                "mean_prediction": 0.14770772238514177,
+                "reported_fraction": 0.6,
+                "upper": 0.2
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              106,
+              0,
+              10,
+              0
+            ],
+            "log_loss": 0.3011994530478486,
+            "positives": 10,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.08620689655172414,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.6537735849056605,
+            "rows": 116
+          },
+          "western_wildfire": {
+            "average_precision": 0.3378833074812075,
+            "brier": 0.12580671921153921,
+            "calibration_bins": [
+              {
+                "count": 99,
+                "lower": 0,
+                "mean_prediction": 0.021421389962946173,
+                "reported_fraction": 0.09090909090909091,
+                "upper": 0.1
+              },
+              {
+                "count": 17,
+                "lower": 0.1,
+                "mean_prediction": 0.14112903225806453,
+                "reported_fraction": 0.47058823529411764,
+                "upper": 0.2
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              99,
+              0,
+              17,
+              0
+            ],
+            "log_loss": 0.4526867945118152,
+            "positives": 17,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.14655172413793102,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.7415329768270944,
+            "rows": 116
+          }
+        },
+        "roc_auc": 0.6292569659442724,
+        "rows": 691
+      },
+      "temporal_validation": {
+        "average_precision": 0.05834710477929568,
+        "brier": 0.04657057257766977,
+        "calibration_bins": [
+          {
+            "count": 1780,
+            "lower": 0,
+            "mean_prediction": 0.024092906798291118,
+            "reported_fraction": 0.04269662921348315,
+            "upper": 0.1
+          },
+          {
+            "count": 274,
+            "lower": 0.1,
+            "mean_prediction": 0.14485611730039166,
+            "reported_fraction": 0.072992700729927,
+            "upper": 0.2
+          },
+          {
+            "count": 21,
+            "lower": 0.2,
+            "mean_prediction": 0.334573982849845,
+            "reported_fraction": 0.09523809523809523,
+            "upper": 0.4
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          1977,
+          0,
+          98,
+          0
+        ],
+        "daily_review": {
+          "budget": "ceil(10% of evaluated sites per UTC day)",
+          "precision": 0.04741379310344827,
+          "recall": 0.11224489795918367,
+          "selected": 232,
+          "selected_fraction": 0.11180722891566265
+        },
+        "log_loss": 0.20223155890786162,
+        "positives": 98,
+        "precision_at_0_5": 0.0,
+        "prevalence": 0.047228915662650604,
+        "recall_at_0_5": 0.0,
+        "regions": {
+          "eastern_storms": {
+            "average_precision": 0.023637300950853476,
+            "brier": 0.016602422386839684,
+            "calibration_bins": [
+              {
+                "count": 309,
+                "lower": 0,
+                "mean_prediction": 0.014819780559125991,
+                "reported_fraction": 0.012944983818770227,
+                "upper": 0.1
+              },
+              {
+                "count": 36,
+                "lower": 0.1,
+                "mean_prediction": 0.14880855764218964,
+                "reported_fraction": 0.027777777777777776,
+                "upper": 0.2
+              },
+              {
+                "count": 3,
+                "lower": 0.2,
+                "mean_prediction": 0.32827586206896553,
+                "reported_fraction": 0.0,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              343,
+              0,
+              5,
+              0
+            ],
+            "log_loss": 0.08563095580912553,
+            "positives": 5,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.014367816091954023,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.6241982507288629,
+            "rows": 348
+          },
+          "florida_gulf": {
+            "average_precision": 0.06279419813902573,
+            "brier": 0.031397111720022894,
+            "calibration_bins": [
+              {
+                "count": 220,
+                "lower": 0,
+                "mean_prediction": 0.016000706078695675,
+                "reported_fraction": 0.013636363636363636,
+                "upper": 0.1
+              },
+              {
+                "count": 109,
+                "lower": 0.1,
+                "mean_prediction": 0.14360610288399575,
+                "reported_fraction": 0.05504587155963303,
+                "upper": 0.2
+              },
+              {
+                "count": 7,
+                "lower": 0.2,
+                "mean_prediction": 0.32,
+                "reported_fraction": 0.14285714285714285,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              326,
+              0,
+              10,
+              0
+            ],
+            "log_loss": 0.13749358147504312,
+            "positives": 10,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.02976190476190476,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.6881901840490798,
+            "rows": 336
+          },
+          "mississippi_valley": {
+            "average_precision": 0.1724137931034483,
+            "brier": 0.022606092566851553,
+            "calibration_bins": [
+              {
+                "count": 304,
+                "lower": 0,
+                "mean_prediction": 0.015213082541440182,
+                "reported_fraction": 0.006578947368421052,
+                "upper": 0.1
+              },
+              {
+                "count": 42,
+                "lower": 0.1,
+                "mean_prediction": 0.1491398945444004,
+                "reported_fraction": 0.14285714285714285,
+                "upper": 0.2
+              },
+              {
+                "count": 2,
+                "lower": 0.2,
+                "mean_prediction": 0.3488888888888889,
+                "reported_fraction": 0.5,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              339,
+              0,
+              9,
+              0
+            ],
+            "log_loss": 0.092897517530299,
+            "positives": 9,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.02586206896551724,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.8171091445427728,
+            "rows": 348
+          },
+          "plains_storms": {
+            "average_precision": 0.02007461181689857,
+            "brier": 0.013529875976218526,
+            "calibration_bins": [
+              {
+                "count": 303,
+                "lower": 0,
+                "mean_prediction": 0.01800787456426542,
+                "reported_fraction": 0.009900990099009901,
+                "upper": 0.1
+              },
+              {
+                "count": 44,
+                "lower": 0.1,
+                "mean_prediction": 0.14364572739450548,
+                "reported_fraction": 0.022727272727272728,
+                "upper": 0.2
+              },
+              {
+                "count": 1,
+                "lower": 0.2,
+                "mean_prediction": 0.3448275862068966,
+                "reported_fraction": 0.0,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              344,
+              0,
+              4,
+              0
+            ],
+            "log_loss": 0.07394142586388544,
+            "positives": 4,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.011494252873563218,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.6319040697674417,
+            "rows": 348
+          },
+          "southwest_heat": {
+            "average_precision": 0.09447542041572314,
+            "brier": 0.07192407092268636,
+            "calibration_bins": [
+              {
+                "count": 314,
+                "lower": 0,
+                "mean_prediction": 0.047450993572784254,
+                "reported_fraction": 0.06369426751592357,
+                "upper": 0.1
+              },
+              {
+                "count": 27,
+                "lower": 0.1,
+                "mean_prediction": 0.14154089011715457,
+                "reported_fraction": 0.2222222222222222,
+                "upper": 0.2
+              },
+              {
+                "count": 6,
+                "lower": 0.2,
+                "mean_prediction": 0.3448275862068966,
+                "reported_fraction": 0.0,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              321,
+              0,
+              26,
+              0
+            ],
+            "log_loss": 0.29483767260075827,
+            "positives": 26,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.07492795389048991,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.4587826503714354,
+            "rows": 347
+          },
+          "western_wildfire": {
+            "average_precision": 0.11400068115318739,
+            "brier": 0.12291349398550665,
+            "calibration_bins": [
+              {
+                "count": 330,
+                "lower": 0,
+                "mean_prediction": 0.02971251970742641,
+                "reported_fraction": 0.13333333333333333,
+                "upper": 0.1
+              },
+              {
+                "count": 16,
+                "lower": 0.1,
+                "mean_prediction": 0.14215695259042033,
+                "reported_fraction": 0.0,
+                "upper": 0.2
+              },
+              {
+                "count": 2,
+                "lower": 0.2,
+                "mean_prediction": 0.3448275862068966,
+                "reported_fraction": 0.0,
+                "upper": 0.4
+              }
+            ],
+            "confusion_at_0_5_tn_fp_fn_tp": [
+              304,
+              0,
+              44,
+              0
+            ],
+            "log_loss": 0.526621965640757,
+            "positives": 44,
+            "precision_at_0_5": 0.0,
+            "prevalence": 0.12643678160919541,
+            "recall_at_0_5": 0.0,
+            "roc_auc": 0.416230562200957,
+            "rows": 348
+          }
+        },
+        "roc_auc": 0.5735111950698337,
+        "rows": 2075
+      }
+    }
+  },
+  "validation_permutation_importance": {
+    "logistic": {
+      "geographic_validation": [
+        {
+          "feature": "relative_humidity_mean_pct",
+          "mean_ap_drop": 0.08369572772972692,
+          "repeat_std": 0.012960999177869734
+        },
+        {
+          "feature": "wind_gust_max_mph",
+          "mean_ap_drop": 0.07092334138873979,
+          "repeat_std": 0.010651515939232536
+        },
+        {
+          "feature": "heat_index_max_f",
+          "mean_ap_drop": 0.06778440779069636,
+          "repeat_std": 0.022591428388958605
+        },
+        {
+          "feature": "wind_max_mph",
+          "mean_ap_drop": 0.055149250444878936,
+          "repeat_std": 0.006010399123418805
+        },
+        {
+          "feature": "precip_max_1h_in",
+          "mean_ap_drop": 0.023412283507112226,
+          "repeat_std": 0.017897185103304684
+        },
+        {
+          "feature": "soil_moisture_mean_m3_m3",
+          "mean_ap_drop": 0.014035357162851324,
+          "repeat_std": 0.002589731620785835
+        },
+        {
+          "feature": "temperature_max_f",
+          "mean_ap_drop": 0.010775757750024716,
+          "repeat_std": 0.0019423202002448263
+        },
+        {
+          "feature": "month_cos",
+          "mean_ap_drop": 0.01010359515429391,
+          "repeat_std": 0.004438347882088812
+        },
+        {
+          "feature": "month_sin",
+          "mean_ap_drop": 0.0009402460620625164,
+          "repeat_std": 0.00033054421155247356
+        },
+        {
+          "feature": "temperature_min_f",
+          "mean_ap_drop": 0.00044708405982233913,
+          "repeat_std": 0.0026184119213764454
+        },
+        {
+          "feature": "precip_total_24h_in",
+          "mean_ap_drop": -0.00206989569317208,
+          "repeat_std": 0.0011498165779134666
+        },
+        {
+          "feature": "relative_humidity_min_pct",
+          "mean_ap_drop": -0.029025163288232892,
+          "repeat_std": 0.017329372084577386
+        }
+      ],
+      "temporal_validation": [
+        {
+          "feature": "heat_index_max_f",
+          "mean_ap_drop": 0.014969806346095729,
+          "repeat_std": 0.003744441229918618
+        },
+        {
+          "feature": "relative_humidity_mean_pct",
+          "mean_ap_drop": 0.013868434354919666,
+          "repeat_std": 0.002365951206439545
+        },
+        {
+          "feature": "soil_moisture_mean_m3_m3",
+          "mean_ap_drop": 0.008989700858859168,
+          "repeat_std": 0.0021868277958473886
+        },
+        {
+          "feature": "wind_gust_max_mph",
+          "mean_ap_drop": 0.007892151440458229,
+          "repeat_std": 0.013014735234732846
+        },
+        {
+          "feature": "wind_max_mph",
+          "mean_ap_drop": 0.004600770652939965,
+          "repeat_std": 0.00283356455464404
+        },
+        {
+          "feature": "month_cos",
+          "mean_ap_drop": 0.0017278865532974696,
+          "repeat_std": 0.0018109507565473428
+        },
+        {
+          "feature": "relative_humidity_min_pct",
+          "mean_ap_drop": 0.0013925645766391715,
+          "repeat_std": 0.002861465405467866
+        },
+        {
+          "feature": "temperature_max_f",
+          "mean_ap_drop": 0.0004949199789586716,
+          "repeat_std": 0.0008480799068374395
+        },
+        {
+          "feature": "month_sin",
+          "mean_ap_drop": 0.0001434226250998788,
+          "repeat_std": 0.00015158674619955356
+        },
+        {
+          "feature": "temperature_min_f",
+          "mean_ap_drop": -0.00021414978821640007,
+          "repeat_std": 0.00014636820945315883
+        },
+        {
+          "feature": "precip_total_24h_in",
+          "mean_ap_drop": -0.0013681933878425118,
+          "repeat_std": 0.0003524052347617222
+        },
+        {
+          "feature": "precip_max_1h_in",
+          "mean_ap_drop": -0.0046303435315948795,
+          "repeat_std": 0.0021740938387535737
+        }
+      ]
+    },
+    "random_forest": {
+      "geographic_validation": [
+        {
+          "feature": "temperature_max_f",
+          "mean_ap_drop": 0.00609263164009616,
+          "repeat_std": 0.0020133574251418288
+        },
+        {
+          "feature": "wind_max_mph",
+          "mean_ap_drop": 0.004670042275396083,
+          "repeat_std": 0.0017749061181881061
+        },
+        {
+          "feature": "month_cos",
+          "mean_ap_drop": 0.0037738692598113994,
+          "repeat_std": 0.0008441503889574993
+        },
+        {
+          "feature": "heat_index_max_f",
+          "mean_ap_drop": 0.003528602589747709,
+          "repeat_std": 0.012600499431417337
+        },
+        {
+          "feature": "wind_gust_max_mph",
+          "mean_ap_drop": 0.0028459636921787184,
+          "repeat_std": 0.0019545834779821484
+        },
+        {
+          "feature": "precip_total_24h_in",
+          "mean_ap_drop": 0.002227313487126614,
+          "repeat_std": 0.0012861050056990682
+        },
+        {
+          "feature": "soil_moisture_mean_m3_m3",
+          "mean_ap_drop": 0.0014652820972591908,
+          "repeat_std": 0.0002266050539510107
+        },
+        {
+          "feature": "precip_max_1h_in",
+          "mean_ap_drop": 0.0009811970169782635,
+          "repeat_std": 0.0011050521353346554
+        },
+        {
+          "feature": "month_sin",
+          "mean_ap_drop": 0.0,
+          "repeat_std": 0.0
+        },
+        {
+          "feature": "temperature_min_f",
+          "mean_ap_drop": -0.0012836646731546803,
+          "repeat_std": 0.0018851767451263188
+        },
+        {
+          "feature": "relative_humidity_mean_pct",
+          "mean_ap_drop": -0.0013480984740949248,
+          "repeat_std": 0.0026211652797183222
+        },
+        {
+          "feature": "relative_humidity_min_pct",
+          "mean_ap_drop": -0.0029721491967412946,
+          "repeat_std": 0.0031445162292000417
+        }
+      ],
+      "temporal_validation": [
+        {
+          "feature": "heat_index_max_f",
+          "mean_ap_drop": 0.027838747148508813,
+          "repeat_std": 0.0033343800334933236
+        },
+        {
+          "feature": "relative_humidity_mean_pct",
+          "mean_ap_drop": 0.005698868111574856,
+          "repeat_std": 0.0035726340514588904
+        },
+        {
+          "feature": "soil_moisture_mean_m3_m3",
+          "mean_ap_drop": 0.004388192830991644,
+          "repeat_std": 0.0008626439688217049
+        },
+        {
+          "feature": "wind_max_mph",
+          "mean_ap_drop": 0.003333181493448506,
+          "repeat_std": 0.002355913966582646
+        },
+        {
+          "feature": "relative_humidity_min_pct",
+          "mean_ap_drop": 0.002598648654562813,
+          "repeat_std": 0.003610640848194808
+        },
+        {
+          "feature": "month_cos",
+          "mean_ap_drop": 0.000527408417151437,
+          "repeat_std": 0.0015172293649574342
+        },
+        {
+          "feature": "precip_total_24h_in",
+          "mean_ap_drop": 0.0004778785408823677,
+          "repeat_std": 0.0016146850716539075
+        },
+        {
+          "feature": "month_sin",
+          "mean_ap_drop": 0.0,
+          "repeat_std": 0.0
+        },
+        {
+          "feature": "temperature_min_f",
+          "mean_ap_drop": -0.0010708453886645818,
+          "repeat_std": 0.0017768571699426678
+        },
+        {
+          "feature": "precip_max_1h_in",
+          "mean_ap_drop": -0.0011647362418716306,
+          "repeat_std": 0.0020194943506754246
+        },
+        {
+          "feature": "temperature_max_f",
+          "mean_ap_drop": -0.0022351495074933946,
+          "repeat_std": 0.004489174252433832
+        },
+        {
+          "feature": "wind_gust_max_mph",
+          "mean_ap_drop": -0.00525229415053888,
+          "repeat_std": 0.008560415251861806
+        }
+      ]
+    },
+    "shallow_tree": {
+      "geographic_validation": [
+        {
+          "feature": "heat_index_max_f",
+          "mean_ap_drop": 0.012463434214984349,
+          "repeat_std": 0.007454819962052202
+        },
+        {
+          "feature": "relative_humidity_mean_pct",
+          "mean_ap_drop": 0.004282540926925893,
+          "repeat_std": 0.0017376329270469846
+        },
+        {
+          "feature": "temperature_min_f",
+          "mean_ap_drop": 0.003356102499392011,
+          "repeat_std": 0.003965286768965959
+        },
+        {
+          "feature": "wind_gust_max_mph",
+          "mean_ap_drop": 0.0016710169477862553,
+          "repeat_std": 0.003050424486458085
+        },
+        {
+          "feature": "precip_total_24h_in",
+          "mean_ap_drop": 0.0007242032989587422,
+          "repeat_std": 0.006392159214869432
+        },
+        {
+          "feature": "soil_moisture_mean_m3_m3",
+          "mean_ap_drop": 0.00028725670574714644,
+          "repeat_std": 0.0028482742898153397
+        },
+        {
+          "feature": "temperature_max_f",
+          "mean_ap_drop": 0.0,
+          "repeat_std": 0.0
+        },
+        {
+          "feature": "precip_max_1h_in",
+          "mean_ap_drop": 0.0,
+          "repeat_std": 0.0
+        },
+        {
+          "feature": "month_sin",
+          "mean_ap_drop": 0.0,
+          "repeat_std": 0.0
+        },
+        {
+          "feature": "month_cos",
+          "mean_ap_drop": 0.0,
+          "repeat_std": 0.0
+        },
+        {
+          "feature": "relative_humidity_min_pct",
+          "mean_ap_drop": -0.002347578890042637,
+          "repeat_std": 0.0071869106372418785
+        },
+        {
+          "feature": "wind_max_mph",
+          "mean_ap_drop": -0.0032472753406979386,
+          "repeat_std": 0.0038138044471586457
+        }
+      ],
+      "temporal_validation": [
+        {
+          "feature": "heat_index_max_f",
+          "mean_ap_drop": 0.010693327436007342,
+          "repeat_std": 0.002184244668685737
+        },
+        {
+          "feature": "relative_humidity_mean_pct",
+          "mean_ap_drop": 0.0017834010346688967,
+          "repeat_std": 0.001231797501941868
+        },
+        {
+          "feature": "relative_humidity_min_pct",
+          "mean_ap_drop": 0.001383745561461497,
+          "repeat_std": 0.0017399593079261688
+        },
+        {
+          "feature": "wind_max_mph",
+          "mean_ap_drop": 0.0013737557144119033,
+          "repeat_std": 0.0016279114501545555
+        },
+        {
+          "feature": "soil_moisture_mean_m3_m3",
+          "mean_ap_drop": 0.001026297965073472,
+          "repeat_std": 0.0009138905808568707
+        },
+        {
+          "feature": "temperature_max_f",
+          "mean_ap_drop": 0.0,
+          "repeat_std": 0.0
+        },
+        {
+          "feature": "precip_max_1h_in",
+          "mean_ap_drop": 0.0,
+          "repeat_std": 0.0
+        },
+        {
+          "feature": "month_sin",
+          "mean_ap_drop": 0.0,
+          "repeat_std": 0.0
+        },
+        {
+          "feature": "month_cos",
+          "mean_ap_drop": 0.0,
+          "repeat_std": 0.0
+        },
+        {
+          "feature": "wind_gust_max_mph",
+          "mean_ap_drop": -0.0003835336673662246,
+          "repeat_std": 0.0018369423329448306
+        },
+        {
+          "feature": "temperature_min_f",
+          "mean_ap_drop": -0.0018296591116286481,
+          "repeat_std": 0.0005209016008772647
+        },
+        {
+          "feature": "precip_total_24h_in",
+          "mean_ap_drop": -0.004618851923604614,
+          "repeat_std": 0.0013952028904177633
+        }
+      ]
+    }
+  }
+}
