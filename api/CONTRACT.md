@@ -1,4 +1,4 @@
-# PlanIT Control: Contract v1
+# PlanIT Control: Contract v1.1
 
 **Status:** v1.1, decided 2026-10-17 from Sid's and Aryan's AI reviews and the
 team's answers. Any change gets announced in the team chat first.
@@ -108,14 +108,22 @@ The 0 to 10 score has **two trained parts**, added together:
 
 - **Models:** a small decision tree for each part (about 4 levels). Trained on
   older years, tested on the most recent year.
-- **Explanation:** `score = baseline + sum of contributions`, where `wildlife` is
-  one of the contributions. Contributions can be negative. Must match within
+- **Inputs when running live:** the weather part uses the **next-24-hour
+  forecast** for the site (from `weather_forecasts`); the wildlife part uses the
+  site's location and the current month.
+- **Explanation:** `score = baseline + sum of contributions`. `baseline` is the
+  weather part's baseline plus the wildlife part's baseline, and `wildlife` is
+  one of the contributions. The weather part stays within 0 to 8 and the wildlife
+  part within 0 to 2. Contributions can be negative. Must match within
   0.05. Round only for display.
 - **Known limitation (say it if asked):** wildlife sightings cluster where people
   are, so remote areas can look safer than they are.
 - **Fallback:** if a trained part isn't ready in time, ship a rules-based version
   and label it **rules-based**, never "ML," until the trained one replaces it.
 - **Crew reports** do not change the score in v1 (see section 7).
+- **The score is separate from the live lightning alert.** The `lightning` factor
+  is forecast risk for the next 24 hours. The stop-work alert (section 8) is a
+  fixed safety rule that fires on real strikes no matter what the score says.
 
 ```json
 {
@@ -127,13 +135,16 @@ The 0 to 10 score has **two trained parts**, added together:
   "model_version": "weather-tree-v1+wildlife-tree-v1",
   "factors": [
     {"hazard_type": "heat", "contribution": 3.1},
-    {"hazard_type": "lightning", "contribution": 2.6},
+    {"hazard_type": "lightning", "contribution": 1.9},
     {"hazard_type": "soil_saturation", "contribution": 0.9},
     {"hazard_type": "flooding", "contribution": -1.5},
-    {"hazard_type": "wildlife", "contribution": 1.7}
+    {"hazard_type": "wildlife", "contribution": 1.4}
   ]
 }
 ```
+
+Check: 2.4 + 3.1 + 1.9 + 0.9 − 1.5 + 1.4 = 8.2. (Weather part: 2.0 baseline +
+4.4 = 6.4 of 8. Wildlife part: 0.4 baseline + 1.4 = 1.8 of 2.)
 
 (Site IDs in examples are placeholders.)
 
@@ -160,7 +171,7 @@ Errors always look like: `{"error": {"code": "not_found", "message": "Site 123 n
     "scored_at": "2026-10-17T18:00:00Z",
     "top_factors": [
       {"hazard_type": "heat", "contribution": 3.1},
-      {"hazard_type": "lightning", "contribution": 2.8}
+      {"hazard_type": "lightning", "contribution": 1.9}
     ],
     "active_alert": {"level": "stop_work", "hazard_type": "lightning", "clear_at": "2026-10-17T18:30:00Z"},
     "open_report_count": 1
@@ -261,9 +272,13 @@ DeepSpace is used for real-time only. Photos do **not** go through DeepSpace.
 
 ## 7. Crew reports and the score
 
-Reports are shown **next to** the score and can trigger their own warning. They
-do **not** change the trained score in v1, so the score stays an honest model
-output.
+Reports are shown **next to** the score. They do **not** change the trained
+score in v1, so the score stays an honest model output.
+
+**Report warnings:** an open report with `severity = high` creates an alert
+with `level = warning` and the report's `hazard_type` at that site (e.g. a
+wildlife warning for a gator). The alert ends when the report is resolved.
+It uses the same `alerts` table and `alert.started` / `alert.cleared` events.
 
 ## 8. Lightning data (live)
 
