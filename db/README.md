@@ -32,8 +32,9 @@ Use the same `--prompt-password` flag without `--check` to apply migrations
 when the connection URI omits the password.
 
 Sid confirmed a successful foundation migration and verified site/weather loads
-on October 17, 2026, using PostgreSQL 18.6 and TimescaleDB 2.30.2. Hypertable
-conversion and restricted Gemini login setup remain pending.
+on October 17, 2026, using PostgreSQL 18.6 and TimescaleDB 2.30.2. Sid also
+reported applying migration 002. The new migration 003 and restricted Gemini
+login have not been executed against the service by this implementation.
 
 The runner records SHA-256 checksums, skips already applied migrations, rejects
 edited applied files, serializes migration processes with a database lock, and
@@ -86,7 +87,16 @@ Optional missing measurements remain null. SQL adds keys, foreign keys, ranges,
 and timestamp constraints. Score-factor reconciliation currently happens in
 Python, so every future score writer must call `validate_score`.
 
-The restricted Gemini login is a later database setup step, pending database
-access and Alan's approved table/view allowlist. Do not grant it all tables:
-crew reports contain identity and private photo references. No login or cloud
-privilege changes happen in this interval.
+The restricted Gemini login setup is implemented in `access.py`; it must be
+applied from an interactive terminal with the owner's connection configured.
+Its six-table allowlist excludes crew identities and photo references. Alan can
+use `ask_query.py` to validate generated SELECT queries and execute them through
+the separate restricted login. Neither module silently uses the application's
+write account. See [the correction guide](../model/CORRECTIONS.md) for setup.
+
+Migration `003_model_evidence.sql` adds private model snapshots, model artifacts,
+screening predictions and original weather payloads. It preserves humidity,
+gust and soil arrays with their original units and evidence. It does not alter
+the team's current score contract. The loaders compare stored values inside
+transactions and raise on a mismatch; real-service execution remains a distinct
+integration check.

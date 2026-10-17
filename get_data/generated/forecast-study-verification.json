@@ -1,0 +1,1021 @@
+{
+  "code_hashes": {
+    "forecast_inputs.py": "5a1304e7b6697c8f7b4e5c6fbac64b4b2742bf8a6cf48a84331521a342fd50f1",
+    "forecast_study.py": "f0dc8e17f3c400b0663f7dc722c5b6c7d4525212abe8f418a6b7ddb76952063a",
+    "warnings_archive.py": "9d4617a531a2bcc88c50148758043fd3b99ad6cc9cf19abe61ddefb704d870d7"
+  },
+  "cutoff_hours_utc": [
+    0,
+    6,
+    12,
+    18
+  ],
+  "examples_sha256": "abca2d01e2608f1d591dc00abd325c505951876848a2542cdd0b2f5bb8315c5d",
+  "features": [
+    "temperature_max_f",
+    "temperature_min_f",
+    "humidity_mean_pct",
+    "humidity_min_pct",
+    "wind_max_mph",
+    "rain_max_1h_in",
+    "rain_total_24h_in",
+    "heat_index_max_f",
+    "antecedent_forecast_rain_24h_in",
+    "antecedent_forecast_rain_72h_in",
+    "antecedent_forecast_rain_168h_in",
+    "latitude",
+    "longitude",
+    "elevation_m",
+    "month_sin",
+    "month_cos",
+    "hour_sin",
+    "hour_cos"
+  ],
+  "historical_availability": "Fixed 48h lead at every valid hour leaves at least 24h nominal latency margin. Original publication timestamps are not verified.",
+  "limitations": [
+    "Archive warning lifecycle metadata can be revised; outcome is archived warning exposure.",
+    "No-warning label is not proof of safety. Red-flag warning is fire-weather exposure, not a fire at the plant.",
+    "SV/TO labels do not establish lightning strikes. Soil moisture and wildlife remain separate context.",
+    "GFS fixed-lead composites are not a single run initialized at cutoff."
+  ],
+  "missing_windows": {
+    "2024": 6360,
+    "unknown_warning_label": 103
+  },
+  "output_directory": "data/raw/forecast-study/builds/20261017T225916923370Z",
+  "production_approved": false,
+  "rows": 212417,
+  "schema": "gfs-fixed-lead48-v1",
+  "sites": 60,
+  "sites_sha256": "734782bbcb28858ee231d4613544c69a396e326bbc0c285f44f2c8cf7fb94785",
+  "status": "ok",
+  "target": "Selected NWS warning or heat advisory geometry covers plant during next 24h; not injury or confirmed hazard absence.",
+  "warnings": {
+    "2020-AL": {
+      "matched_site_intervals": 142,
+      "source_records": 1465
+    },
+    "2020-AR": {
+      "matched_site_intervals": 81,
+      "source_records": 3636
+    },
+    "2020-AZ": {
+      "matched_site_intervals": 91,
+      "source_records": 1233
+    },
+    "2020-CA": {
+      "matched_site_intervals": 83,
+      "source_records": 1628
+    },
+    "2020-CO": {
+      "matched_site_intervals": 122,
+      "source_records": 2455
+    },
+    "2020-FL": {
+      "matched_site_intervals": 130,
+      "source_records": 2582
+    },
+    "2020-GA": {
+      "matched_site_intervals": 46,
+      "source_records": 75
+    },
+    "2020-ID": {
+      "matched_site_intervals": 21,
+      "source_records": 586
+    },
+    "2020-IL": {
+      "matched_site_intervals": 54,
+      "source_records": 71
+    },
+    "2020-KS": {
+      "matched_site_intervals": 37,
+      "source_records": 56
+    },
+    "2020-KY": {
+      "matched_site_intervals": 13,
+      "source_records": 22
+    },
+    "2020-LA": {
+      "matched_site_intervals": 221,
+      "source_records": 3960
+    },
+    "2020-ME": {
+      "matched_site_intervals": 67,
+      "source_records": 387
+    },
+    "2020-MI": {
+      "matched_site_intervals": 18,
+      "source_records": 536
+    },
+    "2020-MN": {
+      "matched_site_intervals": 98,
+      "source_records": 1978
+    },
+    "2020-MO": {
+      "matched_site_intervals": 89,
+      "source_records": 2211
+    },
+    "2020-MS": {
+      "matched_site_intervals": 86,
+      "source_records": 1421
+    },
+    "2020-MT": {
+      "matched_site_intervals": 64,
+      "source_records": 467
+    },
+    "2020-NC": {
+      "matched_site_intervals": 41,
+      "source_records": 65
+    },
+    "2020-ND": {
+      "matched_site_intervals": 40,
+      "source_records": 64
+    },
+    "2020-NE": {
+      "matched_site_intervals": 63,
+      "source_records": 84
+    },
+    "2020-NM": {
+      "matched_site_intervals": 49,
+      "source_records": 97
+    },
+    "2020-NV": {
+      "matched_site_intervals": 59,
+      "source_records": 297
+    },
+    "2020-NY": {
+      "matched_site_intervals": 46,
+      "source_records": 69
+    },
+    "2020-OH": {
+      "matched_site_intervals": 39,
+      "source_records": 50
+    },
+    "2020-OR": {
+      "matched_site_intervals": 25,
+      "source_records": 179
+    },
+    "2020-SC": {
+      "matched_site_intervals": 46,
+      "source_records": 103
+    },
+    "2020-TN": {
+      "matched_site_intervals": 30,
+      "source_records": 42
+    },
+    "2020-TX": {
+      "matched_site_intervals": 183,
+      "source_records": 12606
+    },
+    "2020-UT": {
+      "matched_site_intervals": 65,
+      "source_records": 263
+    },
+    "2020-WA": {
+      "matched_site_intervals": 7,
+      "source_records": 20
+    },
+    "2020-WI": {
+      "matched_site_intervals": 8,
+      "source_records": 13
+    },
+    "2020-WV": {
+      "matched_site_intervals": 28,
+      "source_records": 49
+    },
+    "2020-WY": {
+      "matched_site_intervals": 87,
+      "source_records": 155
+    },
+    "2021-AL": {
+      "matched_site_intervals": 143,
+      "source_records": 1405
+    },
+    "2021-AR": {
+      "matched_site_intervals": 80,
+      "source_records": 3066
+    },
+    "2021-AZ": {
+      "matched_site_intervals": 272,
+      "source_records": 3049
+    },
+    "2021-CA": {
+      "matched_site_intervals": 94,
+      "source_records": 1655
+    },
+    "2021-CO": {
+      "matched_site_intervals": 97,
+      "source_records": 2313
+    },
+    "2021-FL": {
+      "matched_site_intervals": 98,
+      "source_records": 1984
+    },
+    "2021-GA": {
+      "matched_site_intervals": 36,
+      "source_records": 48
+    },
+    "2021-ID": {
+      "matched_site_intervals": 31,
+      "source_records": 606
+    },
+    "2021-IL": {
+      "matched_site_intervals": 47,
+      "source_records": 59
+    },
+    "2021-KS": {
+      "matched_site_intervals": 35,
+      "source_records": 47
+    },
+    "2021-KY": {
+      "matched_site_intervals": 10,
+      "source_records": 17
+    },
+    "2021-LA": {
+      "matched_site_intervals": 249,
+      "source_records": 4559
+    },
+    "2021-ME": {
+      "matched_site_intervals": 63,
+      "source_records": 318
+    },
+    "2021-MI": {
+      "matched_site_intervals": 30,
+      "source_records": 624
+    },
+    "2021-MN": {
+      "matched_site_intervals": 43,
+      "source_records": 1276
+    },
+    "2021-MO": {
+      "matched_site_intervals": 82,
+      "source_records": 2465
+    },
+    "2021-MS": {
+      "matched_site_intervals": 69,
+      "source_records": 1335
+    },
+    "2021-MT": {
+      "matched_site_intervals": 62,
+      "source_records": 501
+    },
+    "2021-NC": {
+      "matched_site_intervals": 23,
+      "source_records": 35
+    },
+    "2021-ND": {
+      "matched_site_intervals": 23,
+      "source_records": 28
+    },
+    "2021-NE": {
+      "matched_site_intervals": 29,
+      "source_records": 40
+    },
+    "2021-NM": {
+      "matched_site_intervals": 74,
+      "source_records": 166
+    },
+    "2021-NV": {
+      "matched_site_intervals": 58,
+      "source_records": 256
+    },
+    "2021-NY": {
+      "matched_site_intervals": 43,
+      "source_records": 73
+    },
+    "2021-OH": {
+      "matched_site_intervals": 29,
+      "source_records": 41
+    },
+    "2021-OR": {
+      "matched_site_intervals": 19,
+      "source_records": 156
+    },
+    "2021-SC": {
+      "matched_site_intervals": 24,
+      "source_records": 47
+    },
+    "2021-TN": {
+      "matched_site_intervals": 29,
+      "source_records": 44
+    },
+    "2021-TX": {
+      "matched_site_intervals": 236,
+      "source_records": 13638
+    },
+    "2021-UT": {
+      "matched_site_intervals": 89,
+      "source_records": 430
+    },
+    "2021-WA": {
+      "matched_site_intervals": 8,
+      "source_records": 27
+    },
+    "2021-WI": {
+      "matched_site_intervals": 8,
+      "source_records": 10
+    },
+    "2021-WV": {
+      "matched_site_intervals": 30,
+      "source_records": 45
+    },
+    "2021-WY": {
+      "matched_site_intervals": 87,
+      "source_records": 148
+    },
+    "2022-AL": {
+      "matched_site_intervals": 147,
+      "source_records": 1492
+    },
+    "2022-AR": {
+      "matched_site_intervals": 115,
+      "source_records": 4974
+    },
+    "2022-AZ": {
+      "matched_site_intervals": 330,
+      "source_records": 3626
+    },
+    "2022-CA": {
+      "matched_site_intervals": 164,
+      "source_records": 1917
+    },
+    "2022-CO": {
+      "matched_site_intervals": 121,
+      "source_records": 2378
+    },
+    "2022-FL": {
+      "matched_site_intervals": 142,
+      "source_records": 2855
+    },
+    "2022-GA": {
+      "matched_site_intervals": 42,
+      "source_records": 59
+    },
+    "2022-ID": {
+      "matched_site_intervals": 18,
+      "source_records": 794
+    },
+    "2022-IL": {
+      "matched_site_intervals": 50,
+      "source_records": 65
+    },
+    "2022-KS": {
+      "matched_site_intervals": 32,
+      "source_records": 40
+    },
+    "2022-KY": {
+      "matched_site_intervals": 39,
+      "source_records": 53
+    },
+    "2022-LA": {
+      "matched_site_intervals": 173,
+      "source_records": 3910
+    },
+    "2022-ME": {
+      "matched_site_intervals": 86,
+      "source_records": 430
+    },
+    "2022-MI": {
+      "matched_site_intervals": 21,
+      "source_records": 484
+    },
+    "2022-MN": {
+      "matched_site_intervals": 109,
+      "source_records": 2412
+    },
+    "2022-MO": {
+      "matched_site_intervals": 70,
+      "source_records": 1635
+    },
+    "2022-MS": {
+      "matched_site_intervals": 116,
+      "source_records": 1863
+    },
+    "2022-MT": {
+      "matched_site_intervals": 80,
+      "source_records": 695
+    },
+    "2022-NC": {
+      "matched_site_intervals": 39,
+      "source_records": 62
+    },
+    "2022-ND": {
+      "matched_site_intervals": 29,
+      "source_records": 36
+    },
+    "2022-NE": {
+      "matched_site_intervals": 72,
+      "source_records": 98
+    },
+    "2022-NM": {
+      "matched_site_intervals": 55,
+      "source_records": 90
+    },
+    "2022-NV": {
+      "matched_site_intervals": 70,
+      "source_records": 222
+    },
+    "2022-NY": {
+      "matched_site_intervals": 30,
+      "source_records": 51
+    },
+    "2022-OH": {
+      "matched_site_intervals": 51,
+      "source_records": 70
+    },
+    "2022-OR": {
+      "matched_site_intervals": 18,
+      "source_records": 165
+    },
+    "2022-SC": {
+      "matched_site_intervals": 39,
+      "source_records": 91
+    },
+    "2022-TN": {
+      "matched_site_intervals": 38,
+      "source_records": 55
+    },
+    "2022-TX": {
+      "matched_site_intervals": 200,
+      "source_records": 15316
+    },
+    "2022-UT": {
+      "matched_site_intervals": 95,
+      "source_records": 390
+    },
+    "2022-WA": {
+      "matched_site_intervals": 12,
+      "source_records": 27
+    },
+    "2022-WI": {
+      "matched_site_intervals": 4,
+      "source_records": 5
+    },
+    "2022-WV": {
+      "matched_site_intervals": 33,
+      "source_records": 58
+    },
+    "2022-WY": {
+      "matched_site_intervals": 71,
+      "source_records": 99
+    },
+    "2023-AL": {
+      "matched_site_intervals": 230,
+      "source_records": 2178
+    },
+    "2023-AR": {
+      "matched_site_intervals": 133,
+      "source_records": 6586
+    },
+    "2023-AZ": {
+      "matched_site_intervals": 127,
+      "source_records": 1512
+    },
+    "2023-CA": {
+      "matched_site_intervals": 133,
+      "source_records": 2405
+    },
+    "2023-CO": {
+      "matched_site_intervals": 126,
+      "source_records": 4029
+    },
+    "2023-FL": {
+      "matched_site_intervals": 241,
+      "source_records": 4716
+    },
+    "2023-GA": {
+      "matched_site_intervals": 80,
+      "source_records": 116
+    },
+    "2023-ID": {
+      "matched_site_intervals": 18,
+      "source_records": 655
+    },
+    "2023-IL": {
+      "matched_site_intervals": 56,
+      "source_records": 77
+    },
+    "2023-KS": {
+      "matched_site_intervals": 57,
+      "source_records": 81
+    },
+    "2023-KY": {
+      "matched_site_intervals": 22,
+      "source_records": 31
+    },
+    "2023-LA": {
+      "matched_site_intervals": 387,
+      "source_records": 8585
+    },
+    "2023-ME": {
+      "matched_site_intervals": 62,
+      "source_records": 415
+    },
+    "2023-MI": {
+      "matched_site_intervals": 22,
+      "source_records": 578
+    },
+    "2023-MN": {
+      "matched_site_intervals": 56,
+      "source_records": 1366
+    },
+    "2023-MO": {
+      "matched_site_intervals": 71,
+      "source_records": 2184
+    },
+    "2023-MS": {
+      "matched_site_intervals": 171,
+      "source_records": 2093
+    },
+    "2023-MT": {
+      "matched_site_intervals": 31,
+      "source_records": 297
+    },
+    "2023-NC": {
+      "matched_site_intervals": 45,
+      "source_records": 76
+    },
+    "2023-ND": {
+      "matched_site_intervals": 21,
+      "source_records": 26
+    },
+    "2023-NE": {
+      "matched_site_intervals": 45,
+      "source_records": 51
+    },
+    "2023-NM": {
+      "matched_site_intervals": 130,
+      "source_records": 302
+    },
+    "2023-NV": {
+      "matched_site_intervals": 30,
+      "source_records": 231
+    },
+    "2023-NY": {
+      "matched_site_intervals": 45,
+      "source_records": 68
+    },
+    "2023-OH": {
+      "matched_site_intervals": 39,
+      "source_records": 47
+    },
+    "2023-OR": {
+      "matched_site_intervals": 21,
+      "source_records": 154
+    },
+    "2023-SC": {
+      "matched_site_intervals": 42,
+      "source_records": 88
+    },
+    "2023-TN": {
+      "matched_site_intervals": 77,
+      "source_records": 109
+    },
+    "2023-TX": {
+      "matched_site_intervals": 345,
+      "source_records": 26095
+    },
+    "2023-UT": {
+      "matched_site_intervals": 59,
+      "source_records": 329
+    },
+    "2023-WA": {
+      "matched_site_intervals": 10,
+      "source_records": 17
+    },
+    "2023-WI": {
+      "matched_site_intervals": 2,
+      "source_records": 2
+    },
+    "2023-WV": {
+      "matched_site_intervals": 16,
+      "source_records": 33
+    },
+    "2023-WY": {
+      "matched_site_intervals": 74,
+      "source_records": 135
+    },
+    "2024-AL": {
+      "matched_site_intervals": 150,
+      "source_records": 1156
+    },
+    "2024-AR": {
+      "matched_site_intervals": 130,
+      "source_records": 4194
+    },
+    "2024-AZ": {
+      "matched_site_intervals": 212,
+      "source_records": 2341
+    },
+    "2024-CA": {
+      "matched_site_intervals": 84,
+      "source_records": 2248
+    },
+    "2024-CO": {
+      "matched_site_intervals": 100,
+      "source_records": 2569
+    },
+    "2024-FL": {
+      "matched_site_intervals": 227,
+      "source_records": 4586
+    },
+    "2024-GA": {
+      "matched_site_intervals": 59,
+      "source_records": 77
+    },
+    "2024-ID": {
+      "matched_site_intervals": 24,
+      "source_records": 699
+    },
+    "2024-IL": {
+      "matched_site_intervals": 55,
+      "source_records": 74
+    },
+    "2024-KS": {
+      "matched_site_intervals": 71,
+      "source_records": 97
+    },
+    "2024-KY": {
+      "matched_site_intervals": 22,
+      "source_records": 33
+    },
+    "2024-LA": {
+      "matched_site_intervals": 334,
+      "source_records": 7036
+    },
+    "2024-ME": {
+      "matched_site_intervals": 72,
+      "source_records": 429
+    },
+    "2024-MI": {
+      "matched_site_intervals": 22,
+      "source_records": 393
+    },
+    "2024-MN": {
+      "matched_site_intervals": 69,
+      "source_records": 1624
+    },
+    "2024-MO": {
+      "matched_site_intervals": 131,
+      "source_records": 3562
+    },
+    "2024-MS": {
+      "matched_site_intervals": 118,
+      "source_records": 1521
+    },
+    "2024-MT": {
+      "matched_site_intervals": 62,
+      "source_records": 441
+    },
+    "2024-NC": {
+      "matched_site_intervals": 67,
+      "source_records": 100
+    },
+    "2024-ND": {
+      "matched_site_intervals": 23,
+      "source_records": 26
+    },
+    "2024-NE": {
+      "matched_site_intervals": 54,
+      "source_records": 74
+    },
+    "2024-NM": {
+      "matched_site_intervals": 72,
+      "source_records": 147
+    },
+    "2024-NV": {
+      "matched_site_intervals": 32,
+      "source_records": 239
+    },
+    "2024-NY": {
+      "matched_site_intervals": 33,
+      "source_records": 52
+    },
+    "2024-OH": {
+      "matched_site_intervals": 29,
+      "source_records": 38
+    },
+    "2024-OR": {
+      "matched_site_intervals": 24,
+      "source_records": 227
+    },
+    "2024-SC": {
+      "matched_site_intervals": 42,
+      "source_records": 89
+    },
+    "2024-TN": {
+      "matched_site_intervals": 54,
+      "source_records": 77
+    },
+    "2024-TX": {
+      "matched_site_intervals": 312,
+      "source_records": 20486
+    },
+    "2024-UT": {
+      "matched_site_intervals": 78,
+      "source_records": 405
+    },
+    "2024-WA": {
+      "matched_site_intervals": 9,
+      "source_records": 21
+    },
+    "2024-WI": {
+      "matched_site_intervals": 4,
+      "source_records": 7
+    },
+    "2024-WV": {
+      "matched_site_intervals": 25,
+      "source_records": 42
+    },
+    "2024-WY": {
+      "matched_site_intervals": 80,
+      "source_records": 125
+    },
+    "2025-AL": {
+      "matched_site_intervals": 172,
+      "source_records": 1636
+    },
+    "2025-AR": {
+      "matched_site_intervals": 180,
+      "source_records": 5730
+    },
+    "2025-AZ": {
+      "matched_site_intervals": 144,
+      "source_records": 1669
+    },
+    "2025-CA": {
+      "matched_site_intervals": 138,
+      "source_records": 1927
+    },
+    "2025-CO": {
+      "matched_site_intervals": 101,
+      "source_records": 2926
+    },
+    "2025-FL": {
+      "matched_site_intervals": 140,
+      "source_records": 3042
+    },
+    "2025-GA": {
+      "matched_site_intervals": 39,
+      "source_records": 52
+    },
+    "2025-ID": {
+      "matched_site_intervals": 28,
+      "source_records": 477
+    },
+    "2025-IL": {
+      "matched_site_intervals": 49,
+      "source_records": 63
+    },
+    "2025-KS": {
+      "matched_site_intervals": 52,
+      "source_records": 74
+    },
+    "2025-KY": {
+      "matched_site_intervals": 63,
+      "source_records": 92
+    },
+    "2025-LA": {
+      "matched_site_intervals": 268,
+      "source_records": 5297
+    },
+    "2025-ME": {
+      "matched_site_intervals": 47,
+      "source_records": 234
+    },
+    "2025-MI": {
+      "matched_site_intervals": 24,
+      "source_records": 440
+    },
+    "2025-MN": {
+      "matched_site_intervals": 81,
+      "source_records": 2163
+    },
+    "2025-MO": {
+      "matched_site_intervals": 72,
+      "source_records": 2514
+    },
+    "2025-MS": {
+      "matched_site_intervals": 170,
+      "source_records": 2169
+    },
+    "2025-MT": {
+      "matched_site_intervals": 56,
+      "source_records": 440
+    },
+    "2025-NC": {
+      "matched_site_intervals": 37,
+      "source_records": 57
+    },
+    "2025-ND": {
+      "matched_site_intervals": 20,
+      "source_records": 28
+    },
+    "2025-NE": {
+      "matched_site_intervals": 72,
+      "source_records": 98
+    },
+    "2025-NM": {
+      "matched_site_intervals": 69,
+      "source_records": 174
+    },
+    "2025-NV": {
+      "matched_site_intervals": 72,
+      "source_records": 231
+    },
+    "2025-NY": {
+      "matched_site_intervals": 16,
+      "source_records": 33
+    },
+    "2025-OH": {
+      "matched_site_intervals": 46,
+      "source_records": 69
+    },
+    "2025-OR": {
+      "matched_site_intervals": 28,
+      "source_records": 195
+    },
+    "2025-SC": {
+      "matched_site_intervals": 31,
+      "source_records": 76
+    },
+    "2025-TN": {
+      "matched_site_intervals": 71,
+      "source_records": 102
+    },
+    "2025-TX": {
+      "matched_site_intervals": 235,
+      "source_records": 18908
+    },
+    "2025-UT": {
+      "matched_site_intervals": 50,
+      "source_records": 200
+    },
+    "2025-WA": {
+      "matched_site_intervals": 9,
+      "source_records": 17
+    },
+    "2025-WI": {
+      "matched_site_intervals": 10,
+      "source_records": 13
+    },
+    "2025-WV": {
+      "matched_site_intervals": 41,
+      "source_records": 74
+    },
+    "2025-WY": {
+      "matched_site_intervals": 79,
+      "source_records": 133
+    },
+    "2026-AL": {
+      "matched_site_intervals": 67,
+      "source_records": 658
+    },
+    "2026-AR": {
+      "matched_site_intervals": 51,
+      "source_records": 1768
+    },
+    "2026-AZ": {
+      "matched_site_intervals": 35,
+      "source_records": 246
+    },
+    "2026-CA": {
+      "matched_site_intervals": 43,
+      "source_records": 670
+    },
+    "2026-CO": {
+      "matched_site_intervals": 119,
+      "source_records": 2011
+    },
+    "2026-FL": {
+      "matched_site_intervals": 85,
+      "source_records": 1340
+    },
+    "2026-GA": {
+      "matched_site_intervals": 34,
+      "source_records": 53
+    },
+    "2026-ID": {
+      "matched_site_intervals": 13,
+      "source_records": 308
+    },
+    "2026-IL": {
+      "matched_site_intervals": 75,
+      "source_records": 89
+    },
+    "2026-KS": {
+      "matched_site_intervals": 49,
+      "source_records": 67
+    },
+    "2026-KY": {
+      "matched_site_intervals": 18,
+      "source_records": 27
+    },
+    "2026-LA": {
+      "matched_site_intervals": 107,
+      "source_records": 2494
+    },
+    "2026-ME": {
+      "matched_site_intervals": 13,
+      "source_records": 81
+    },
+    "2026-MI": {
+      "matched_site_intervals": 24,
+      "source_records": 550
+    },
+    "2026-MN": {
+      "matched_site_intervals": 39,
+      "source_records": 991
+    },
+    "2026-MO": {
+      "matched_site_intervals": 88,
+      "source_records": 3350
+    },
+    "2026-MS": {
+      "matched_site_intervals": 49,
+      "source_records": 584
+    },
+    "2026-MT": {
+      "matched_site_intervals": 35,
+      "source_records": 239
+    },
+    "2026-NC": {
+      "matched_site_intervals": 13,
+      "source_records": 24
+    },
+    "2026-ND": {
+      "matched_site_intervals": 15,
+      "source_records": 17
+    },
+    "2026-NE": {
+      "matched_site_intervals": 34,
+      "source_records": 56
+    },
+    "2026-NM": {
+      "matched_site_intervals": 51,
+      "source_records": 92
+    },
+    "2026-NV": {
+      "matched_site_intervals": 24,
+      "source_records": 101
+    },
+    "2026-NY": {
+      "matched_site_intervals": 11,
+      "source_records": 21
+    },
+    "2026-OH": {
+      "matched_site_intervals": 15,
+      "source_records": 19
+    },
+    "2026-OR": {
+      "matched_site_intervals": 5,
+      "source_records": 67
+    },
+    "2026-SC": {
+      "matched_site_intervals": 10,
+      "source_records": 20
+    },
+    "2026-TN": {
+      "matched_site_intervals": 30,
+      "source_records": 51
+    },
+    "2026-TX": {
+      "matched_site_intervals": 135,
+      "source_records": 10396
+    },
+    "2026-UT": {
+      "matched_site_intervals": 31,
+      "source_records": 164
+    },
+    "2026-WA": {
+      "matched_site_intervals": 1,
+      "source_records": 5
+    },
+    "2026-WI": {
+      "matched_site_intervals": 10,
+      "source_records": 11
+    },
+    "2026-WV": {
+      "matched_site_intervals": 13,
+      "source_records": 25
+    },
+    "2026-WY": {
+      "matched_site_intervals": 55,
+      "source_records": 100
+    }
+  },
+  "years": {
+    "2024": {
+      "positive": 10545,
+      "rows": 81446
+    },
+    "2025": {
+      "positive": 9527,
+      "rows": 87564
+    },
+    "2026": {
+      "positive": 4433,
+      "rows": 43407
+    }
+  }
+}

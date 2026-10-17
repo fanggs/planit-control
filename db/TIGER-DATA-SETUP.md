@@ -1,5 +1,11 @@
 # Tiger Data setup for Sid
 
+**Current status:** Sid has already created `planit-control-dev` and reported
+successful migrations 001/002 plus site, weather and historical loads. Keep
+using that service. For the new model-evidence migration and restricted `/ask`
+login, follow [model/CORRECTIONS.md](../model/CORRECTIONS.md). The original
+first-time walkthrough below is retained as reference.
+
 The data collectors already work locally. This setup gives the team a shared
 PostgreSQL database; it does not train the hazard model or connect the frontend.
 

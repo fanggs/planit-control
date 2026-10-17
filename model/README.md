@@ -1,4 +1,10 @@
-# Model experiments: interval 5
+# Model experiments
+
+The corrected forecast-based pipeline and operating instructions are in
+[CORRECTIONS.md](CORRECTIONS.md). The report below preserves the original interval
+5 experiment; its realized-weather inputs are not used by the new live scorer.
+
+## Original interval 5 experiment
 
 We trained real models, but **none met the predeclared acceptance rule** in this
 first experiment. No production hazard score or new weather/wildlife weighting

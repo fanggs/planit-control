@@ -1,5 +1,8 @@
 # Data ingestion
 
+For multi-year forecast training, verified warning geometries, wildlife context,
+and the recurring collection worker, see [model/CORRECTIONS.md](../model/CORRECTIONS.md).
+
 Intervals 2 and 3 implement EIA plant ingestion and weather collection.
 Historical evidence is documented in `HISTORY.md` (interval 4). These commands do not generate
 hazard scores or modify the API.
@@ -20,8 +23,9 @@ python3 -m venv .venv
 Open **`get_data/generated/sites.json`** to see all 60 real plants. The adjacent
 **`sites-validation.json`** records source URLs, actual download times, SHA-256
 checksums, dependency versions, counts, rejected-data summaries and checks.
-These are real external data, not the API's sample fixtures. API routes still
-need Alan's database integration before these plants appear in the live app.
+These are real external data, not the API's sample fixtures. Alan's API now has
+database adapters; its process must have the shared development connection
+configured before it can read these plants.
 
 The command discovers the newest workbook linked by the [official EIA monthly
 inventory](https://www.eia.gov/electricity/data/eia860m/index.php). On October 17,
@@ -130,7 +134,8 @@ On October 17, 2026, Sid ran the foundation migration and the 60-site loader
 against the team's Tiger Data service and reported successful post-load
 verification. The service reports PostgreSQL 18.6 and TimescaleDB 2.30.2.
 Repeated-load idempotency and deliberate rollback-failure tests remain separate
-integration checks. The foundation tables are not yet hypertables.
+integration checks. Sid subsequently reported applying migration 002, which
+converts the four contract time-series tables to hypertables.
 
 ## Weather: interval 3
 

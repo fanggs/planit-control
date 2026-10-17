@@ -19,7 +19,21 @@ review. Publishing to the team repository is a separate approval step.
 7. Integration: database adapters for Alan, end-to-end checks, operating guide,
    limitations and team handoff.
 
-## Model direction
+## Corrective interval 6 bundle
+
+The forecast-based replacement is documented in `CORRECTIONS.md`. It implements
+multi-year fixed-lead inputs, point-in-warning geometry labels, separate
+calibration/final evaluation, portable exact explanations, guarded live inference,
+versioned evidence storage, wildlife context and a restricted `/ask` adapter.
+Original interval 5 results remain below as a historical record. New measured
+results live in `generated/forecast-v2/report.json`; no new model is promoted
+merely because these implementation pieces exist. Migration 003, restricted
+login provisioning, scheduler deployment and the proposed API contract remain
+separate real-service/team checks. This bundle includes integration helpers
+because the correction needs a complete inference/storage path; it does not
+edit teammates' owned files or claim those integration checks are finished.
+
+## Original interval 5 direction
 
 Interval 5 status: five fixed candidates trained and exported; no weather model
 met the predeclared validation acceptance rule. Logistic regression leads mean
