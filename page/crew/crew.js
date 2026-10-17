@@ -1,6 +1,6 @@
 /* Why: Assemble previously tested modules into simple crew navigation and an isolated supervisor handoff, retaining alerts across views. */
 import {config} from './crew-config.js';
-import {userRoles} from './crew-routing.js';
+import {supervisorDashboardURL, userRoles} from './crew-routing.js';
 import {HAZARD_LABELS} from './crew-integration.js';
 import {initAuth,session,signIn,signOut,enterDemo,authConfigured} from './crew-auth.js';
 import {services,demoAction} from './crew-services.js';
@@ -65,7 +65,8 @@ async function refreshSite(version=state.loadVersion,incoming){
 }
 function renderWorkspace(){
   const p=state.site;cleanupView();
-  $('#crew-root').innerHTML=`<header class="crew-header"><a href="index.html" class="crew-brand">${brandMark()}PlanIT <span>Control</span></a><div class="crew-header-actions">${state.user?.demo||userRoles(state.user,config.authRoleClaim).includes('supervisor')?`<a class="crew-link" href="crew-supervisor.html${state.user?.demo?'?demo=1':''}">Supervisor workspace ↗</a>`:''}<a class="crew-link" href="crew-atlas.html?site=${esc(p.id)}&amp;return_site=${esc(p.id)}">Site map ↗</a><button class="crew-link" data-action="logout">Sign out</button></div></header><main id="crew-main" class="crew-main">
+  const supervisorHref=state.user?.demo?'crew-supervisor.html?demo=1':supervisorDashboardURL(location.href).href;
+  $('#crew-root').innerHTML=`<header class="crew-header"><a href="index.html" class="crew-brand">${brandMark()}PlanIT <span>Control</span></a><div class="crew-header-actions">${state.user?.demo||userRoles(state.user,config.authRoleClaim).includes('supervisor')?`<a class="crew-link" href="${esc(supervisorHref)}">Supervisor workspace ↗</a>`:''}<a class="crew-link" href="crew-atlas.html?site=${esc(p.id)}&amp;return_site=${esc(p.id)}">Site map ↗</a><button class="crew-link" data-action="logout">Sign out</button></div></header><main id="crew-main" class="crew-main">
     ${config.dataMode==='mock'?'<p class="crew-demo"><strong>SAMPLE DATA</strong> · Real plant locations. Synthetic conditions and scores. Reports stay on this browser; no live alerts or delivery.</p>':p.sample?'<p class="crew-demo"><strong>SAMPLE API DATA</strong> · Placeholder plants and fixed sample readings. This is not a live safety assessment.</p>':''}
     <section class="crew-section-heading crew-site-hero"><div class="crew-hero-copy"><p class="crew-eyebrow">YOUR JOB SITE</p><h1 id="crew-site-name">${esc(p.name)}</h1><p class="crew-muted">${esc(p.state)} · Plant ${esc(p.id)} · ${state.sites.length.toLocaleString()} available sites</p><p class="crew-muted"><a href="crew-atlas.html?site=${esc(p.id)}&amp;return_site=${esc(p.id)}">Open site map ↗</a></p></div><div class="crew-hero-end">${contourArt()}<button class="crew-button secondary" data-action="change-site">Change site ${icon("switch")}</button></div></section>
     <section id="crew-site-picker" class="crew-card" hidden><div class="crew-coordinate-row"><div><label for="crew-site-query">Search plants</label><input id="crew-site-query" type="search" placeholder="Plant, operator, state or ID" autocomplete="off"></div><div><label for="crew-site-region">State / territory</label><select id="crew-site-region"><option value="">All states & territories</option>${[...new Set(state.sites.map(s=>s.state))].sort().map(s=>`<option>${esc(s)}</option>`).join('')}</select></div></div><p id="crew-search-count" class="crew-muted" role="status"></p><div id="crew-site-results" class="crew-site-results"></div></section>
