@@ -7,7 +7,7 @@ import {createDeepSpaceSource} from '../realtime/deepspace-source.js';
 import {createRefreshQueue} from './refresh.js';
 import {bindPageLifecycle, changeSelectedSite, markDetailStale} from './lifecycle.js';
 import {assessScore, coordinates, countdown, finite, freshness, hasSupervisorRole, label, points,
-  isReplayAlert, rankSites, riskTone, safeSourceURL, siteHasReplayAlert, siteTime, summaryScore,
+  isReplayAlert, openReportPins, rankSites, riskTone, safeSourceURL, siteHasReplayAlert, siteTime, summaryScore,
   validFactors} from './domain.js';
 
 const $ = id => document.getElementById(id);
@@ -95,9 +95,8 @@ function renderMap(sites) {
 function renderReportPins() {
   if (!map) return;
   reportLayer.clearLayers();
-  for (const report of state.reports) {
+  for (const report of openReportPins(state.reports)) {
     const position = coordinates(report);
-    if (!position) continue;
     const content = el('div');
     content.append(el('strong', `${label(report.hazard_type)} · ${report.status}`), el('p', report.description));
     window.L.circleMarker(position, {radius: 6, color: '#add4ff', weight: 2, fillColor: '#1b3454', fillOpacity: 1})

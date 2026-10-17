@@ -33,6 +33,10 @@ export function coordinates(row) {
   return finite(row?.latitude) && Math.abs(row.latitude) <= 90 && finite(row?.longitude)
     && Math.abs(row.longitude) <= 180 ? [row.latitude, row.longitude] : null;
 }
+export function openReportPins(reports) {
+  // Resolved reports remain in the history panel, but are not active map hazards.
+  return reports.filter(report => report?.status === 'open' && coordinates(report));
+}
 export function riskTone(score) {
   // Visual bands only, not a new model or a work-permission decision.
   return score === null ? 'unknown' : score >= 7 ? 'high' : score >= 4 ? 'medium' : 'low';
