@@ -52,3 +52,23 @@ def validate_reporter_id(value: str) -> str:
 
 class HazardReportCreate(BaseModel):
     """The JSON body a crew member may submit. Authorization happens separately."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    site_id: SiteId
+    hazard_type: HazardType
+    severity: Severity
+    description: str = Field(strict=True, min_length=1, max_length=2000)
+    latitude: float | None = Field(default=None, strict=True, ge=-90, le=90, allow_inf_nan=False)
+    longitude: float | None = Field(default=None, strict=True, ge=-180, le=180, allow_inf_nan=False)
+    photo_key: str | None = Field(default=None, strict=True, min_length=1, max_length=1024)
+
+    @field_validator("description", mode="before")
+    @classmethod
+    def clean_description(cls, value: object) -> object:
+        # Whitespace alone is not a useful report. PostgreSQL text forbids NUL.
+        if isinstance(value, str):
+            if "\x00" in value:
+                raise ValueError("description cannot contain a NUL character")
+            return value.strip()
+        return value
