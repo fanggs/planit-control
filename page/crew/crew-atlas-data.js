@@ -58,17 +58,35 @@ export function atlasZoom(camera,zoom,width,height,anchor=[width/2,height/2]) {
 }
 export const atlasEase=t=>t<.5?4*t*t*t:1-(-2*t+2)**3/2;
 
-export function spreadAtlasPins(pins,width,height) {
-  const placed=[];
-  for(const pin of pins.slice().sort((a,b)=>Number(b.selected)-Number(a.selected)||a.site.site_id-b.site.site_id)) {
-    let x=pin.x,y=pin.y;
-    const inside=x>=10&&x<=width-10&&y>=14&&y<=height-14;
-    const clear=(cx,cy)=>cx>10&&cx<width-10&&cy>14&&cy<height-14&&placed.every(p=>Math.hypot(cx-p.x,cy-p.y)>17);
-    if(inside&&!clear(x,y))for(let n=1;n<=80;n++){
-      const angle=n*2.39996323,radius=9*Math.sqrt(n),cx=pin.x+Math.cos(angle)*radius,cy=pin.y+Math.sin(angle)*radius;
-      if(clear(cx,cy)){x=cx;y=cy;break;}
+// A marker's position depends only on its coordinates, score height and camera.
+// Selection changes its appearance, never the geometry of nearby plants.
+export function atlasPins(positions,camera,width,height,selectedId) {
+  return positions.map(({site,xy})=>{
+    const beam=validScore(site.score)?site.score*10:52;
+    const base=atlasPoint(...xy,0,camera,width,height);
+    const [x,y]=atlasPoint(...xy,beam*Math.min(1,width/900),camera,width,height);
+    return {site,base,x,y,selected:site.id===selectedId};
+  });
+}
+
+// Move text boxes only. When space runs out, keep higher-priority labels and
+// omit the rest; all plants remain selectable through the searchable list.
+export function layoutAtlasLabels(labels,width,height) {
+  const placed=[],margin=8,gap=10;
+  for(const label of labels.slice().sort((a,b)=>b.priority-a.priority||a.id.localeCompare(b.id))) {
+    const {w,h,anchorX,anchorY}=label;
+    if(w>width-margin*2||h>height-margin*2||anchorX<0||anchorX>width||anchorY<0||anchorY>height)continue;
+    const candidates=[
+      [anchorX-w/2,anchorY-h-gap],[anchorX-w/2,anchorY+gap],
+      [anchorX+gap,anchorY-h/2],[anchorX-w-gap,anchorY-h/2],
+      [anchorX-w/2,anchorY-h*2-gap*2],[anchorX-w/2,anchorY+h+gap*2]
+    ];
+    for(const [cx,cy] of candidates) {
+      const x=Math.max(margin,Math.min(width-w-margin,cx)),y=Math.max(margin,Math.min(height-h-margin,cy));
+      if(anchorX>x-gap/2&&anchorX<x+w+gap/2&&anchorY>y-gap/2&&anchorY<y+h+gap/2)continue;
+      if(placed.some(p=>x<p.x+p.w+4&&x+w+4>p.x&&y<p.y+p.h+4&&y+h+4>p.y))continue;
+      placed.push({...label,x,y});break;
     }
-    placed.push({...pin,x,y,anchorX:pin.x,anchorY:pin.y,displaced:Math.hypot(x-pin.x,y-pin.y)>1});
   }
   return placed;
 }

@@ -4,7 +4,7 @@ import {supervisorDashboardURL} from './crew-routing.js';
 import {brandMark} from './crew-visuals.js';
 import {validScore} from './crew-domain.js';
 import {esc,dateLabel} from './crew-ui.js';
-import {REGIONS,RISK_BANDS,atlasRisk,atlasRank,atlasRoster,atlasSummaries,atlasFilter,atlasPoint,atlasZoom,atlasEase,spreadAtlasPins} from './crew-atlas-data.js';
+import {REGIONS,RISK_BANDS,atlasRisk,atlasRank,atlasRoster,atlasSummaries,atlasFilter,atlasPoint,atlasZoom,atlasEase,atlasPins,layoutAtlasLabels} from './crew-atlas-data.js';
 
 const $=selector=>document.querySelector(selector),canvas=$('#atlas-canvas'),ctx=canvas.getContext('2d');
 const reduced=matchMedia('(prefers-reduced-motion: reduce)'),abort=new AbortController();
@@ -65,18 +65,12 @@ function draw(now){
   ctx.font=`${8/Math.max(1,camera.zoom*.55)}px ui-monospace,monospace`;ctx.textAlign='center';ctx.fillStyle='#9bb0a477';
   if(width>700)for(const feature of ground)if(names.has(feature.name)&&feature.center.every(Number.isFinite))ctx.fillText(feature.name.toUpperCase(),...feature.center);
   ctx.restore();
-  const pins=positions.map(p=>{
-    const beam=validScore(p.site.score)?p.site.score*10:52;
-    const base=point(...p.xy),cap=point(...p.xy,beam*Math.min(1,width/900));
-    return {site:p.site,base,x:cap[0],y:cap[1],selected:p.site.id===state.selected};
-  });
-  hits=spreadAtlasPins(pins,width,height);
+  hits=atlasPins(positions,camera,width,height,state.selected);
   // Lines and halos are local canvas effects. No frame can request API data.
   for(const p of hits){
     const color=atlasRisk(p.site.score).color;
     ctx.save();ctx.strokeStyle=color;ctx.lineWidth=p.selected?1.6:1;ctx.globalAlpha=p.selected?.9:.5;
-    ctx.beginPath();ctx.moveTo(...p.base);ctx.lineTo(p.anchorX,p.anchorY);ctx.stroke();
-    if(p.displaced){ctx.globalAlpha=.4;ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(p.anchorX,p.anchorY);ctx.lineTo(p.x,p.y);ctx.stroke();}
+    ctx.beginPath();ctx.moveTo(...p.base);ctx.lineTo(p.x,p.y);ctx.stroke();
     ctx.globalAlpha=.3;ctx.beginPath();ctx.ellipse(p.base[0],p.base[1],p.selected?6:3,(p.selected?6:3)*Math.max(.3,cos),0,0,Math.PI*2);ctx.stroke();ctx.restore();
   }
   const ordered=hits.slice().sort((a,b)=>Number(a.selected)-Number(b.selected));
@@ -90,13 +84,18 @@ function draw(now){
     ctx.restore();
   }
   const labels=ordered.filter(p=>p.selected||p.site.id===state.hover||camera.zoom>2.3).sort((a,b)=>Number(a.selected)-Number(b.selected));
-  const seen=[];
+  const labelBoxes=[];
   for(const p of labels.slice(-Math.min(width<700?3:6,labels.length))){
     ctx.save();ctx.font='500 10px system-ui';let text=p.site.name;const max=Math.min(230,width-36);
     while(ctx.measureText(text).width>max-18&&text.length>8)text=text.slice(0,-2)+'…';
-    const w=ctx.measureText(text).width+18,h=24,x=Math.max(8,Math.min(width-w-8,p.x-w/2)),y=Math.max(8,Math.min(height-h-8,p.y-34));
-    const overlaps=seen.some(a=>x<a.x+a.w&&x+w>a.x&&y<a.y+h&&y+h>a.y);
-    if(!overlaps||p.selected||p.site.id===state.hover){ctx.fillStyle='#0c1712ee';ctx.strokeStyle=atlasRisk(p.site.score).color+'77';ctx.lineWidth=.6;ctx.beginPath();ctx.roundRect(x,y,w,h,6);ctx.fill();ctx.stroke();ctx.fillStyle='#e4ecee';ctx.textAlign='left';ctx.fillText(text,x+9,y+16);seen.push({x,y,w});}ctx.restore();
+    labelBoxes.push({id:p.site.id,site:p.site,text,w:ctx.measureText(text).width+18,h:24,anchorX:p.x,anchorY:p.y,priority:p.selected?2:p.site.id===state.hover?1:0});ctx.restore();
+  }
+  for(const label of layoutAtlasLabels(labelBoxes,width,height)){
+    const {x,y,w,h,anchorX,anchorY,site,text}=label,color=atlasRisk(site.score).color;
+    ctx.save();ctx.strokeStyle=color+'77';ctx.lineWidth=.6;
+    ctx.beginPath();ctx.moveTo(anchorX,anchorY);ctx.lineTo(Math.max(x,Math.min(x+w,anchorX)),Math.max(y,Math.min(y+h,anchorY)));ctx.stroke();
+    ctx.fillStyle='#0c1712ee';ctx.beginPath();ctx.roundRect(x,y,w,h,6);ctx.fill();ctx.stroke();
+    ctx.font='500 10px system-ui';ctx.fillStyle='#e4ecee';ctx.textAlign='left';ctx.fillText(text,x+9,y+16);ctx.restore();
   }
   canvas.dataset.view=state.mode;canvas.dataset.zoom=camera.zoom.toFixed(2);canvas.dataset.transitioning=String(Boolean(animation));
   $('#atlas-compass-needle').style.transform=`rotate(${-camera.yaw*180/Math.PI}deg)`;

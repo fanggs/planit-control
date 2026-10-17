@@ -36,7 +36,10 @@ reads clear scores and remain unavailable without falling back to sample data.
   roster; clearing filters restores all 60. Every plant keeps a separate beacon.
 - Select a plant to inspect; **Locate** centers it; **Overview** resets the view.
 - Drag to pan; Shift + drag tilts/orbits 3D. Wheel and pinch zoom follow the
-  pointer. Nearby heads spread with geographic leader lines to remain distinct.
+  pointer. Plant dots stay anchored to their projected locations; only labels
+  shift to avoid overlap, with connector lines back to their markers. In 3D,
+  each beam's base stays at its location and its height reflects the score.
+  Zoom in or use the list to select plants whose dots overlap.
 - Arrow keys pan, + / − zoom, N / P select plants, Escape returns to overview.
   The searchable list provides a canvas alternative. Phone controls include a
   collapsible plant list, score counts, and access to the selected crew site.
@@ -63,6 +66,6 @@ node --test
 Validation rejects incomplete or unexpected rosters. Tests compare the exact
 snapshot with Sid’s file, cover risk-color boundaries and ranking, check shared
 demo scores/timezones, safe API merges, projection coverage, transition math,
-anchored zoom and overlapping-pin placement. `crew-data/atlas-source.json`
+anchored zoom, fixed markers and collision-free label placement. `crew-data/atlas-source.json`
 records provenance. Local D3 and Census-derived geography include licenses.
 No map key, tile service, hosted font or new package is required.
