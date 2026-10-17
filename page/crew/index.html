@@ -41,12 +41,59 @@
         <div class="welcome-hero-footer"><span>BUILT AROUND THE PEOPLE IN THE FIELD</span><span>01 / KNOW BEFORE YOU GO</span></div>
       </section>
       <section class="welcome-workflow" id="how-it-works" aria-labelledby="workflow-title">
-        <div class="welcome-section-intro"><p class="welcome-kicker">FROM AWARENESS TO ACTION</p><h2 id="workflow-title">Less noise.<br>More clarity.</h2><p>One shared picture, from the control room to the job site.</p></div>
-        <ol>
-          <li><span class="workflow-number">01</span><div><h3>Know your site.</h3><p>See environmental conditions and understand the factors behind the hazard score.</p></div></li>
-          <li><span class="workflow-number">02</span><div><h3>Keep your crew informed.</h3><p>Follow stop-work alerts. Share a photo and a map pin when you spot a hazard.</p></div></li>
-          <li><span class="workflow-number">03</span><div><h3>Look ahead.</h3><p>Review tomorrow’s briefing and help the next crew arrive prepared.</p></div></li>
+        <div class="welcome-section-intro">
+          <p class="welcome-kicker">HOW PLANIT WORKS</p>
+          <h2 id="workflow-title">Know the risks.<br>Know what to do.</h2>
+          <p>PlanIT brings environmental conditions, on-site observations, and a next-day risk outlook into one picture for each job site.</p>
+          <p class="workflow-preview-note" id="workflow-preview-note" hidden><strong>About this preview</strong> Plant locations are real; conditions and scores are sample data. The model design below follows our scoring plan, but this preview does not run trained models. Live alerts, team-wide report sharing, and briefing delivery require connected services.</p>
+        </div>
+        <ol class="workflow-functions">
+          <li><span class="workflow-number">01</span><div><h3>Check the conditions at your site.</h3><p>Select a real power plant to review weather, extreme heat, lightning, flooding, wildfire, soil saturation, and wildlife. Read each source and timestamp; missing readings show “no data.”</p></div></li>
+          <li><span class="workflow-number">02</span><div><h3>Act on changing hazards.</h3><p>A lightning strike within 10 miles triggers a stop-work alert and a 30-minute countdown. Each new nearby strike restarts it. River sites can also receive flood warnings after heavy overnight rain.</p></div></li>
+          <li><span class="workflow-number">03</span><div><h3>Share what you see.</h3><p>Add a photo, pin the location, and describe a hazard for your team and future crews. An open high-severity report creates a warning until a supervisor resolves it.</p></div></li>
+          <li><span class="workflow-number">04</span><div><h3>Focus attention where it matters.</h3><p>Supervisors compare sites on a map ranked by hazard score, inspect the factors behind each score, and review crew observations before allocating attention and resources.</p></div></li>
+          <li><span class="workflow-number">05</span><div><h3>Prepare for the next shift.</h3><p>At 6 PM in each site’s local timezone, the daily briefing summarizes tomorrow’s hazards using the forecast and score. Open the briefing to review its date and the information it was based on.</p></div></li>
         </ol>
+        <div class="score-method" aria-labelledby="score-method-title">
+          <header class="score-method-heading"><p class="welcome-kicker">THE HAZARD INDEX / 0–10</p><h3 id="score-method-title">Two models. One explainable score.</h3><p>The index combines a weather outlook for the next 24 hours with the likelihood of dangerous wildlife nearby this month. A higher number means greater predicted environmental risk.</p></header>
+          <div class="score-models">
+            <article class="score-model weather-model">
+              <div class="score-model-top"><h4>Weather risk</h4><span>0–8 points</span></div>
+              <p>A small decision-tree model—one that learns a sequence of yes/no checks—is trained on historical weather and NOAA Storm Events, including heat, lightning, flooding, wildfire, and high wind.</p>
+              <p>It uses the site’s next-24-hour forecast to estimate the chance of hazardous outdoor-work conditions.</p>
+              <p class="score-model-formula">Predicted probability × 8</p>
+            </article>
+            <article class="score-model wildlife-model">
+              <div class="score-model-top"><h4>Wildlife risk</h4><span>0–2 points</span></div>
+              <p>A second decision tree learns from GBIF wildlife sightings, including iNaturalist records of alligators, cottonmouths, rattlesnakes, and copperheads.</p>
+              <p>It uses the site’s location and the current month to estimate the chance of dangerous wildlife nearby.</p>
+              <p class="score-model-formula">Predicted probability × 2</p>
+            </article>
+          </div>
+          <figure class="score-example">
+            <figcaption><span class="welcome-kicker">ILLUSTRATIVE EXAMPLE</span><strong>Weather 6.4 + wildlife 1.8 = <span>8.2 / 10</span></strong><span>An 80% weather prediction contributes 6.4 points; a 90% wildlife prediction contributes 1.8.</span></figcaption>
+            <div class="score-example-track" role="img" aria-label="Example index of 8.2 out of 10: weather contributes 6.4 points and wildlife contributes 1.8 points."><span class="score-weather-segment"></span><span class="score-wildlife-segment"></span></div>
+            <div class="score-example-legend"><span><i class="weather-key" aria-hidden="true"></i>Weather · 6.4</span><span><i class="wildlife-key" aria-hidden="true"></i>Wildlife · 1.8</span><span>Scale: 0–10</span></div>
+          </figure>
+          <details class="score-explanation">
+            <summary>How do the individual factors add up?</summary>
+            <p>The breakdown starts at a <strong>baseline</strong>, the model’s starting score. Each factor then raises or lowers it. In a waterfall chart, these changes lead from the baseline to the final score.</p>
+            <div class="score-example-table-wrap"><table><caption>The same 8.2-point example, explained factor by factor</caption><thead><tr><th scope="col">Factor</th><th scope="col">Change</th><th scope="col">Running score</th></tr></thead><tbody>
+              <tr><th scope="row">Baseline</th><td>Starting point</td><td>2.4</td></tr>
+              <tr><th scope="row">Heat</th><td>+3.1</td><td>5.5</td></tr>
+              <tr><th scope="row">Lightning forecast</th><td>+1.9</td><td>7.4</td></tr>
+              <tr><th scope="row">Soil saturation</th><td>+0.9</td><td>8.3</td></tr>
+              <tr><th scope="row">Flooding</th><td>−1.5</td><td>6.8</td></tr>
+              <tr><th scope="row">Wildlife</th><td>+1.4</td><td>8.2</td></tr>
+            </tbody></table></div>
+            <p>A negative contribution lowers the model’s estimate; it does not mean a hazard is impossible. These example values explain the model design and are not current site readings.</p>
+          </details>
+          <div class="score-method-notes">
+            <p><strong>Alerts work independently.</strong> The score’s lightning factor is a forecast. An actual nearby strike triggers the stop-work rule regardless of the score.</p>
+            <p><strong>Reports add context.</strong> Crew reports sit alongside the score and can trigger warnings. They do not change the trained score in this version.</p>
+            <p><strong>Understand the limits.</strong> Models train on older years and are tested on the most recent year. Wildlife sightings are less complete in remote areas. The index is not an injury prediction; a rules-based fallback must be labeled as such.</p>
+          </div>
+        </div>
       </section>
       <section class="welcome-demo" id="explore-demo" aria-labelledby="demo-title" hidden>
         <div><p class="welcome-kicker">TAKE A LOOK AROUND</p><h2 id="demo-title">Two perspectives.<br>One site picture.</h2><p>Explore real plant locations with sample conditions.<br>This preview does not sign you in or send live alerts.</p></div>
