@@ -20,6 +20,8 @@ from jwt.exceptions import PyJWKClientConnectionError
 from PIL import Image
 from sqlalchemy.exc import SQLAlchemyError
 
+from api.llm import LLMError
+from api.photo_tag import HazardSuggestion
 from api.auth.hazard_auth import (
     DEFAULT_ROLES_CLAIM, Auth0Config, Principal, create_auth_dependency, require_roles,
 )
@@ -229,6 +231,40 @@ class PhotoRouteTests(unittest.TestCase):
         self.principal = Principal("auth0|supervisor", frozenset({"supervisor"}))
         self.assertEqual(self.client.get(f"/photos/{key}").status_code, 200)
         self.assertEqual(self.upload().status_code, 201)
+
+    def test_only_uploader_can_request_optional_photo_suggestion(self):
+        key = self.upload().json()["photo_key"]
+        suggestion = HazardSuggestion(
+            hazard_type="wildlife", confidence="medium", reason="An animal is visible.",
+        )
+        with patch("api.routes.hazard_photos.photo_tag.suggest_hazard", return_value=suggestion) as predict:
+            response = self.client.post(f"/photos/{key}/suggestion")
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {"suggestion": suggestion.model_dump()})
+            self.assertEqual(response.headers["cache-control"], "private, no-store")
+            self.assertEqual(response.headers["x-content-type-options"], "nosniff")
+            predict.assert_called_once_with(image_bytes(), "image/png")
+
+            # Attachment makes viewing possible for teammates, but not a new
+            # model request on a photograph someone else uploaded.
+            self.attached.add(key)
+            self.principal = Principal("auth0|other", frozenset({"supervisor"}))
+            self.assertEqual(self.client.get(f"/photos/{key}").status_code, 200)
+            self.assertEqual(self.client.post(f"/photos/{key}/suggestion").status_code, 404)
+            self.principal = Principal("auth0|uploader", frozenset())
+            self.assertEqual(self.client.post(f"/photos/{key}/suggestion").status_code, 403)
+            self.principal = Principal("auth0|uploader", frozenset({"crew"}))
+            self.assertEqual(self.client.post("/photos/missing/suggestion").status_code, 404)
+            predict.assert_called_once()
+
+    def test_gemini_unavailable_returns_null_without_removing_upload(self):
+        key = self.upload().json()["photo_key"]
+        with patch("api.photo_tag.llm.ask_json", side_effect=LLMError("private provider details")):
+            response = self.client.post(f"/photos/{key}/suggestion")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"suggestion": None})
+        self.assertNotIn("private provider details", response.text)
+        self.assertEqual(self.client.get(f"/photos/{key}").status_code, 200)
 
     def test_roles_validation_limits_and_error_envelope(self):
         self.principal = Principal("auth0|unknown", frozenset())

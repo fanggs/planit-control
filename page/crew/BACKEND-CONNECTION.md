@@ -38,11 +38,17 @@ All calls request a fresh Auth0 bearer token. List responses follow the contract
 | `GET /alerts` | Refreshes authoritative alert details after a realtime notice/reconnect. |
 | `GET /reports?site_id={site_id}` | Maps open/resolved reports; fetches attached photos with authorization. |
 | `POST /photos` | Multipart JPEG/PNG, at most 5 MB; returns `{photo_key}`. |
+| `POST /photos/{photo_key}/suggestion` | Optional authenticated Gemini suggestion for the uploader's private photo. `suggestion: null` leaves the category unselected; the crew member makes the final choice. This additive route is not required for basic contract v1.1 reporting. |
 | `GET /photos/{photo_key}` | Fetches the protected image as a blob for an object URL; no public photo URL is assumed. |
 | `POST /reports` | JSON with numeric `site_id`, `hazard_type`, `severity`, `description`, optional paired coordinates and `photo_key`. |
 | `GET /briefings/{site_id}` | One latest briefing; 404 renders no briefing, other errors remain errors. |
 
-**Confirm with Aryan:** the contract does not name the multipart image field. `api.photoField` defaults to `file` and can be changed without editing the form.
+The backend upload route names the multipart field `file`; `api.photoField`
+defaults to that value. In live HTTP mode, choosing a photo uploads it once,
+then requests a suggestion. A manual category choice always wins, and a late
+suggestion from a replaced photo is ignored. The same upload key is reused
+when the report is submitted. Selecting and abandoning a photo can leave an
+unattached private upload; Aryan's cleanup helper handles old orphans safely.
 
 The browser never sends `reporter_id`, status, creation time or a raw image inside report JSON. Those values are server-owned. A successful photo upload is reused if report creation is definitively rejected and retried. A timeout/connection loss after a write is treated as uncertain: check existing reports before submitting again. Local request IDs prevent duplicate in-flight submissions in the same page session; the contract does not promise server idempotency.
 

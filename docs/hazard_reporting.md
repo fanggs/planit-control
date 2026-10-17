@@ -13,7 +13,7 @@ it does not store photographs.** Reports do not change Sid's model score.
 | `api/services/hazard_report_service.py` | SQLAlchemy save, per-site list, resolution, and attached-photo checks using the session supplied by the API. Reporter/resolver IDs come only from a verified Auth0 subject. |
 | `db/hazard_report.sql` | PostgreSQL table, constraints, site foreign key, and per-site newest-first index. Apply only to the agreed development database after Sid's foundation migration. |
 | `api/services/hazard_photo_service.py` | Validates a real JPEG/PNG (5 MB maximum), writes the bytes and metadata in an owner-only private directory, and verifies upload ownership before a key is attached to a report. |
-| `api/routes/hazard_photos.py` | Authenticated `POST /photos` and `GET /photos/{photo_key}`. Only the uploader can view an unattached upload; after attachment, crew and supervisors may view it through the API. |
+| `api/routes/hazard_photos.py` | Authenticated upload, private viewing, and optional photo-hazard suggestion. Only the uploader can request Gemini advice for their photo; after attachment, crew and supervisors may view it through the API. |
 | `api/routes/hazard_reports.py` | Authenticated `GET /reports?site_id=...`, `POST /reports`, and supervisor-only `PATCH /reports/{id}`. Commits the report and any high-severity warning together, then attempts ID-only notices after commit. |
 | `api/services/hazard_photo_cleanup.py` | Dry-run helper for identifying old uploads with no report. Removal needs an explicit stopped-API assertion; do not run it against live storage during a demo. |
 | `page/supervisor/` | Authenticated risk map and report/history panel. Open reports get map pins; resolved reports stay in history. Photos are fetched with a bearer token and held only in memory while the selected site is open. |
@@ -28,19 +28,28 @@ In explicit sample mode, report writes and photo routes are intentionally absent
 1. The signed-in crew or supervisor page calls `POST /photos` with one multipart
    field named `file`. The API returns a random `photo_key`. Skip this step when
    there is no photo. The key is not a URL or an authorization credential.
-2. The page calls `POST /reports` with `site_id`, `hazard_type`, `severity`,
+2. If a crew member selects a photo, the page may call authenticated
+   `POST /photos/{photo_key}/suggestion`. This additive endpoint reads the
+   already-private upload, calls `api.photo_tag.suggest_hazard` on the server,
+   and returns `{"suggestion": {"hazard_type": "wildlife", "confidence":
+   "medium", "reason": "..."}}` or `{"suggestion": null}` if Gemini is
+   unavailable. It does not alter the upload or create a report. The crew
+   member must confirm or change the suggested category; without a suggestion,
+   the field starts empty. No Gemini credential or photo bytes go to the browser
+   from this endpoint.
+3. The page calls `POST /reports` with `site_id`, `hazard_type`, `severity`,
    `description`, optional paired `latitude`/`longitude`, and optional
    `photo_key`. The API verifies the token role and photo uploader, writes the
    report, and returns the complete saved row. A high-severity open report also
    creates a warning alert in the same transaction.
-3. The API attempts `report.created` (and, for a high-severity warning,
+4. The API attempts `report.created` (and, for a high-severity warning,
    `alert.started`) through DeepSpace **after** the database commit. Screens
    receive only IDs and refetch the protected API; the notice contains no photo
    bytes, reporter identity, or report text.
-4. The supervisor dashboard reads `/sites`, `/sites/{site_id}` and
+5. The supervisor dashboard reads `/sites`, `/sites/{site_id}` and
    `/reports?site_id=...`. `GET /photos/{photo_key}` requires an access token;
    neither the photo key nor bearer token is placed in a public `<img>` URL.
-5. A supervisor sends `PATCH /reports/{id}` with `{"status":"resolved"}`.
+6. A supervisor sends `PATCH /reports/{id}` with `{"status":"resolved"}`.
    The API records `resolved_at` and `resolved_by`, clears the report warning,
    and attempts `report.resolved`/`alert.cleared` notices after commit. Retrying
    an already-resolved report does not publish a second resolution event.
@@ -82,7 +91,9 @@ engine or commit independently.
 2. Run the frontend preview on `127.0.0.1:4174`, **not** PyCharm's
    `localhost:63342` HTML preview. The Auth0 SPA must allow the exact callback
    and web origin actually shown in the browser address bar.
-3. Sign in with an assigned crew account. Upload a small JPEG/PNG, submit a
+3. Sign in with an assigned crew account. Select a small JPEG/PNG and check
+   that an available Gemini suggestion appears without overriding a manual
+   choice. With Gemini unavailable, choose the hazard type yourself. Submit a
    high-severity report, and confirm the response has a server-owned reporter
    and `open` status. Refresh `/reports?site_id=...`; confirm the row persists.
    Confirm the same photo cannot be fetched without an authorized token.

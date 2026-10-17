@@ -14,6 +14,7 @@ export const config = {
       sites: '/sites', site: '/sites/{id}',
       alerts: '/alerts', reports: '/reports',
       photos: '/photos', photo: '/photos/{photo_key}',
+      photoSuggestion: '/photos/{photo_key}/suggestion',
       briefing: '/briefings/{id}'
     }
   },
