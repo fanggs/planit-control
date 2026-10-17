@@ -108,6 +108,12 @@ node --test page/supervisor/tests/*.test.mjs
 node --test page/crew/dev/*.test.mjs
 ```
 
+After confirming `.env` points to the **team development** Tiger Data service,
+`python -m tests.manual_hazard_tiger_smoke --run-dev-db` checks a real
+PostgreSQL save, read, and resolve inside one transaction that always rolls
+back. It does not publish a DeepSpace event or leave a test report. This does
+not substitute for an actual Auth0/browser test.
+
 ## Private storage and old unattached uploads
 
 On a server, set `PLANIT_PRIVATE_PHOTOS_DIR` to a dedicated persistent directory
