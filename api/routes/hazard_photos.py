@@ -13,7 +13,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from starlette.concurrency import run_in_threadpool
 
 from api.auth.hazard_auth import Principal, require_roles
-from api.routes.hazard_errors import HazardRoute
+from api.routes.hazard_upload_limit import BodyLimitedHazardRoute
 from api.services.hazard_photo_service import (
     MAX_PHOTO_BYTES, InvalidPhoto, PhotoNotFound, PhotoStorageUnavailable,
     PhotoTooLarge, PrivatePhotoStore,
@@ -22,6 +22,15 @@ from api.services.hazard_photo_service import (
 
 class PhotoUploadResponse(BaseModel):
     photo_key: str
+
+
+# Keep room for the multipart boundary and headers without allowing unbounded
+# extra parts. The actual image still has its own strict 5 MiB limit below.
+MAX_PHOTO_REQUEST_BYTES = MAX_PHOTO_BYTES + 64 * 1024
+
+
+class PhotoRoute(BodyLimitedHazardRoute):
+    max_body_bytes = MAX_PHOTO_REQUEST_BYTES
 
 
 def create_photo_router(
@@ -38,7 +47,7 @@ def create_photo_router(
         for candidate in (is_photo_attached, getattr(is_photo_attached, "__call__", None))
     ):
         raise ValueError("is_photo_attached must be a synchronous database callback")
-    router = APIRouter(tags=["Hazard photos"], route_class=HazardRoute)
+    router = APIRouter(tags=["Hazard photos"], route_class=PhotoRoute)
 
     @router.post("/photos", response_model=PhotoUploadResponse, status_code=201)
     async def upload_photo(
@@ -47,8 +56,8 @@ def create_photo_router(
     ):
         require_roles(principal, "crew", "supervisor")
         try:
-            # Also limit request size at the reverse proxy, before multipart
-            # spooling. This read itself never allocates an unbounded payload.
+            # PhotoRoute limits the complete request before multipart parsing.
+            # This second limit applies specifically to the selected image.
             data = await file.read(MAX_PHOTO_BYTES + 1)
             if len(data) > MAX_PHOTO_BYTES:
                 raise PhotoTooLarge("Photos must be 5 MB or smaller")
