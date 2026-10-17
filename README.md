@@ -21,7 +21,7 @@ and an explainable ML hazard index (0-10).
 ## Stack
 
 Gemini (LLM) · Tiger Data (Postgres time-series) · Auth0 (logins) ·
-DeepSpace (real-time alerts, photo storage) · Vultr (hosting) · GoDaddy (domain)
+DeepSpace (real-time alerts) · Vultr (hosting) · GoDaddy (domain)
 
 ## Setup
 
