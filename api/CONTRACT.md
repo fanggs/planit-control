@@ -1,7 +1,17 @@
 # PlanIT Control: Contract v1.1
 
 **Status:** v1.1, decided 2026-10-17 from Sid's and Aryan's AI reviews and the
-team's answers. Any change gets announced in the team chat first.
+team's answers.
+
+> **This is our base, not a frozen spec.** Build from it, but things will come up
+> once real data and code hit it (an API returns different fields, a feature
+> takes longer than planned, something doesn't work). When that happens:
+> 1. **Tell the team right away** in the chat: what you found and what it affects.
+> 2. **Work out a fix together** with whoever it touches (the owner of that area
+>    makes the final call).
+> 3. **Update this file** so it stays the shared source of truth.
+>
+> Until a change is agreed and written here, keep building against what's here.
 
 **Build order:** everything here is in scope, but the core comes first:
 60 sites → live weather → score → lightning alert → map. Everything else is
