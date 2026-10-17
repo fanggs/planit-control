@@ -1,5 +1,4 @@
-/* Commit: fix(crew): map contract site_id and hazard names in adapter
-   API fields follow api/CONTRACT.md v1.1. UI aliases stay on this side of the boundary.
+/* API fields follow api/CONTRACT.md v1.1. UI aliases stay on this side of the boundary.
    Revisions below order client requests; they are not backend data or timestamps. */
 export const HAZARD_LABELS = Object.freeze({
   heat: 'Extreme heat', lightning: 'Lightning', flooding: 'Flooding',
@@ -125,19 +124,18 @@ export function createContractMapper() {
   return {nextRevision, site, briefing};
 }
 
-/* Commit: fix(crew): bridge contract event notices and verify adapter compatibility
-   Alan supplies the DeepSpace SDK connection through this small frontend boundary.
+/* Alan supplies the DeepSpace SDK connection through this small frontend boundary.
    Events are invalidation notices: fetch authorized API data before updating screens. */
 export function subscribeContractEvents({siteId, getSource, getToken, readSite, listSites,
   onEvent, onConnection, heartbeatMs = 45000, timers = globalThis, retryBaseMs = 1000}) {
-  const types = new Set(['alert.started', 'alert.updated', 'alert.cleared', 'report.created', 'report.resolved']);
+  const types = new Set(['alert.started', 'alert.updated', 'alert.cleared', 'report.created', 'report.resolved', 'scores.updated']);
   let stopped = false, generation = 0, cleanup, retry, heartbeat, opening;
-  let connected = false, attempt = 0, queue = Promise.resolve();
+  let connected = false, confirming = false, attempt = 0, queue = Promise.resolve(), pendingScores;
   const current = gen => !stopped && gen === generation;
   const clearTimers = () => {timers.clearInterval(heartbeat); timers.clearTimeout(opening);};
   function reconnect(gen) {
     if (!current(gen)) return;
-    generation++; connected = false; clearTimers();
+    generation++; connected = false; confirming = false; pendingScores = undefined; clearTimers();
     const close = cleanup; cleanup = undefined;
     try { close?.(); } catch { /* The SDK connection is already lost. */ }
     onConnection(false);
@@ -146,35 +144,48 @@ export function subscribeContractEvents({siteId, getSource, getToken, readSite, 
   }
   async function refresh(gen, notice) {
     if (!current(gen)) return;
-    const id = siteId ?? (notice ? String(notice.site_id) : null);
-    if (id === null) {
-      await listSites();
-      if (current(gen)) onEvent({type: 'site'});
-    } else {
-      const site = await readSite(id, {refreshAlerts: true, clearedAlertId: notice?.type === 'alert.cleared' ? notice.alert_id : undefined});
-      if (!current(gen)) return;
-      onEvent({type: 'site', site_id: String(id), site});
-      if (notice?.type.startsWith('report.')) onEvent({type: 'report', site_id: String(id)});
+    if(siteId===null){
+      const sites=await listSites();
+      if(current(gen))onEvent({type:'site',sites,
+        ...(notice?.type==='scores.updated'?{site_ids:notice.site_ids.map(String)}:notice?{site_ids:[String(notice.site_id)]}:{})});
+      return;
     }
+    const id=String(siteId);
+    const site=await readSite(id,{refreshAlerts:true,clearedAlertId:notice?.type==='alert.cleared'?notice.alert_id:undefined});
+    if(!current(gen))return;
+    onEvent({type:'site',site_id:id,site});
+    if(notice?.type.startsWith('report.'))onEvent({type:'report',site_id:id});
   }
+
   function enqueue(gen, task) {
     queue = queue.then(() => current(gen) ? task() : undefined).catch(() => reconnect(gen));
   }
   async function connect() {
     if (stopped) return;
-    const gen = ++generation; queue = Promise.resolve();
+    const gen = ++generation; queue = Promise.resolve(); confirming = false; pendingScores = undefined;
     onConnection(false);
     opening = timers.setTimeout(() => reconnect(gen), heartbeatMs);
     opening?.unref?.();
     try {
-      const source = getSource();
+      const source = await getSource();
+      if(!current(gen))return;
       if (typeof source?.subscribe !== 'function') { reconnect(gen); return; }
-      const accessToken = await getToken();
+      // Check the session, but keep its bearer token on authorized API reads.
+      await getToken();
       if (!current(gen)) return;
       const unsubscribe = await source.subscribe({
-        site_id: siteId === null ? null : contractSiteId(siteId), accessToken,
+        site_id: siteId === null ? null : contractSiteId(siteId),
         onEvent(notice) {
-          if (!current(gen) || !types.has(notice?.type) || !Number.isSafeInteger(notice.site_id) || notice.site_id <= 0) return;
+          if(!current(gen)||!types.has(notice?.type))return;
+          if(notice.type==='scores.updated'){
+            if(!Array.isArray(notice.site_ids)||!notice.site_ids.length||!notice.site_ids.every(id=>Number.isSafeInteger(id)&&id>0))return;
+            if(siteId!==null&&!notice.site_ids.includes(Number(siteId)))return;
+            if(pendingScores){for(const id of notice.site_ids)pendingScores.add(id);return;}
+            const ids=new Set(notice.site_ids);pendingScores=ids;
+            enqueue(gen,async()=>{if(pendingScores===ids)pendingScores=undefined;await refresh(gen,{type:'scores.updated',site_ids:[...ids]});});
+            return;
+          }
+          if(!Number.isSafeInteger(notice.site_id)||notice.site_id<=0)return;
           if (siteId !== null && String(notice.site_id) !== String(siteId)) return;
           if (notice.type.startsWith('alert.') && (!Number.isSafeInteger(notice.alert_id) || notice.alert_id <= 0)) return;
           if (notice.type.startsWith('report.') && (typeof notice.report_id !== 'string' || !notice.report_id)) return;
@@ -182,11 +193,12 @@ export function subscribeContractEvents({siteId, getSource, getToken, readSite, 
         },
         onConnection(value) {
           if (!current(gen)) return;
-          if (!value) { if (connected) reconnect(gen); else onConnection(false); return; }
+          if(value!==true){reconnect(gen);return;}
+          if(connected||confirming)return;confirming=true;
           enqueue(gen, async () => {
             await refresh(gen);
             if (!current(gen)) return;
-            connected = true; attempt = 0; clearTimers(); onConnection(true);
+            connected = true; confirming = false; attempt = 0; clearTimers(); onConnection(true);
             // This heartbeat describes a confirmed SDK transport, not lightning-feed health.
             heartbeat = timers.setInterval(() => {if (current(gen) && connected) onEvent({type: 'heartbeat'});}, Math.max(1000, Math.floor(heartbeatMs / 3)));
             heartbeat?.unref?.();

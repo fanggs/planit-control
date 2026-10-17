@@ -43,9 +43,12 @@ reads clear scores and remain unavailable without falling back to sample data.
 - **Motion** and system reduced-motion preferences disable transitions and
   pulses. Glow is static; rendering has no permanent animation loop.
 - Initial loading and **Refresh scores** each use one bulk site-list read.
+  In live HTTP mode, DeepSpace notices and reconnection also refresh the bulk
+  list. The map consumes that snapshot without issuing another list request.
   Pan, zoom, selection, filtering and view transitions do not request scores.
-- Alerts, countdowns, reports and briefings remain in the crew screen. The
-  DeepSpace subscription connection is still separate issue #1.
+- Alerts, countdowns, reports and briefings remain in the crew screen. Live
+  score notices recolor and rerank the 60 plants through the shared listener;
+  mock mode remains explicitly synthetic and does not connect to DeepSpace.
 
 ## Refresh and verify
 

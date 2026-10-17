@@ -1,8 +1,6 @@
 /* Visual update
-Commit: feat(crew): add a colorful field-inspired visual theme
-Why: Category icons make scanning easier; decorative contour lines give PlanIT
-its own identity without adding controls, data dependencies or map claims.
-*/
+   Why: Category icons make scanning easier; decorative contour lines give PlanIT
+   its own identity without adding controls, data dependencies or map claims. */
 const paths = {
   weather:'<path d="M5 16h12a4 4 0 0 0 0-8h-.6A6 6 0 0 0 5 9a3.5 3.5 0 0 0 0 7Z"/><path d="M7 20h6m3 0h2"/>',
   heat:'<path d="M9 14.5V5a3 3 0 0 1 6 0v9.5a5 5 0 1 1-6 0Z"/><path d="M12 7v10m6-9h3m-3 4h2"/>',

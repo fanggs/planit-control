@@ -48,31 +48,50 @@ The browser never sends `reporter_id`, status, creation time or a raw image insi
 
 Archived status, briefing history, preferences and email controls are hidden by default, with their postponed code retained. Do not enable them or build endpoints until the team agrees a contract update. Crew screens do not resolve reports; `PATCH /reports/{id}` remains supervisor-owned.
 
-## Alan's DeepSpace bridge
+## DeepSpace live updates
 
-The adapter no longer opens `/events`. Alan supplies `window.PlanITCrewRealtime` before starting the workspace (or `api.realtimeSource` when constructing an HTTP adapter in tests). This is a local frontend integration interface, not a proposed backend endpoint:
+The default HTTP adapter now lazily imports Alan’s shared
+`../realtime/deepspace-source.js` listener. Public connection settings are in
+`crew-config.js` under `api.realtime` and match the shared contract. No global
+hook is required. Mock mode keeps browser-only demo events and never opens a
+DeepSpace WebSocket. Serve the `page/` folder structure so `/realtime/` exists;
+the crew local preview already supports that route.
 
-```js
-window.PlanITCrewRealtime = {
-  async subscribe({site_id, accessToken, onEvent, onConnection, onError}) {
-    // Use the team's actual DeepSpace SDK here.
-    // site_id is numeric (or null for an authorized all-site subscription).
-    // Forward each contract notice as {type: eventName, ...payload}.
-    // Call onConnection(true) only when the SDK subscription is connected.
-    // Call onConnection(false) / onError(error) on connection loss.
-    // Return a function that removes listeners and unsubscribes.
-    return () => {};
-  }
-};
-```
+Recognized notices are `alert.started`, `alert.updated`, `alert.cleared`,
+`report.created`, `report.resolved` and `scores.updated`. The last one carries
+`{site_ids: [...]}` rather than a single `site_id`. Unknown event types and
+invalid or unrelated IDs are ignored.
 
-The empty function above documents the interface only; it is not installed or treated as a working connection. Never put DeepSpace server keys in this hook.
+DeepSpace carries public IDs only. The adapter checks the Auth0 session before
+listening, but sends no bearer token to the anonymous WebSocket. All actual
+site details, scores, reports and private photos still use the authorized API.
+Notice scores or deadlines never replace an API response.
 
-Recognized notices: `alert.started`, `alert.updated`, `alert.cleared`, `report.created`, `report.resolved`, with the contract's IDs. The adapter validates and filters IDs, then fetches details from the API. It does not trust the optional notice deadline as an authoritative snapshot. Report notices also refresh the report list. Reconnection obtains a fresh token, resynchronizes the site and active alerts, and uses backoff. Site changes and sign-out remove the old subscription and timers.
+For the selected crew site, relevant notices fetch fresh site detail and
+alerts; report notices also refresh the visible report list. Global supervisor
+and Atlas subscriptions fetch one bulk site list. Their UI event includes
+`sites` and the affected `site_ids`, so rankings and map colors update without
+a duplicate list request. The supervisor refreshes its selected detail when
+that plant is affected. API read failures leave notifications disconnected.
 
-Without a provider, the screen stays disconnected. Connection heartbeats mean notification transport health only; they do not prove the lightning feed is healthy. A countdown reaching zero is not permission to resume. A matching `alert.cleared` notice plus a fresh API response without the hold can clear it; an absent alert on an ordinary snapshot stays unknown. A later nearby strike extends the deadline, and older responses cannot shorten it.
+Bursts of score notices are coalesced: at most one score refresh is in flight
+and one is queued. The affected IDs merge while waiting. Alert and report
+events retain their ordering. A confirmed reconnect fetches a fresh snapshot
+to recover changes missed offline. Retries use backoff; leaving a screen closes
+the subscription and ignores late source loads, responses and messages.
 
-An optional custom `window.PlanITCrewAPI` can still replace the HTTP adapter using the UI types in `crew-contract.d.ts`; it must perform the same contract translation and token handling itself.
+Notification connection status describes the WebSocket and API refresh, not
+the health of the lightning observation feed. A countdown reaching zero is not
+permission to resume. Only a matching `alert.cleared` notice with a fresh API
+response lacking the hold confirms clearance. Existing holds cannot be
+shortened by older responses.
+
+Advanced integrations can still supply `api.realtimeSource` to `createHTTPAPI`,
+or provide `window.PlanITCrewRealtime`. A source implements
+`subscribe({site_id,onEvent,onConnection,onError})` and returns an unsubscribe
+function (or a promise of one). Overrides do not receive Auth0 tokens.
+`window.PlanITCrewAPI` can still replace the complete HTTP adapter when custom
+transport is selected; it must implement the UI types in `crew-contract.d.ts`.
 
 ## Verification and remaining team work
 
@@ -86,6 +105,6 @@ node dev/check-api.mjs
 
 The last command is a read-only check against Alan's local API at `http://localhost:8010`. It requires `/health` to identify the server as sample data. Set `PLANIT_API_BASE_URL` for a different sample server. Its sample bearer value is not a real Auth0 token or a production authentication check.
 
-At verification, the sample server served sites, detail, alerts, briefings and reports. It did not yet register photo upload/view or report creation routes. Those flows are covered by simulated HTTP tests, pending real endpoint integration. Auth0 settings and Alan's SDK bridge are still needed for live browser testing. Test two devices, a new-strike reset, disconnect/reconnect, explicit clear, protected photo visibility and a persisted report once those services are ready. Briefing scheduling and 6 PM delivery remain backend responsibilities.
+At verification, the sample server served sites, detail, alerts, briefings and reports. It did not yet register photo upload/view or report creation routes. Those flows are covered by simulated HTTP tests, pending real endpoint integration. The shared listener is now wired and its public subscription handshake was verified. Auth0 settings and the database-backed API are still needed for end-to-end live browser testing. Test two devices, a new-strike reset, disconnect/reconnect, explicit clear, protected photo visibility and a persisted report once those services are ready. Briefing scheduling and 6 PM delivery remain backend responsibilities.
 
 Aryan owns the supervisor dashboard. `crew-supervisor.html/js` restores the original crew-owned supervisor preview, sharing crew Auth0, adapters, demo scores and the 60 monitored plants. It links to the separate `crew-atlas.html` 2D/3D map. Aryan’s dashboard files remain unchanged.

@@ -1,3 +1,4 @@
+import {watchAtlasScores} from './crew-atlas-realtime.js';
 import {config} from './crew-config.js';
 import {brandMark} from './crew-visuals.js';
 import {validScore} from './crew-domain.js';
@@ -13,6 +14,7 @@ const query=new URLSearchParams(location.search),initialSite=query.get('return_s
 const returnId=/^[1-9]\d*$/.test(initialSite||'')?initialSite:'621';
 let d3,geography,projection,ground=[],grid,width=0,height=0,ratio=1,positions=[],hits=[],raf=0,animation,pulse=0,drag,pinch,sourceAPI;
 const touches=new Map();
+let stopScoreUpdates,updatesConnected=false;
 const selected=()=>state.sites.find(s=>s.id===state.selected);
 const point=(x,y,z=0)=>atlasPoint(x,y,z,camera,width,height);
 function announce(text){$('#atlas-announcement').textContent=text;}
@@ -169,14 +171,24 @@ on(canvas,'keydown',e=>{
 });
 on(document,'visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(raf);raf=0;if(animation)Object.assign(camera,animation.to);animation=null;pulse=0;}else request();});
 const resize=new ResizeObserver(build);resize.observe(canvas);
-on(window,'pagehide',()=>{cancelAnimationFrame(raf);raf=0;});on(window,'pageshow',e=>{if(e.persisted)build();});
+on(window,'pagehide',()=>{stopScoreUpdates?.();stopScoreUpdates=undefined;updatesConnected=false;cancelAnimationFrame(raf);raf=0;});on(window,'pageshow',e=>{if(e.persisted){build();if(config.dataMode==='live')void refreshScores().then(startScoreUpdates);}});
+function scoreStatus(){
+  const scored=state.sites.filter(s=>validScore(s.score)).length;
+  $('#atlas-data-status').textContent=state.scoreState==='unavailable'?'VERIFIED LOCATIONS / SCORE FEED UNAVAILABLE':config.dataMode==='mock'?`SAMPLE SCORES · ${scored} REAL PLANT LOCATIONS`:`${scored} OF 60 SCORES · ${updatesConnected?'LIVE UPDATES':'UPDATES DISCONNECTED'}`;
+}
+function startScoreUpdates(){
+  if(config.dataMode!=='live'||!sourceAPI||stopScoreUpdates)return;
+  stopScoreUpdates=watchAtlasScores({api:sourceAPI,roster:state.roster,
+    onSites(sites){state.sites=sites;state.scoreState='connected';filter();scoreStatus();},
+    onConnection(connected){updatesConnected=connected;scoreStatus();},onError(error){announce(error.message);}});
+}
 async function refreshScores(){
   const button=$('#atlas-data-refresh');button.disabled=true;
   try{
     if(config.dataMode==='live'&&!sourceAPI){const auth=await import('./crew-auth.js');await auth.initAuth();const user=await auth.session();const {userRoles}=await import('./crew-routing.js');if(!user||!userRoles(user,config.authRoleClaim).length){button.textContent='Sign in for scores ↗';button.onclick=()=>{location.href='login.html?start=1&site='+encodeURIComponent(state.selected);};throw new Error('Sign in to load scores. Location data remains available.');}sourceAPI=(await import('./crew-services.js')).services;}
     sourceAPI??=(await import('./crew-services.js')).services;
     state.sites=atlasSummaries(state.roster,await sourceAPI.listSites());state.scoreState='connected';filter();
-    const scored=state.sites.filter(s=>validScore(s.score)).length;$('#atlas-data-status').textContent=config.dataMode==='mock'?`SAMPLE SCORES · ${scored} REAL PLANT LOCATIONS`:`EIA LOCATIONS / ${scored} OF 60 SCORES AVAILABLE`;button.textContent='Refresh scores ↻';
+    scoreStatus();button.textContent='Refresh scores ↻';
   }catch(error){state.sites=atlasSummaries(state.roster,[]);state.scoreState='unavailable';filter();$('#atlas-data-status').textContent='VERIFIED LOCATIONS / SCORE FEED UNAVAILABLE';announce(error.message);}
   finally{button.disabled=false;}
 }
@@ -194,7 +206,7 @@ async function boot(){
     $('#atlas-toggle-panel').setAttribute('aria-expanded',String(innerWidth>900));renderList();renderInspection();motion();
     const [,states]=await Promise.all([import('./crew-vendor/d3-7.9.0.min.js'),getJSON('./crew-data/atlas-us-states.json')]);d3=globalThis.d3;geography=states;build();$('#atlas-loading').hidden=true;
     if(query.get('view')==='3d')switchMode('3d');saveView();
-    $('#atlas-data-refresh').hidden=false;await refreshScores();
+    $('#atlas-data-refresh').hidden=false;await refreshScores();startScoreUpdates();
   }catch(error){$('#atlas-loading').hidden=false;$('#atlas-loading').textContent=error.message+' The plant list remains available if the roster loaded.';announce(error.message);}
 }
 boot();

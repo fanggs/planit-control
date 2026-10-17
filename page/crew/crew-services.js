@@ -1,7 +1,4 @@
-/* Frontend part 3
-Commit: feat(crew): isolate persistent demo data from live services
-Why: Allow reproducible local demos while keeping browser-only storage and synthetic conditions clearly distinct from the real backend.
-*/
+/* Why: Allow reproducible local demos while keeping browser-only storage and synthetic conditions clearly distinct from the real backend. */
 import './crew-integration.js';
 import {config} from './crew-config.js';
 import {accessToken} from './crew-auth.js';

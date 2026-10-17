@@ -1,7 +1,4 @@
-/* Frontend part 6
-Commit: feat(crew): assemble crew workspace and supervisor preview
-Why: Assemble previously tested modules into simple crew navigation and an isolated supervisor handoff, retaining alerts across views.
-*/
+/* Why: Assemble previously tested modules into simple crew navigation and an isolated supervisor handoff, retaining alerts across views. */
 import {config} from './crew-config.js';
 import {userRoles} from './crew-routing.js';
 import {HAZARD_LABELS} from './crew-integration.js';
@@ -49,7 +46,7 @@ async function loadSite(id){
       if(event.type==='site')refreshSite(version,event.site);
       if(event.type==='report'){state.reports?.refresh();message(config.dataMode==='mock'?'Sample report updated on this browser.':'A site report was updated.');}
       if(event.type==='briefing')message('Briefing information changed. Open Briefing to refresh it.');
-    },connected=>{if(version!==state.loadVersion)return;const was=state.connected;state.connected=Boolean(connected)&&navigator.onLine;if(connected)state.lastEvent=Date.now();updateAlert();if(state.connected&&!was){refreshSite(version);state.reports?.refresh();}});
+    },connected=>{if(version!==state.loadVersion)return;const was=state.connected;state.connected=Boolean(connected)&&navigator.onLine;if(connected)state.lastEvent=Date.now();updateAlert();if(state.connected&&!was){if(config.dataMode==='mock'||config.transport==='custom')refreshSite(version);state.reports?.refresh();}});
     if(version!==state.loadVersion){if(typeof unsubscribe==='function')unsubscribe();return;}
     if(typeof unsubscribe==='function')state.unsubscribe=unsubscribe;
   }catch(error){if(version!==state.loadVersion)return;if(state.site){state.connected=false;updateAlert();message(error.message);}else unavailable(error);}

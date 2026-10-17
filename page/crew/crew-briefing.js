@@ -1,7 +1,4 @@
-/* Frontend part 5
-Commit: feat(crew): add photo reporting and next-day briefing flows
-Why: Confirm stored report receipts and preserve retry IDs; show site-local delivery preferences without pretending that a browser schedules server jobs.
-*/
+/* Why: Confirm stored report receipts and preserve retry IDs; show site-local delivery preferences without pretending that a browser schedules server jobs. */
 import {config} from './crew-config.js';
 import {services} from './crew-services.js';
 import {esc,dateLabel,sourceLink} from './crew-ui.js';

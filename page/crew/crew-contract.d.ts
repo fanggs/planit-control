@@ -13,11 +13,12 @@ export type APIReport = APIReportCreate & {id:string; reporter_id:string; status
 export type APISiteDetail = {site_id:number; name:string; utility:string; state:string; county:string; latitude:number; longitude:number; timezone:string; plant_type:string; hazard_region:string; latest_weather:APIWeather|null; score:APIScore|null; active_alerts:APIAlert[]; environmental_events:APIEnvironmentalEvent[]; recent_reports:APIReport[]};
 export type APIBriefing = {site_id:number; for_date:string; generated_at:string; text:string; inputs:{forecast_valid_from:string; score_scored_at:string}};
 export type APIError = {error:{code:string; message:string}};
-export type ContractNotice =
+export type ContractNotice = (
   | {type:'alert.started'|'alert.cleared'; alert_id:number; site_id:number}
   | {type:'alert.updated'; alert_id:number; site_id:number; clear_at:string}
-  | {type:'report.created'; report_id:string; site_id:number; created_at:string}
-  | {type:'report.resolved'; report_id:string; site_id:number};
+  | {type:'report.created'|'report.resolved'; report_id:string; site_id:number}
+  | {type:'scores.updated'; site_ids:number[]}
+) & {sent_at?:string};
 
 // UI-only types. revision/version are local request-order counters, not API fields.
 type LightningAlert = {site_id:string; version:number; status:'hold'|'cleared'|'unknown'; all_clear_at:string|null; last_strike_at?:string|null; distance_miles?:number|null; contract_id?:number|string|null};
@@ -32,7 +33,7 @@ type BriefingSummary = {id:string; site_id:string; title:string; valid_date:stri
 type Briefing = BriefingSummary & {timezone:string|null; body:string; forecast:{name:string; reading:string|null; advice?:string}[]; sources:Source[]; inputs?:APIBriefing['inputs']};
 // Retained for postponed functionality and local storage; not API v1.1 endpoints.
 type Preferences = {site_id:string; enabled:boolean; local_time:'18:00'; timezone:string; channels:('in_app'|'email')[]; email?:string|null; next_run_at:string|null; delivery_status:string};
-type StreamEvent = {type:'heartbeat'|'site'|'alert'|'report'|'briefing'; site_id?:string; server_time?:string; site?:Site; alert?:LightningAlert; report?:Report};
+type StreamEvent = {type:'heartbeat'|'site'|'alert'|'report'|'briefing'; site_id?:string; site_ids?:string[]; sites?:SiteSummary[]; server_time?:string; site?:Site; alert?:LightningAlert; report?:Report};
 type AuthOptions = {accessToken:string};
 interface PlanITCrewAPI {
   listSites(options?:AuthOptions):Promise<SiteSummary[]>;
@@ -46,7 +47,7 @@ interface PlanITCrewAPI {
   subscribeEvents(siteId:string|null,onEvent:(event:StreamEvent)=>void,onConnection:(connected:boolean)=>void,options?:AuthOptions):Promise<()=>void>|(()=>void);
 }
 interface PlanITCrewRealtime {
-  subscribe(options:{site_id:number|null; accessToken:string; onEvent:(notice:ContractNotice)=>void; onConnection:(connected:boolean)=>void; onError:(error?:unknown)=>void}):Promise<()=>void>|(()=>void);
+  subscribe(options:{site_id:number|null; onEvent:(notice:ContractNotice)=>void; onConnection:(connected:boolean)=>void; onError:(error?:unknown)=>void}):Promise<()=>void>|(()=>void);
 }
 declare global {interface Window {PlanITCrewAPI?:PlanITCrewAPI; PlanITCrewRealtime?:PlanITCrewRealtime;}}
 export {Site,SiteSummary,LightningAlert,Hazard,Report,ReportInput,Briefing,Preferences,StreamEvent,PlanITCrewAPI,PlanITCrewRealtime};

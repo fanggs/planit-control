@@ -1,7 +1,4 @@
-/* Frontend part 4
-Commit: feat(crew): add accessible hazard and score components
-Why: Use scoped styles and reusable evidence-aware components so crew screens remain consistent without replacing the shared design system.
-*/
+/* Why: Use scoped styles and reusable evidence-aware components so crew screens remain consistent without replacing the shared design system. */
 import {hazards,validScore,riskLabel} from './crew-domain.js';
 import {contributionLabel} from './crew-state.js';
 import {icon} from './crew-visuals.js';

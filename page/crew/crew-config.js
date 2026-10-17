@@ -1,7 +1,4 @@
-/* Frontend part 2
-Commit: feat(crew): add authenticated backend connection adapters
-Why: Keep authentication and configurable network contracts separate from the UI; a failed live request must never become a synthetic success.
-*/
+/* Why: Keep authentication and configurable network contracts separate from the UI; a failed live request must never become a synthetic success. */
 // Isaiah-owned frontend settings. Public identifiers only. Never put a client secret here.
 export const config = {
   dataMode: 'mock', // Switch to 'live' after configuring Auth0 and the HTTP or custom adapter.
@@ -11,6 +8,7 @@ export const config = {
     baseURL: '', // For example https://api.your-domain.example; public URL, never secrets.
     timeoutMs: 20000,
     heartbeatMs: 45000,
+    realtime: {baseURL: 'https://planit-realtime.app.space', appId: 'app_01M557EC8CQY7VDN5253P86ZBN'},
     photoField: 'file', // Confirm the multipart field name with Aryan; v1.1 does not specify it.
     routes: {
       sites: '/sites', site: '/sites/{id}',

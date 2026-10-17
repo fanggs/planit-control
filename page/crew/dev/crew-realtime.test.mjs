@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {createHTTPAPI} from '../crew-http.js';
+import {subscribeContractEvents} from '../crew-integration.js';
 const fixture=JSON.parse(await fs.readFile(new URL('./fixtures/contract-v1.1.json',import.meta.url)));
 const json=value=>new Response(JSON.stringify(value),{headers:{'Content-Type':'application/json'}});
 const flush=()=>new Promise(resolve=>setImmediate(resolve));
@@ -12,18 +13,19 @@ function clock(){
 function harness(){
   const timers=clock(),events=[],connections=[],requests=[],callbacks=[];
   let closes=0,tokens=0,alerts=structuredClone(fixture.alerts),fail=false;
+  const details=structuredClone(fixture.details['9001']),sites=structuredClone(fixture.sites);
   const source={subscribe(options){callbacks.push(options);return()=>{closes++;};}};
   const api=createHTTPAPI({baseURL:'https://example.test',realtimeSource:source,timers},async()=>`token-${++tokens}`,async url=>{
     requests.push(url.pathname);if(fail)throw new TypeError('API unavailable');
-    return json(url.pathname==='/alerts'?alerts:url.pathname==='/sites'?fixture.sites:fixture.details['9001']);
+    return json(url.pathname==='/alerts'?alerts:url.pathname==='/sites'?sites:details);
   });
-  return {api,timers,events,connections,requests,callbacks,get closes(){return closes;},get alerts(){return alerts;},set alerts(value){alerts=value;},set fail(value){fail=value;}};
+  return {api,timers,events,connections,requests,callbacks,details,sites,get closes(){return closes;},get tokens(){return tokens;},get alerts(){return alerts;},set alerts(value){alerts=value;},set fail(value){fail=value;}};
 }
 test('ID-only notices refetch details; unrelated sites and old custom event names are ignored',async()=>{
   const h=harness(),stop=h.api.subscribeEvents('9001',e=>h.events.push(e),c=>h.connections.push(c));
   await flush();h.callbacks[0].onConnection(true);await flush();
   assert.equal(h.connections.at(-1),true);assert.equal(h.events.at(-1).site.alert.status,'hold');
-  assert.equal(h.callbacks[0].site_id,9001);assert.equal(h.callbacks[0].accessToken,'token-1');
+  assert.equal(h.callbacks[0].site_id,9001);assert.equal(h.callbacks[0].accessToken,undefined);assert.ok(h.tokens>=3);
   const count=h.requests.length;
   h.callbacks[0].onEvent({type:'alert.updated',site_id:9002,alert_id:103,clear_at:'2026-10-17T19:00:00Z'});
   h.callbacks[0].onEvent({type:'alert',site_id:9001,alert:{status:'cleared'}});await flush();
@@ -52,7 +54,7 @@ test('reconnect gets a fresh token and snapshot; cleanup stops retries, heartbea
   for(const {fn} of h.timers.intervals.values())fn();assert.equal(h.events.at(-1).type,'heartbeat');
   h.callbacks[0].onError();assert.equal(h.connections.at(-1),false);assert.equal(h.closes,1);
   assert.equal(h.timers.intervals.size,0);assert.equal([...h.timers.timeouts.values()][0].ms,1000);
-  h.timers.next();await flush();assert.equal(h.callbacks.length,2);assert.notEqual(h.callbacks[1].accessToken,h.callbacks[0].accessToken);
+  const previousTokens=h.tokens;h.timers.next();await flush();assert.equal(h.callbacks.length,2);assert.ok(h.tokens>previousTokens);assert.equal(h.callbacks[1].accessToken,undefined);
   h.callbacks[1].onConnection(true);await flush();assert.equal(h.connections.at(-1),true);
   stop();const count=h.events.length;
   h.callbacks[1].onEvent({type:'alert.started',site_id:9001,alert_id:101});await flush();
@@ -67,4 +69,55 @@ test('API failures keep notifications disconnected and an unconfigured provider 
   const close=api.subscribeEvents('9001',()=>{},value=>connections.push(value));await flush();
   assert.equal(requested,false);assert.equal(connections.at(-1),false);assert.equal(timers.timeouts.size,1);
   close();assert.equal(timers.timeouts.size,0);
+});
+
+test('score batches update the selected site from the API and ignore unrelated or malformed ID lists',async()=>{
+  const h=harness(),stop=h.api.subscribeEvents('9001',e=>h.events.push(e),c=>h.connections.push(c));
+  try{
+    await flush();h.callbacks[0].onConnection(true);await flush();const count=h.requests.length;
+    for(const site_ids of [undefined,null,[],[9002],['9001'],[9001,-1],[9001,1.5],[9001,Number.MAX_SAFE_INTEGER+1]])h.callbacks[0].onEvent({type:'scores.updated',site_ids});
+    await flush();assert.equal(h.requests.length,count);
+    h.details.score.score=8.8;h.details.score.factors[0].contribution+=.6;
+    for(let n=0;n<50;n++)h.callbacks[0].onEvent({type:'scores.updated',site_ids:[9001,9001],score:10});
+    await flush();assert.equal(h.requests.length,count+2);
+    assert.equal(h.events.at(-1).site.score,8.8);assert.equal(h.events.at(-1).site.score_reconciles,true);
+  }finally{stop();}
+});
+
+test('global listeners refetch one bulk list for scores, alerts and reports, including reconnect recovery',async()=>{
+  const h=harness(),stop=h.api.subscribeEvents(null,e=>h.events.push(e),c=>h.connections.push(c));
+  try{
+    await flush();h.callbacks[0].onConnection(true);await flush();assert.deepEqual(h.requests,['/sites']);
+    h.sites[0].score=9;
+    for(let n=0;n<50;n++)h.callbacks[0].onEvent({type:'scores.updated',site_ids:[9001,n%2?9002:9003]});
+    await flush();assert.equal(h.requests.length,2);assert.equal(h.events.at(-1).sites[0].score,9);
+    assert.deepEqual(new Set(h.events.at(-1).site_ids),new Set(['9001','9002','9003']));
+    const notices=[{type:'alert.started',alert_id:101},{type:'alert.updated',alert_id:101},{type:'alert.cleared',alert_id:101},{type:'report.created',report_id:'report-id'},{type:'report.resolved',report_id:'report-id'}];
+    for(const notice of notices){h.callbacks[0].onEvent({...notice,site_id:9001});await flush();assert.equal(h.events.at(-1).type,'site');assert.deepEqual(h.events.at(-1).site_ids,['9001']);}
+    assert.ok(h.requests.every(path=>path==='/sites'));assert.equal(h.requests.length,7);
+    h.callbacks[0].onConnection(false);h.sites[0].score=null;h.timers.next();await flush();h.callbacks[1].onConnection(true);await flush();
+    assert.equal(h.events.at(-1).sites[0].score,null);assert.equal(h.connections.at(-1),true);
+  }finally{stop();}
+});
+
+test('a socket that closes before acknowledgement retries immediately and does not duplicate handshake snapshots',async()=>{
+  const h=harness(),stop=h.api.subscribeEvents('9001',e=>h.events.push(e),c=>h.connections.push(c));
+  try{
+    await flush();h.callbacks[0].onConnection(false);assert.equal(h.closes,1);assert.equal([...h.timers.timeouts.values()][0].ms,1000);
+    h.timers.next();await flush();h.callbacks[1].onConnection(true);h.callbacks[1].onConnection(true);await flush();
+    assert.equal(h.requests.length,2);assert.equal(h.timers.intervals.size,1);
+  }finally{stop();}
+});
+
+test('score bursts during a slow read allow only one active and one pending score refresh',async()=>{
+  const timers=clock(),reads=[],delivered=[];let callbacks,blocked=false;
+  const stop=subscribeContractEvents({siteId:'621',timers,getSource:()=>({subscribe(value){callbacks=value;return()=>{};}}),getToken:async()=>'token',
+    readSite:async()=>{if(!blocked)return {id:'621',score:1};return new Promise(resolve=>reads.push(resolve));},listSites:async()=>[],onEvent:event=>delivered.push(event),onConnection(){}});
+  try{
+    await flush();callbacks.onConnection(true);await flush();blocked=true;
+    callbacks.onEvent({type:'scores.updated',site_ids:[621]});await flush();assert.equal(reads.length,1);
+    for(let n=0;n<100;n++)callbacks.onEvent({type:'scores.updated',site_ids:[621]});await flush();assert.equal(reads.length,1);
+    reads[0]({id:'621',score:2});await flush();assert.equal(reads.length,2);
+    reads[1]({id:'621',score:3});await flush();assert.equal(reads.length,2);assert.equal(delivered.at(-1).site.score,3);
+  }finally{stop();}
 });

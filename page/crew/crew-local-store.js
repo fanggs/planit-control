@@ -1,7 +1,4 @@
-/* Frontend part 3
-Commit: feat(crew): isolate persistent demo data from live services
-Why: Allow reproducible local demos while keeping browser-only storage and synthetic conditions clearly distinct from the real backend.
-*/
+/* Why: Allow reproducible local demos while keeping browser-only storage and synthetic conditions clearly distinct from the real backend. */
 // Browser-only demonstration storage. This is not DeepSpace or the team's shared database.
 let connection;
 async function db(){

@@ -4,7 +4,7 @@ These commits organize an already-developed frontend into reviewable implementat
 
 All new application/tooling files live under `page/crew/`. `page/crew.html` is a small entry redirect. Existing team files, backend schema, supervisor dashboard and shared styles are not overwritten. The supervisor in this package is a separate integration preview that Aryan can adopt or replace.
 
-Each first-party module starts with its part number, matching commit title and a short explanation. Third-party Leaflet files and machine-readable JSON remain intact. More specific comments explain why deadlines, event ordering, explicit server clears, upload retries and unit preservation matter.
+Commit history records each implementation part and its message; application comments keep only useful technical rationale. Third-party Leaflet files and machine-readable JSON remain intact. More specific comments explain why deadlines, event ordering, explicit server clears, upload retries and unit preservation matter.
 
 | Part | Commit message | Files / responsibility | Why this boundary helps |
 |---|---|---|---|
@@ -50,3 +50,17 @@ For source attribution, the plant-data provenance is in `crew-data/atlas-source.
 The welcome page follows the sparse, near-black composition of the supplied Deepsec reference, with original PlanIT copy and code-native grid/network artwork. `crew-dark.css` keeps the same palette across login, crew, reports, briefings, and the separate supervisor preview. Severity wording stays visible independently of color.
 
 `crew-entry.js` consumes the Auth0 callback and chooses the workspace from the account’s configured role claim. It imports the workspace in the same document, preserving the memory-only SDK session. Unknown roles get an access message; query parameters cannot grant roles. The backend remains responsible for authorization. See AUTH0-HANDOFF.md for application URLs and hosted-login branding.
+
+
+## DeepSpace integration
+
+Issue #1 is implemented in the default HTTP adapter. Public listener settings
+are in `crew-config.js`; `crew-realtime-source.js` imports the shared listener
+only when live subscriptions start. `scores.updated` supports batch IDs and
+coalesced refetches. Global listeners deliver bulk snapshots to the supervisor
+preview and Atlas. Demo mode stays local. Commit-message comments were removed
+from application sources while retaining useful implementation rationale.
+
+The external bridge accepted a read-only subscription during verification.
+Full authenticated live browser testing still requires the team’s Auth0 and API
+configuration. No events were published by the connectivity check.

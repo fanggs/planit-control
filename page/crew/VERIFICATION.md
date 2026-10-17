@@ -142,3 +142,31 @@ Auth0 login/role claims, API CORS, actual feeds/10-mile server decisions, DeepSp
   Final desktop preview had no horizontal overflow or browser console errors.
 - Aryan’s independent `page/supervisor/` files remain unchanged. Live Auth0
   and backend operation were not exercised; current conditions are samples.
+
+
+## Issue #1 · DeepSpace crew integration · October 17, 2026
+
+- Default live HTTP subscriptions now lazily load Alan’s unchanged shared
+  `page/realtime/deepspace-source.js` with the contract’s public URL and app ID.
+- Added `scores.updated` batch-ID validation, selected-site filtering, coalesced
+  score refetches, and global authorized snapshots for the supervisor and Atlas.
+- Auth0 tokens remain on API requests and never enter the anonymous WebSocket.
+  Existing lightning reset/clear ordering, reconnect snapshots, backoff and
+  unsubscribe behavior remain covered. Early disconnects retry immediately.
+- `node dev/check.mjs`: passed. `node --test`: 71 passed, none failed. The
+  protocol test also passed after replacing polling with a socket-ready signal.
+- Tests drive Alan’s actual listener with a WebSocket double and simulated
+  authorized API responses; cover all six notice types, malformed/unrelated
+  batches, burst limits, global rankings, Atlas allowlisting, stale responses,
+  deferred source/subscription cleanup and default demo isolation.
+- A separate read-only subscription to the real public bridge was acknowledged
+  successfully. No notices were published, and no credentials were sent.
+- Browser demo regression: Fort Peck crew screen connected to its sample
+  stream, reports remained readable, and the Atlas displayed all 60 plants
+  with an explicit sample-score label. No live connection was claimed.
+- Commit-message metadata was removed from first-party application comments;
+  useful technical rationale, third-party code and licenses were preserved.
+- End-to-end authenticated live browser operation still requires team Auth0
+  and API/database configuration. The preview intentionally remains mock mode.
+- Only page/crew files changed. Shared listener, API, database and Aryan’s
+  independent supervisor application are untouched.

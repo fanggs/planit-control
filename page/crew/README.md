@@ -30,7 +30,7 @@ See **CREW-ATLAS.md** for roster refresh, controls and integration.
 6. **Photo reports:** optional JPEG/PNG up to 5 MB, preview, map click or draggable pin, accessible paired coordinates, validation, two-step upload/report state, stored receipt, open/all/resolved filters and report-map pins. Archived controls remain hidden.
 7. **Supervisor workspace:** the original dark dashboard with colored summary cards, search/state/risk filters, risk ranking, site overview, selected-site score/flood details and crew observations. It uses the same 60-plant roster and demo storage as the crew screen. **Open 2D / 3D map** opens the separate Atlas with the selected plant. Aryan’s dashboard files remain unchanged.
 8. **Explainable 0–10 model display:** validated score, signed contributions in score points, baseline, model version, score time and forecast horizon. Mismatched totals show an unavailable explanation; missing values never become zero. Training/evaluation fields render only when supplied.
-9. **Backend adapters:** authenticated contract REST requests, separate photo upload and JSON report creation, protected image reads, and an ID-notice bridge for Alan's DeepSpace source with refetch, reconnect and cleanup. No legacy `/events` request or invented pagination.
+9. **Backend adapters:** authenticated contract REST requests, separate photo upload and JSON report creation, protected image reads, and Alan’s shared DeepSpace listener with ID validation, batched score refresh, reconnect and cleanup. No legacy `/events` request or invented pagination.
 10. **Auth0 entry points:** Universal Login, callback handling and sign-out. Sample access is available only in mock mode. Supervisor live entry checks a configurable roles claim; the API must independently enforce authorization.
 
 ## Connect the backend
@@ -38,10 +38,10 @@ See **CREW-ATLAS.md** for roster refresh, controls and integration.
 Read **BACKEND-CONNECTION.md** first. An adapter is a small translation layer between your team's API and the fields the screens expect.
 
 - Set public Auth0 identifiers, API URL and route mapping in `crew-config.js`.
-- Use the included HTTP adapter and connect Alan's SDK through `window.PlanITCrewRealtime`. An optional custom `window.PlanITCrewAPI` must supply the existing UI shapes.
+- Use the included HTTP adapter and use the included default DeepSpace listener configured under `api.realtime`. An optional custom `window.PlanITCrewAPI` must supply the existing UI shapes.
 - `crew-contract.d.ts` separates API types from UI display aliases. `crew-integration.js` translates between them; `api/CONTRACT.md` v1.1 remains authoritative.
 - Confirm `api.photoField` with Aryan. The contract specifies multipart images but not the field name; the configurable default is `file`.
-- Change `dataMode` to `live` only after these are configured. Live failures show errors and never substitute synthetic data.
+- Change `dataMode` to `live` only after these are configured. Live failures show errors and never substitute synthetic data. The six contract event types—including `scores.updated`—refresh crew details, reports, supervisor rankings and Atlas colors automatically.
 
 ## Local demonstration limits
 

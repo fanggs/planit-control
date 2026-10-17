@@ -1,5 +1,5 @@
-/* Contract HTTP transport. Screens consume mapped UI objects, never raw API DTOs.
-   Commit: fix(crew): map contract site_id and hazard names in adapter */
+/* Contract HTTP transport. Screens consume mapped UI objects, never raw API DTOs. */
+import {createCrewRealtimeProvider} from './crew-realtime-source.js';
 import {contractSiteId, createContractMapper, mapSiteSummary, mapReport, subscribeContractEvents} from './crew-integration.js';
 import {createHazardReportPayload, validateReportPhoto, MAX_PHOTO_BYTES} from './crew-report-mapping.js';
 
@@ -17,6 +17,7 @@ export class CrewAPIError extends Error {
 
 export function createHTTPAPI(settings, getToken, fetcher = fetch) {
   const mapper = createContractMapper();
+  const getRealtimeSource = createCrewRealtimeProvider(settings);
   const briefingCache = new Map();
   const uploads = new Map(), receipts = new Map(), uncertainReports = new Set(), submissions = new Map();
   function url(route, params = {}, query = {}) {
@@ -158,7 +159,7 @@ export function createHTTPAPI(settings, getToken, fetcher = fetch) {
   }
   function subscribeEvents(siteId, onEvent, onConnection) {
     return subscribeContractEvents({siteId: siteId === null ? null : String(contractSiteId(siteId)),
-      getSource: () => settings.realtimeSource || globalThis.window?.PlanITCrewRealtime,
+      getSource: getRealtimeSource,
       getToken, readSite, listSites, onEvent, onConnection,
       heartbeatMs: settings.heartbeatMs, timers: settings.timers || globalThis, retryBaseMs: settings.retryBaseMs});
   }

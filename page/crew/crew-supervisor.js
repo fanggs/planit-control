@@ -1,7 +1,4 @@
-/* Frontend part 6
-Commit: feat(crew): assemble crew workspace and supervisor preview
-Why: Assemble previously tested modules into simple crew navigation and an isolated supervisor handoff, retaining alerts across views.
-*/
+/* Why: Assemble previously tested modules into simple crew navigation and an isolated supervisor handoff, retaining alerts across views. */
 // Separate integration preview. This does not replace Aryan's owned dashboard files.
 import {icon,brandMark,contourArt} from './crew-visuals.js';
 import {config} from './crew-config.js';
@@ -38,15 +35,15 @@ async function open(){
     document.getElementById('supervisor-logout').onclick=async()=>{state.version++;state.unsubscribe?.();state.map?.remove();await signOut();login();};
     applyFilters();
     const version=++state.version;const unsubscribe=await services.subscribeEvents(null,event=>{
-      if(version!==state.version)return;state.lastEvent=Date.now();if(event.type==='site'||event.type==='alert')refresh();if(event.type==='report'&&String(event.site_id)===String(state.selected))selectSite(state.selected,false);
+      if(version!==state.version)return;state.lastEvent=Date.now();if(event.type==='site'||event.type==='alert')refresh(event.sites,event.site_ids);if(event.type==='report'&&String(event.site_id)===String(state.selected))selectSite(state.selected,false);
     },connected=>{if(version!==state.version)return;state.connected=connected;if(connected)state.lastEvent=Date.now();updateStream();});
     if(version===state.version)state.unsubscribe=unsubscribe;else unsubscribe?.();
   }catch(error){if(document.getElementById('supervisor-map'))message(error.message);else login(error.message);}
 }
 function updateStream(){const element=document.getElementById('supervisor-stream');if(!element)return;if(!navigator.onLine||Date.now()-state.lastEvent>config.api.heartbeatMs)state.connected=false;element.textContent=state.connected?(config.dataMode==='mock'?'Sample updates':'Live updates'):'Updates disconnected';}
-async function refresh(){
+async function refresh(incoming,affectedIds){
   const version=state.version,listVersion=++state.listVersion,button=document.getElementById('supervisor-refresh');if(!button)return;button.disabled=true;
-  try{const sites=await services.listSites();if(version!==state.version||listVersion!==state.listVersion)return;if(!Array.isArray(sites))throw new Error('Invalid site list.');state.sites=sites;applyFilters();if(state.selected)await selectSite(state.selected,false);}catch(error){message(error.message);}finally{if(button.isConnected&&listVersion===state.listVersion)button.disabled=false;}
+  try{const sites=Array.isArray(incoming)?incoming:await services.listSites();if(version!==state.version||listVersion!==state.listVersion)return;if(!Array.isArray(sites))throw new Error('Invalid site list.');state.sites=sites;applyFilters();if(state.selected&&(!Array.isArray(affectedIds)||affectedIds.includes(state.selected)))await selectSite(state.selected,false);}catch(error){message(error.message);}finally{if(button.isConnected&&listVersion===state.listVersion)button.disabled=false;}
 }
 function applyFilters(reset=false){
   if(reset)state.page=0;state.filtered=rankSites(state.sites,filters());

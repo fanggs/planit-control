@@ -76,9 +76,9 @@ Auth0's API calls are not simulated as successful in the preview.
 
 The HTTP adapter now maps `api/CONTRACT.md` v1.1, including numeric site IDs,
 nested score explanations, two-step photo/report creation, protected photo reads
-and the latest briefing endpoint. See `BACKEND-CONNECTION.md` for Alan's
-`window.PlanITCrewRealtime` bridge. Live browser integration still requires
-Auth0 settings, the actual SDK provider and the backend's photo/report routes.
+and the latest briefing endpoint. See `BACKEND-CONNECTION.md` for the default
+shared DeepSpace listener and optional provider overrides. Live browser integration still requires
+Auth0 settings and the backend’s photo/report routes. The shared DeepSpace provider is already connected in the default adapter.
 Contract v1.1 remains authoritative.
 
 References:

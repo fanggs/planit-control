@@ -1,5 +1,4 @@
-/* Commit: feat(crew): route verified users to their role workspace
-   Why: A URL or demo selection must never grant supervisor access. */
+/* Why: A URL or demo selection must never grant supervisor access. */
 export function userRoles(user, claim) {
   const roles = user?.[claim];
   return Array.isArray(roles)

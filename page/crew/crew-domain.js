@@ -1,7 +1,4 @@
-/* Frontend part 1
-Commit: feat(crew): establish national sites and safety state
-Why: Keep absolute deadlines, version ordering and missing-data handling independent of rendering so safety behavior can be tested.
-*/
+/* Why: Keep absolute deadlines, version ordering and missing-data handling independent of rendering so safety behavior can be tested. */
 export const hazards = [
   ['weather','Weather','Wind, rain & visibility'], ['heat','Extreme heat','Heat exposure'],
   ['lightning','Lightning','Nearby strikes'], ['flood','Flooding','River & surface water'],

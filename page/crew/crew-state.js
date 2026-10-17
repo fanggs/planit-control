@@ -1,7 +1,4 @@
-/* Frontend part 1
-Commit: feat(crew): establish national sites and safety state
-Why: Keep absolute deadlines, version ordering and missing-data handling independent of rendering so safety behavior can be tested.
-*/
+/* Why: Keep absolute deadlines, version ordering and missing-data handling independent of rendering so safety behavior can be tested. */
 // Pure functions: no browser, network or timers. This makes the critical alert behavior testable.
 export function remainingSeconds(deadline, now = Date.now()) {
   const timestamp = Date.parse(deadline);

@@ -1,9 +1,7 @@
 /* Visual update
-Commit: feat(crew): add a colorful field-inspired visual theme
-Why: Muted category colors aid recognition. Severity labels keep a separate,
-consistent red/amber/green vocabulary, so color never replaces safety wording.
-All rules remain within Isaiah's package and inherit the shared forest token.
-*/
+   Why: Muted category colors aid recognition. Severity labels keep a separate,
+   consistent red/amber/green vocabulary, so color never replaces safety wording.
+   All rules remain within Isaiah's package and inherit the shared forest token. */
 .planit-crew {
   --crew-ink: var(--ink, #203d34);
   --crew-muted: var(--muted, #586d64);

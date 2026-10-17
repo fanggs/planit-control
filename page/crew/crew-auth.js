@@ -1,5 +1,4 @@
-/* Commit: feat(crew): connect welcome login to Auth0 and role routing
-   Why: Keep the callback and workspace in one document so memory-only tokens survive. */
+/* Why: Keep the callback and workspace in one document so memory-only tokens survive. */
 import {config} from './crew-config.js';
 import {siteParameter} from './crew-routing.js';
 let client, demo = false, initializing;

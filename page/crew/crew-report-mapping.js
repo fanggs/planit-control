@@ -1,8 +1,5 @@
-/* Frontend part 5
-Commit: feat(crew): add photo reporting and next-day briefing flows
-Why: The team's strict report schema forbids extra fields. Build an explicit
-allowlist after the photo upload rather than sending UI state or user identity.
-*/
+/* Why: The team's strict report schema forbids extra fields. Build an explicit
+   allowlist after the photo upload rather than sending UI state or user identity. */
 const types=new Map([
   ['wildlife','wildlife'],['flooding / standing water','flooding'],
   ['soil / access','soil_saturation'],['weather','other'],['heat','heat'],

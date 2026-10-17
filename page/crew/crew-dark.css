@@ -1,5 +1,4 @@
-/* Commit: style(crew): unify the welcome and workspaces in a dark palette
-   Why: Quiet surfaces keep attention on conditions; mint, amber and red retain meaning.
+/* Why: Quiet surfaces keep attention on conditions; mint, amber and red retain meaning.
    Scoped to Isaiah's package, including the optional supervisor preview. */
 .planit-crew {
   --crew-forest: #8de3bf;

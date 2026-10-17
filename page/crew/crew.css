@@ -1,7 +1,4 @@
-/* Frontend part 4
-Commit: feat(crew): add accessible hazard and score components
-Why: Use scoped styles and reusable evidence-aware components so crew screens remain consistent without replacing the shared design system.
-*/
+/* Why: Use scoped styles and reusable evidence-aware components so crew screens remain consistent without replacing the shared design system. */
 /* Isaiah's crew-only rules. No :root, unscoped body, shared dashboard or shared component overrides.
    Aryan owns --forest, --paper, --ink, --muted, --border and the shared theme file.
    These fallbacks are temporary until he supplies that file. */
