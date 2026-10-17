@@ -20,6 +20,8 @@ test('preview serves direct and trailing-slash entries, modules, shared styles a
     '/shared/planit.css', '/crew/crew-vendor/leaflet.js', '/realtime/deepspace-source.js', '/supervisor/sample-data/sites.json']) {
     assert.equal((await fetch(base + path)).status, 200, path);
   }
+  const dashboard = await (await fetch(base + '/supervisor/')).text();
+  assert.match(dashboard, /PlanIT Control for Sperry Tech/);
   const redirect = await fetch(base + '/supervisor', {redirect: 'manual'});
   assert.equal(redirect.status, 308); assert.equal(redirect.headers.get('location'), '/supervisor/');
   assert.equal((await fetch(base + '/.env')).status, 404);
