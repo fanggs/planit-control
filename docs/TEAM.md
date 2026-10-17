@@ -23,7 +23,7 @@ own part.
 | --- | --- |
 | Python + FastAPI | Backend API |
 | Tiger Data (PostgreSQL + time-series) | Sites, readings, forecasts, scores, alerts, reports |
-| Gemini (`gemini-3.8-flash`) | Ask-a-question, 6 PM briefing text, photo hazard tagging |
+| Gemini (`gemini-3.5-flash-lite`) | Ask-a-question, 6 PM briefing text, photo hazard tagging |
 | Auth0 | Logins with two roles: `crew` and `supervisor` |
 | DeepSpace | Real-time events only (alerts and new reports appear instantly) |
 | Vultr | Hosting the API and the frontend |
