@@ -21,6 +21,7 @@ import time
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
+from api import db
 from api.briefing import briefing_for, latest_forecasts
 from api.site_data import ROOT, load_sites
 
@@ -74,6 +75,13 @@ def run_once(force: bool = False) -> int:
             continue
         saved[str(site["site_id"])] = b
         save(saved)  # save as we go, so a crash keeps finished briefings
+        if db.configured():
+            db.execute("""
+                INSERT INTO public.briefings (site_id, for_date, generated_at, text, model, inputs)
+                VALUES (:site_id, :for_date, :generated_at, :text, :model, CAST(:inputs AS jsonb))""",
+                site_id=b["site_id"], for_date=b["for_date"], generated_at=b["generated_at"],
+                text=b["text"], model=os.environ.get("GEMINI_MODEL", "") if b["inputs"]["method"] == "gemini" else "template",
+                inputs=json.dumps(b["inputs"]))
         written += 1
         log.info("briefing for %s (%s) via %s", site["name"], b["for_date"], b["inputs"]["method"])
     return written

@@ -19,7 +19,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from api import site_data
+from api import db, site_data
 from api.schemas.alerts import Alert, Briefing
 from api.schemas.sites import SiteDetail, SiteSummary
 
@@ -37,7 +37,7 @@ def _live_lightning() -> list[dict] | None:
 
 def _alerts() -> list[dict]:
     live = _live_lightning()
-    if site_data.mode() == "real":
+    if site_data.mode() != "sample":
         return live or []
     # Sample mode: sample alerts, with lightning replaced by live state if any.
     rows = site_data.sample("alerts")
@@ -126,7 +126,7 @@ def site_detail(site_id: int):
         "latest_weather": site.get("latest_weather"),
         "score": site.get("score"),
         "active_alerts": _site_alerts(site_id, _alerts()),
-        "environmental_events": site.get("environmental_events", []),
+        "environmental_events": site_data.active_events(site_id) or site.get("environmental_events", []),
         "recent_reports": [r for r in _reports() if r["site_id"] == site_id],
     }
 
@@ -143,6 +143,11 @@ def _briefings() -> dict:
     """jobs/briefings.py writes these at each site's 6 PM local."""
     if site_data.mode() == "sample":
         return site_data.sample("briefings")
+    if site_data.mode() == "database":
+        rows = db.query("""
+            SELECT DISTINCT ON (site_id) site_id, for_date, generated_at, text, inputs
+            FROM public.briefings ORDER BY site_id, for_date DESC, generated_at DESC""")
+        return {str(r["site_id"]): r for r in rows}
     try:
         return json.loads(LIVE_BRIEFINGS.read_text(encoding="utf-8"))
     except (FileNotFoundError, json.JSONDecodeError):

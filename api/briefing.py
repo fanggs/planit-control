@@ -29,7 +29,19 @@ RULE_NUMBERS = {"10", "30"}
 # ---------------------------------------------------------------- inputs
 
 def latest_forecasts() -> tuple[list[dict], str | None]:
-    """Forecast rows from Sid's newest complete weather run (until Tiger Data is live)."""
+    """Each site's newest forecast run: from Tiger Data if connected, else Sid's newest local run."""
+    from api import db
+    if db.configured():
+        rows = db.query("""
+            SELECT f.site_id, f.issued_at, f.valid_at, f.provider, f.temperature_f, f.heat_index_f,
+                   f.wind_mph, f.precip_1h_in, f.precip_24h_in, f.soil_moisture,
+                   f.source_name, f.source_url, f.retrieved_at
+            FROM public.weather_forecasts f
+            JOIN (SELECT site_id, MAX(issued_at) AS issued_at
+                  FROM public.weather_forecasts GROUP BY site_id) newest
+              ON newest.site_id = f.site_id AND newest.issued_at = f.issued_at
+            ORDER BY f.site_id, f.valid_at""")
+        return rows, max((r["issued_at"] for r in rows), default=None)
     try:
         report = json.loads(LATEST_WEATHER.read_text())
         run_dir = ROOT / report["output_directory"]

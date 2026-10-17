@@ -3,3 +3,5 @@ uvicorn[standard]
 pydantic
 google-genai
 netCDF4
+SQLAlchemy>=2,<3
+psycopg[binary]>=3,<4
