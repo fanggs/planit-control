@@ -104,5 +104,6 @@ if __name__ == "__main__":
             k, v = line.split("=", 1)
             os.environ.setdefault(k.strip(), v.strip())
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
-    sites = json.loads((ROOT / "api" / "samples" / "sites.json").read_text())
+    from api.site_data import load_sites
+    sites = load_sites()
     replay(load_storm(args.storm), sites, speed=args.speed)

@@ -195,6 +195,7 @@ if __name__ == "__main__":
             k, v = line.split("=", 1)
             os.environ.setdefault(k.strip(), v.strip())
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
-    sites = json.loads((root / "api" / "samples" / "sites.json").read_text())
+    from api.site_data import load_sites
+    sites = load_sites()
     log.info("watching %d sites for lightning within %.0f mi", len(sites), STOP_WORK_MILES)
     run(sites)
