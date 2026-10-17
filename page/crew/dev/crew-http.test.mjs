@@ -30,3 +30,24 @@ test('contract error code and message survive; live failures do not use sample d
   const forbidden=createHTTPAPI(settings,async()=>'token',async()=>new Response('',{status:403}));await assert.rejects(forbidden.listSites(),/permission/);
   const invalid=createHTTPAPI({...settings,baseURL:''},async()=>'token');await assert.rejects(invalid.listSites(),/baseURL/);
 });
+
+test('latest briefing uses its contract URL and keeps a local display key without history requests',async()=>{
+  const seen=[];
+  const api=createHTTPAPI(settings,async()=>'token',async url=>{
+    seen.push(url.href);return json(url.pathname.includes('/sites/')?fixture.details['9001']:fixture.briefings['9001']);
+  });
+  await api.readSite('9001');
+  const [latest]=await api.listBriefings('9001');
+  assert.equal(seen[1],'https://example.test/api/briefings/9001');
+  assert.equal((await api.readBriefing('9001',latest.id)).body,fixture.briefings['9001'].text);
+  assert.equal(latest.valid_date,'2026-10-18');assert.equal(latest.timezone,'America/New_York');
+  assert.equal(seen.length,2);assert.equal(latest.delivery_status,null);
+  assert.throws(()=>api.readPreferences('9001'),/not part/);
+  assert.throws(()=>api.savePreferences('9001',{}),/not part/);
+});
+test('missing latest briefings give an empty state, but permission failures remain errors',async()=>{
+  const absent=createHTTPAPI(settings,async()=>'token',async()=>json({error:{code:'not_found',message:'No briefing'}},404));
+  assert.deepEqual(await absent.listBriefings('9001'),[]);
+  const denied=createHTTPAPI(settings,async()=>'token',async()=>json({error:{code:'forbidden',message:'Not allowed'}},403));
+  await assert.rejects(denied.listBriefings('9001'),/Not allowed/);
+});
