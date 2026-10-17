@@ -101,10 +101,18 @@ class PrivatePhotoStore:
             raise ValueError("Photo storage cannot be inside the public page directory")
         if self.root == Path.home() or self.root == _REPOSITORY or self.root in _REPOSITORY.parents:
             raise ValueError("Choose a dedicated photo directory, not a broad existing directory")
-        self.root.mkdir(parents=True, mode=0o700, exist_ok=True)
-        if not self.root.is_dir():
+        if self.root.exists() and not self.root.is_dir():
             raise ValueError("Photo storage must be a directory")
-        self.root.chmod(0o700)
+        self.root.mkdir(parents=True, mode=0o700, exist_ok=True)
+        info = self.root.lstat()
+        # Never chmod an existing path: a mistaken setting might name shared
+        # data. The operator must deliberately create a private directory.
+        if (
+            not stat.S_ISDIR(info.st_mode)
+            or stat.S_IMODE(info.st_mode) != 0o700
+            or info.st_uid != os.geteuid()
+        ):
+            raise ValueError("Photo storage must be owned by the API user with permissions 0700")
 
     @staticmethod
     def _valid_key(key: str) -> bool:
