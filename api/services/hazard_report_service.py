@@ -58,5 +58,29 @@ _reports = Table(
     Column("resolved_by", String(255)),
     schema="public",
 )
+_site_id_validator = TypeAdapter(SiteId)
+_report_id_validator = TypeAdapter(UUID)
 
+AlertId = int | str | UUID
+# Must check private POST /photos metadata, uploader ownership, and whether the
+# key is eligible for this report. Never treat a client key as a filesystem path.
+# It receives the same DB session so the check can use the caller's transaction.
+PhotoVerifier = Callable[[Session, str, str, int], bool]
+# Alan/Sid supply these adapters for the shared alerts table. `start_warning`
+# creates a warning for the report's site/hazard and identifies the report in
+# alerts.trigger. `clear_warning` ends that same alert. Each writes with `db`
+# and returns the created/cleared alert ID for post-commit event publication.
+WarningWriter = Callable[[Session, HazardReportRead], AlertId]
+
+
+class PhotoReferenceNotAuthorized(PermissionError):
+    """The photo key was not verified for this reporter and site."""
+
+
+class WarningAlertIntegrationMissing(RuntimeError):
+    """A high-severity report needs the team's warning alert writer."""
+
+
+class ReportNotFound(LookupError):
+    """No report has the requested ID."""
 
