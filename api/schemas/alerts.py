@@ -23,8 +23,9 @@ class Alert(BaseModel):
 
 
 class BriefingInputs(BaseModel):
-    forecast_valid_from: datetime
-    score_scored_at: datetime
+    forecast_valid_from: datetime | None
+    score_scored_at: datetime | None  # null until hazard scores exist
+    method: str | None = None  # "gemini" or "template" (grounding fallback)
 
 
 class Briefing(BaseModel):

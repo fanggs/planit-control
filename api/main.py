@@ -136,9 +136,22 @@ def alerts():
     return _alerts()
 
 
+LIVE_BRIEFINGS = site_data.ROOT / "data" / "live" / "briefings.json"
+
+
+def _briefings() -> dict:
+    """jobs/briefings.py writes these at each site's 6 PM local."""
+    if site_data.mode() == "sample":
+        return site_data.sample("briefings")
+    try:
+        return json.loads(LIVE_BRIEFINGS.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
 @app.get("/briefings/{site_id}", response_model=Briefing)
 def briefing(site_id: int):
-    found = site_data.sample("briefings").get(str(site_id)) if site_data.mode() == "sample" else None
+    found = _briefings().get(str(site_id))
     if found is None:
         raise HTTPException(404, f"No briefing for site {site_id}")
     return found
