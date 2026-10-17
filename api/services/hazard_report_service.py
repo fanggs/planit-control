@@ -9,6 +9,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timezone
+import inspect
 from uuid import UUID, uuid4
 
 from pydantic import TypeAdapter
@@ -62,9 +63,10 @@ _site_id_validator = TypeAdapter(SiteId)
 _report_id_validator = TypeAdapter(UUID)
 
 AlertId = int | str | UUID
-# Must check private POST /photos metadata, uploader ownership, and whether the
-# key is eligible for this report. Never treat a client key as a filesystem path.
-# It receives the same DB session so the check can use the caller's transaction.
+# Must check private POST /photos metadata and uploader ownership. Upload has
+# no site_id in contract v1.1: the report row associates the photo with its site.
+# Never treat a client key as a filesystem path. The session is available for
+# a future database-backed metadata implementation in the same transaction.
 PhotoVerifier = Callable[[Session, str, str, int], bool]
 # Alan/Sid supply these adapters for the shared alerts table. `start_warning`
 # creates a warning for the report's site/hazard and identifies the report in
@@ -84,6 +86,26 @@ class WarningAlertIntegrationMissing(RuntimeError):
 class ReportNotFound(LookupError):
     """No report has the requested ID."""
 
+
+def _require_warning_writer(writer: WarningWriter | None) -> None:
+    if (
+        not callable(writer)
+        or inspect.iscoroutinefunction(writer)
+        or inspect.isasyncgenfunction(writer)
+        or inspect.iscoroutinefunction(getattr(writer, "__call__", None))
+        or inspect.isasyncgenfunction(getattr(writer, "__call__", None))
+    ):
+        raise WarningAlertIntegrationMissing("supply a synchronous warning writer")
+
+
+def _validate_alert_id(value: object) -> AlertId:
+    # An async callback accidentally passed here must not silently succeed
+    # without writing its alert. Invalid results cause the caller to roll back.
+    if inspect.iscoroutine(value):
+        value.close()
+    if isinstance(value, UUID) or type(value) is int or (isinstance(value, str) and value.strip()):
+        return value
+    raise RuntimeError("warning writer must return an alert ID")
 
 
 @dataclass(frozen=True)
@@ -110,9 +132,10 @@ def save_report(
 ) -> ReportChange:
     """Insert an open report and, if high severity, its warning alert.
 
-    The route first checks Auth0, role, site existence, and site access. The
-    reporter ID must come from the validated token's `sub`. A photo key needs
-    server-side verification against private upload metadata. The warning
+    The route first checks Auth0, role, and site existence. Both roles may
+    report at any site under contract v1.1. The reporter ID must come from the
+    validated token's `sub`. A photo key needs server-side verification
+    against private upload metadata. The warning
     writer must use `db` so report and alert commit or roll back together.
     Publish report.created and any alert.started only after `db.commit()`.
     """
@@ -124,8 +147,8 @@ def save_report(
             db, report.photo_key, reporter_id, report.site_id
         ) is not True:
             raise PhotoReferenceNotAuthorized("photo is not a verified private upload")
-    if report.severity is Severity.HIGH and start_warning is None:
-        raise WarningAlertIntegrationMissing("high-severity reports need start_warning")
+    if report.severity is Severity.HIGH:
+        _require_warning_writer(start_warning)
 
     statement = (
         insert(_reports)
@@ -149,9 +172,7 @@ def save_report(
     if stored.severity is Severity.HIGH:
         if start_warning is None:
             raise WarningAlertIntegrationMissing("high-severity reports need start_warning")
-        alert_id = start_warning(db, stored)
-        if alert_id is None:
-            raise RuntimeError("start_warning must return the warning alert ID")
+        alert_id = _validate_alert_id(start_warning(db, stored))
     return ReportChange(report=stored, warning_alert_id=alert_id)
 
 def resolve_report(
@@ -179,8 +200,8 @@ def resolve_report(
     existing = HazardReportRead.model_validate(dict(row))
     if existing.status is ReportStatus.RESOLVED:
         return ReportChange(report=existing, changed=False)
-    if existing.severity is Severity.HIGH and clear_warning is None:
-        raise WarningAlertIntegrationMissing("high-severity reports need clear_warning")
+    if existing.severity is Severity.HIGH:
+        _require_warning_writer(clear_warning)
 
     statement = (
         update(_reports)
@@ -201,31 +222,31 @@ def resolve_report(
     if stored.severity is Severity.HIGH:
         if clear_warning is None:
             raise WarningAlertIntegrationMissing("high-severity reports need clear_warning")
-        alert_id = clear_warning(db, stored)
-        if alert_id is None:
-            raise RuntimeError("clear_warning must return the cleared alert ID")
+        alert_id = _validate_alert_id(clear_warning(db, stored))
     return ReportChange(report=stored, warning_alert_id=alert_id)
 
 
 def get_site_reports(
-        db: Session,
-        site_id: int,
-        *,
-        limit: int = 100,
-        offset: int = 0,
+    db: Session,
+    site_id: int,
 ) -> list[HazardReportRead]:
-    """Read a bounded page for one site after the route authorizes access."""
+    """Read all reports for one site after the route authorizes access."""
     site_id = _site_id_validator.validate_python(site_id)
-    if type(limit) is not int or not 1 <= limit <= 200:
-        raise ValueError("limit must be an integer from 1 to 200")
-    if type(offset) is not int or not 0 <= offset <= 9223372036854775807:
-        raise ValueError("offset must be a nonnegative PostgreSQL BIGINT")
 
     statement = (
         select(_reports)
         .where(_reports.c.site_id == site_id)
         .order_by(_reports.c.created_at.desc(), _reports.c.id.desc())
-        .limit(limit)
-        .offset(offset)
     )
     return [HazardReportRead.model_validate(dict(row)) for row in db.execute(statement).mappings()]
+
+
+def is_photo_attached(db: Session, photo_key: str) -> bool:
+    """Whether a private upload belongs to a stored report visible to both roles.
+
+    The photo route authenticates the caller first. Unattached uploads remain
+    visible only to their uploader; attaching a report grants both team roles
+    access as required by the contract.
+    """
+    statement = select(_reports.c.id).where(_reports.c.photo_key == photo_key).limit(1)
+    return db.execute(statement).scalar_one_or_none() is not None
