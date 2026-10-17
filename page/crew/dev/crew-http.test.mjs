@@ -27,6 +27,39 @@ test('access tokens only go to HTTPS or 127.0.0.1, never unsafe routes or empty 
   await assert.rejects(createHTTPAPI(settings,async()=>'',fetcher).listSites(),/valid access token/);
   assert.equal(fetchCalls,1);
 });
+test('relative /api stays on a secure page origin and rejects unsafe URL forms before requesting a token',async()=>{
+  const originalLocation=Object.getOwnPropertyDescriptor(globalThis,'location');
+  const setPage=href=>Object.defineProperty(globalThis,'location',{configurable:true,value:href?{href}:undefined});
+  let tokenCalls=0;const seen=[];
+  const token=async()=>{tokenCalls++;return 'test-token';};
+  const fetcher=async url=>{seen.push(url.href);return json(fixture.sites);};
+  try{
+    setPage('https://planit.example/crew/index.html?site=9001#map');
+    await createHTTPAPI({baseURL:'/api'},token,fetcher).listSites();
+    assert.equal(seen.at(-1),'https://planit.example/api/sites');
+    setPage('http://127.0.0.1:4174/crew/index.html');
+    await createHTTPAPI({baseURL:'/api/'},token,fetcher).listSites();
+    assert.equal(seen.at(-1),'http://127.0.0.1:4174/api/sites');
+    assert.equal(tokenCalls,2);
+
+    setPage('https://planit.example/crew/index.html');
+    for(const baseURL of ['//evil.test/api','/api?token=x','/api#fragment','/other','javascript:alert(1)','http://evil.test/api']){
+      await assert.rejects(createHTTPAPI({baseURL},token,fetcher).listSites());
+    }
+    await assert.rejects(createHTTPAPI({baseURL:'/api',routes:{sites:'https://evil.test/sites'}},token,fetcher).listSites(),/configured API origin/);
+    await assert.rejects(createHTTPAPI({baseURL:'/api',routes:{sites:'../admin'}},token,fetcher).listSites(),/configured API origin/);
+    for(const page of ['http://localhost:4174/crew/','http://127.0.0.1.evil.test/crew/','file:///crew/index.html']){
+      setPage(page);
+      await assert.rejects(createHTTPAPI({baseURL:'/api'},token,fetcher).listSites(),/Relative \/api requires/);
+    }
+    setPage(null);
+    await assert.rejects(createHTTPAPI({baseURL:'/api'},token,fetcher).listSites(),/Relative \/api requires/);
+    assert.equal(tokenCalls,2);assert.equal(seen.length,2);
+  }finally{
+    if(originalLocation)Object.defineProperty(globalThis,'location',originalLocation);
+    else delete globalThis.location;
+  }
+});
 test('site detail requests validate identity and map the full nested score',async()=>{
   const api=createHTTPAPI(settings,async()=>'token',async()=>json(fixture.details['9001']));
   assert.equal((await api.readSite('9001')).score,8.2);

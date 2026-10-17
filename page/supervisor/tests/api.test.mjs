@@ -1,6 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createAPI} from '../api.js';
+import {apiBaseForPage} from '../config.js';
+
+test('deployed supervisor API stays on its HTTPS origin; local preview uses loopback only', () => {
+  assert.equal(apiBaseForPage('https://fore-site.example/supervisor/config.js'), 'https://fore-site.example/api');
+  assert.equal(apiBaseForPage('https://fore-site.example/supervisor/config.js?token=bad#fragment'), 'https://fore-site.example/api');
+  assert.equal(apiBaseForPage('http://127.0.0.1:4175/supervisor/config.js'), 'http://127.0.0.1:8010');
+  for (const page of ['http://45.32.216.198/supervisor/config.js', 'http://localhost:4175/supervisor/config.js',
+    'http://0.0.0.0:4175/supervisor/config.js', 'file:///supervisor/config.js',
+    'https://user:password@fore-site.example/supervisor/config.js']) {
+    assert.equal(apiBaseForPage(page), '');
+  }
+});
 
 test('contract requests send bearer headers, correct paths and only the resolve status', async () => {
   const calls = [];

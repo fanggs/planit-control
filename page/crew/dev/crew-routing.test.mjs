@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {workspaceForUser, userRoles, siteParameter, workspaceURL, supervisorDashboardURL, supervisorNavigationURL} from '../crew-routing.js';
+import {workspaceForUser, userRoles, siteParameter, workspaceURL, supervisorDashboardURL, supervisorNavigationURL, isLiveDeploymentURL} from '../crew-routing.js';
 const claim = 'https://planit-control/roles';
 
 test('verified role claims choose the workspace; unknown roles fail closed', () => {
@@ -53,4 +53,11 @@ test('crew and atlas navigation use the live dashboard or an explicitly local sa
     assert.ok(mock.pathname.endsWith('/crew/crew-supervisor.html'));
     assert.equal(mock.search,'?demo=1');
   }
+});
+
+test('live crew mode is limited to the exact HTTPS deployment origin',()=>{
+  assert.equal(isLiveDeploymentURL('https://foresite.work/crew/crew-config.js'),true);
+  for(const url of ['http://foresite.work/crew/crew-config.js','https://www.foresite.work/crew/crew-config.js',
+    'https://foresite.work.evil.test/crew/crew-config.js','http://127.0.0.1:4174/crew/crew-config.js',
+    'file:///crew/crew-config.js'])assert.equal(isLiveDeploymentURL(url),false);
 });

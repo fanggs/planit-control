@@ -39,3 +39,9 @@ export function supervisorNavigationURL(baseURL,dataMode){
   }
   return supervisorDashboardURL(baseURL);
 }
+
+// The public deployment can use live API data only on its exact HTTPS origin.
+// Local and IP-address previews remain clearly labeled samples.
+export function isLiveDeploymentURL(moduleURL){
+  return new URL(moduleURL).origin==='https://foresite.work';
+}

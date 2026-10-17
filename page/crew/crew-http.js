@@ -30,7 +30,20 @@ export function createHTTPAPI(settings, getToken, fetcher = fetch) {
       if (params[key] == null) throw new Error(`Missing route parameter: ${key}`);
       return encodeURIComponent(params[key]);
     });
-    const base = new URL(settings.baseURL.endsWith('/') ? settings.baseURL : settings.baseURL + '/');
+    let base;
+    if (settings.baseURL === '/api' || settings.baseURL === '/api/') {
+      // A same-origin proxy can keep the API behind the website's /api path.
+      // Resolve it only from a secure page, never from a file or unsafe preview.
+      const pageURL = globalThis.location?.href && new URL(globalThis.location.href);
+      if (!pageURL || !(pageURL.protocol === 'https:'
+        || (pageURL.protocol === 'http:' && pageURL.hostname === '127.0.0.1'))) {
+        throw new Error('Relative /api requires an HTTPS page or http://127.0.0.1.');
+      }
+      base = new URL('/api/', pageURL);
+    } else {
+      if (settings.baseURL.startsWith('/')) throw new Error('Only /api may be used as a relative API URL.');
+      base = new URL(settings.baseURL.endsWith('/') ? settings.baseURL : settings.baseURL + '/');
+    }
     // Never send an access token to plain HTTP outside this machine, or to a
     // URL carrying credentials, a query string, or a fragment.
     if (base.username || base.password || base.search || base.hash
@@ -38,7 +51,9 @@ export function createHTTPAPI(settings, getToken, fetcher = fetch) {
       throw new Error('API URL must use HTTPS, or http://127.0.0.1 for local development.');
     }
     const result = new URL(path.replace(/^\//, ''), base);
-    if (result.origin !== base.origin) throw new Error('API routes must stay on the configured API origin.');
+    if (result.origin !== base.origin || !result.pathname.startsWith(base.pathname)) {
+      throw new Error('API routes must stay on the configured API origin and path.');
+    }
     for (const [key, value] of Object.entries(query)) if (value != null) result.searchParams.set(key, value);
     return result;
   }

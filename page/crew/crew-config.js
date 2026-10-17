@@ -1,11 +1,14 @@
 /* Why: Keep authentication and configurable network contracts separate from the UI; a failed live request must never become a synthetic success. */
+import {isLiveDeploymentURL} from './crew-routing.js';
+
+const liveDeployment=isLiveDeploymentURL(import.meta.url);
 // Isaiah-owned frontend settings. Public identifiers only. Never put a client secret here.
 export const config = {
-  dataMode: 'mock', // Switch to 'live' after configuring Auth0 and the HTTP or custom adapter.
+  dataMode: liveDeployment?'live':'mock', // Only the exact HTTPS domain uses real API data.
   transport: 'http', // 'custom' uses window.PlanITCrewAPI; 'http' uses crew-http.js.
   features: {briefingPreferences: false, briefingHistory: false, archivedReports: false},
   api: {
-    baseURL: '', // For example https://api.your-domain.example; public URL, never secrets.
+    baseURL: liveDeployment?'/api':'', // Same-origin proxy; local previews stay sample-only.
     timeoutMs: 20000,
     heartbeatMs: 45000,
     realtime: {baseURL: 'https://planit-realtime.app.space', appId: 'app_01M557EC8CQY7VDN5253P86ZBN'},
