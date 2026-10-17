@@ -144,3 +144,51 @@ def save_report(
         )
         .returning(*_reports.c)
     )
+    stored = HazardReportRead.model_validate(dict(db.execute(statement).mappings().one()))
+    alert_id = None
+    if stored.severity is Severity.HIGH:
+        if start_warning is None:
+            raise WarningAlertIntegrationMissing("high-severity reports need start_warning")
+        alert_id = start_warning(db, stored)
+        if alert_id is None:
+            raise RuntimeError("start_warning must return the warning alert ID")
+    return ReportChange(report=stored, warning_alert_id=alert_id)
+
+def resolve_report(
+    db: Session,
+    report_id: UUID | str,
+    *,
+    resolved_by: str,
+    clear_warning: WarningWriter | None = None,
+) -> ReportChange:
+    """Resolve one report; the route must first require the supervisor role.
+
+    Already resolved reports are returned unchanged so retries are safe.
+    For a high-severity report, the warning writer ends its matching alert in
+    the same transaction. Publish report.resolved and any alert.cleared after
+    commit only when the returned `changed` value is true.
+    """
+    resolved_by = validate_reporter_id(resolved_by)
+    report_id = _report_id_validator.validate_python(report_id)
+    row = db.execute(
+        select(_reports).where(_reports.c.id == report_id).with_for_update()
+    ).mappings().one_or_none()
+    if row is None:
+        raise ReportNotFound(f"report {report_id} not found")
+
+    existing = HazardReportRead.model_validate(dict(row))
+    if existing.status is ReportStatus.RESOLVED:
+        return ReportChange(report=existing, changed=False)
+    if existing.severity is Severity.HIGH and clear_warning is None:
+        raise WarningAlertIntegrationMissing("high-severity reports need clear_warning")
+
+    statement = (
+        update(_reports)
+        .where(_reports.c.id == report_id, _reports.c.status == ReportStatus.OPEN.value)
+        .values(
+            status=ReportStatus.RESOLVED.value,
+            resolved_at=datetime.now(timezone.utc),
+            resolved_by=resolved_by,
+        )
+        .returning(*_reports.c)
+    )
