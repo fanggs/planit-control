@@ -1,6 +1,7 @@
 /* Contract HTTP transport. Screens consume mapped UI objects, never raw API DTOs.
    Commit: fix(crew): map contract site_id and hazard names in adapter */
 import {contractSiteId, createContractMapper, mapSiteSummary, mapReport} from './crew-integration.js';
+import {createHazardReportPayload, validateReportPhoto, MAX_PHOTO_BYTES} from './crew-report-mapping.js';
 
 export const CONTRACT_ROUTES = Object.freeze({
   sites: '/sites', site: '/sites/{id}', alerts: '/alerts',
@@ -17,6 +18,7 @@ export class CrewAPIError extends Error {
 export function createHTTPAPI(settings, getToken, fetcher = fetch) {
   const mapper = createContractMapper();
   const briefingCache = new Map();
+  const uploads = new Map(), receipts = new Map(), uncertainReports = new Set(), submissions = new Map();
   function url(route, params = {}, query = {}) {
     if (!settings.baseURL) throw new Error('Set config.api.baseURL before using live HTTP mode.');
     const template = settings.routes?.[route] || CONTRACT_ROUTES[route];
@@ -46,12 +48,13 @@ export function createHTTPAPI(settings, getToken, fetcher = fetch) {
           : response.status === 403 ? 'Your account does not have permission for this action.'
           : `Service request failed (${response.status}).`;
         throw new CrewAPIError(problem?.error?.message || fallback, {
-          status: response.status, code: problem?.error?.code || 'request_failed'
+          status: response.status, code: problem?.error?.code || 'request_failed', ambiguousWrite: method !== 'GET' && response.status >= 500
         });
       }
       if (binary) {
         const photo = await response.blob();
         if (!['image/jpeg', 'image/png'].includes(photo.type)) throw new Error('The photo service did not return a JPEG or PNG image.');
+        if (photo.size > MAX_PHOTO_BYTES) throw new Error('The photo exceeds the 5 MB contract limit.');
         return photo;
       }
       return response.status === 204 ? null : await response.json();
@@ -111,7 +114,48 @@ export function createHTTPAPI(settings, getToken, fetcher = fetch) {
     return briefing;
   }
   function unsupported() { throw new Error('Briefing preferences are not part of API contract v1.1.'); }
-  async function submitReport() { throw new Error('Report upload adapter is being connected.'); }
+  async function submitReport(report) {
+    validateReportPhoto(report.photo);
+    // Validate all metadata before uploading. A photo is optional; identity is server-owned.
+    createHazardReportPayload(report);
+    const key = report.request_id;
+    if (key && receipts.has(key)) return receipts.get(key);
+    if (key && uncertainReports.has(key)) throw new Error('The previous submission was not confirmed. Refresh the reports before submitting again; automatic retry could create a duplicate.');
+    if (key && submissions.has(key)) return submissions.get(key);
+    const pending = (async () => {
+      let photoKey = null;
+      if (report.photo) {
+        const previous = key && uploads.get(key);
+        if (previous?.photo === report.photo) photoKey = previous.photoKey;
+        else {
+          const form = new FormData();
+          // Contract v1.1 does not name this multipart field; confirm with Aryan.
+          form.append(settings.photoField || 'file', report.photo, report.photo.name || 'hazard-photo');
+          const uploaded = await request('photos', {method: 'POST', body: form});
+          photoKey = uploaded?.photo_key;
+          if (typeof photoKey !== 'string' || !photoKey) throw new Error('The photo service did not return photo_key.');
+          createHazardReportPayload(report, photoKey);
+          if (key) uploads.set(key, {photo: report.photo, photoKey});
+        }
+      }
+      let raw;
+      try { raw = await request('reports', {method: 'POST', body: createHazardReportPayload(report, photoKey)}); }
+      catch (error) { if (key && error.ambiguousWrite) uncertainReports.add(key); throw error; }
+      let receipt;
+      try {
+        receipt = mapReport(raw);
+        if (receipt.site_id !== String(contractSiteId(report.site_id))) throw new Error('The saved report belongs to a different site.');
+      } catch {
+        if (key) uncertainReports.add(key);
+        throw new Error('The server returned an invalid report receipt. Check the report list before submitting again.');
+      }
+      if (key) { receipts.set(key, receipt); uploads.delete(key); }
+      return receipt;
+    })();
+    if (key) submissions.set(key, pending);
+    try { return await pending; }
+    finally { if (key) submissions.delete(key); }
+  }
   function subscribeEvents(_siteId, _onEvent, onConnection) { onConnection(false); return () => {}; }
   return {listSites, readSite, listReports, submitReport, listBriefings, readBriefing,
     readPreferences: unsupported, savePreferences: unsupported, subscribeEvents};

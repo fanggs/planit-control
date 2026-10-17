@@ -11,6 +11,7 @@ export const config = {
     baseURL: '', // For example https://api.your-domain.example; public URL, never secrets.
     timeoutMs: 20000,
     heartbeatMs: 45000,
+    photoField: 'file', // Confirm the multipart field name with Aryan; v1.1 does not specify it.
     routes: {
       sites: '/sites', site: '/sites/{id}',
       alerts: '/alerts', reports: '/reports',
