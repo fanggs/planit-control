@@ -1,5 +1,5 @@
 import {config} from './config.js';
-import {createAuth} from './auth.js';
+import {createAuth, shouldResumeSignIn} from './auth.js';
 import {createAPI, createSampleAPI} from './api.js';
 import {alertFeedDisplay, loadDashboardFeeds} from './feeds.js';
 import {connectRealtime} from './realtime.js';
@@ -9,6 +9,7 @@ import {createPhotoCache} from './photo-cache.js';
 import {bindPageLifecycle, changeSelectedSite, markDetailStale} from './lifecycle.js';
 import {detailScreeningStatus, screeningAvailability, screeningAvailabilityChanged, updateWatchChips} from './status-clock.js';
 import {isSessionExpired} from '../shared/auth-session.mjs';
+import {clearResumeHint, hasResumeHint, markAuthenticated} from '../shared/auth-resume.mjs';
 import {heatIndexDisplay} from '../shared/environment-readings.mjs';
 import {assessScore, coordinates, countdown, featureLabel, finite, freshness, hasSupervisorRole, label,
   lightningDisplay, points, isReplayAlert, openReportPins, rankSites, riskTone, safeSourceURL,
@@ -47,6 +48,10 @@ function expireSession() {
   sessionExpired = true;
   stopRealtime?.(); stopRealtime = null;
   clearInterval(poll); poll = null;
+  clearResumeHint();
+  detailGeneration++; // An in-flight detail response must not restore private report data.
+  state.reports = [];
+  revokePhotos(); reportLayer?.clearLayers();
   setAskControls(false);
   $('refresh').disabled = true;
   $('connection').dataset.connected = 'false';
@@ -394,6 +399,10 @@ function renderWeather(detail) {
 }
 function renderReports(detail) {
   const container = section(`Crew observations · ${state.reports.length}`);
+  if (sessionExpired) {
+    container.append(note('Sign in again to view crew reports and private photos.', true));
+    return container;
+  }
   container.append(note('Open high-severity reports create warnings. Resolving a report clears its warning, not an independent lightning alert.'));
   for (const report of state.reports) {
     const card = el('article', null, 'report-card');
@@ -434,7 +443,7 @@ function renderReports(detail) {
     }
     if (report.status === 'open') {
       const resolve = el('button', sample ? 'Resolve · live mode only' : 'Resolve report', 'planit-button primary');
-      resolve.disabled = sample || resolving || !hasSupervisorRole(user, config.auth.rolesClaim);
+      resolve.disabled = sample || sessionExpired || resolving || !hasSupervisorRole(user, config.auth.rolesClaim);
       resolve.addEventListener('click', () => void resolveReport(report.id, resolve));
       actions.append(resolve);
     }
@@ -462,7 +471,7 @@ async function loadDetail(id) {
   $('detail').setAttribute('aria-busy', 'true');
   try {
     const [detail, reports] = await Promise.all([api.detail(id), api.reports(id)]);
-    if (generation !== detailGeneration || state.selected !== id) return;
+    if (sessionExpired || generation !== detailGeneration || state.selected !== id) return;
     state.detail = detail; state.reports = reports; state.detailStale = false; renderDetail();
   } catch (error) {
     if (generation === detailGeneration && state.selected === id) {
@@ -495,6 +504,7 @@ async function fetchData() {
   $('refresh').disabled = true;
   try {
     const {sites, alerts, alertError} = await loadDashboardFeeds(api);
+    if (sessionExpired) return;
     if (isSessionExpired(alertError)) throw alertError;
     state.sites = sites; state.alerts = alerts;
     if (!sites.some(site => site.site_id === state.selected)) updateSelection(rankSites(sites, {allowHistorical: sample})[0]?.site_id ?? null);
@@ -508,7 +518,7 @@ async function fetchData() {
 }
 const refresh = createRefreshQueue(fetchData);
 async function resolveReport(id, button) {
-  if (sample || resolving || !hasSupervisorRole(user, config.auth.rolesClaim)) return;
+  if (sample || sessionExpired || resolving || !hasSupervisorRole(user, config.auth.rolesClaim)) return;
   resolving = true; button.disabled = true; button.textContent = 'Resolving…';
   const selected = state.selected;
   let saved = false;
@@ -562,18 +572,56 @@ async function start() {
   } else if (config.mode === 'live') {
     $('mode-banner').textContent = 'LIVE API MODE · Screening values are prototypes, not injury probabilities or work authorization. Lightning and NWS status are shown only when their watches confirm a recent check.';
     auth = createAuth(config.auth);
-    user = await auth.initialize();
     const action = $('auth-action'); action.hidden = false;
+    action.disabled = true; action.textContent = 'Checking sign-in…';
+    action.addEventListener('click', () => {
+      if (action.disabled) return;
+      if (user && !sessionExpired) {
+        clearResumeHint();
+        void auth.logout().catch(showError);
+      } else void auth.login().catch(showError);
+    });
+    if (!auth.configured) {
+      action.textContent = 'Sign in unavailable'; action.disabled = true;
+      $('identity').textContent = 'Open a supported address';
+      $('connection').textContent = 'Not connected';
+      $('supported-auth-link').hidden = false;
+      $('site-list').replaceChildren(el('p', 'This preview cannot sign in. Open the supported ForeSite address above.', 'empty'));
+      throw new Error('This preview is not an approved Auth0 callback origin. Use the ForeSite link above, or run the preview on http://127.0.0.1:4174.');
+    }
+    try { user = await auth.initialize(); }
+    catch (error) {
+      clearResumeHint();
+      action.disabled = false;
+      action.textContent = 'Try sign-in again';
+      throw error;
+    }
+    action.disabled = false;
+    const resumeRequested = shouldResumeSignIn(window.location.search, hasResumeHint());
+    if (new URLSearchParams(window.location.search).has('start')) {
+      window.history.replaceState({}, '', config.auth.redirectUri);
+    }
     if (!user) {
       $('identity').textContent = 'Sign-in required'; $('connection').textContent = 'Not connected';
       $('ask-status').textContent = 'Sign in as a supervisor to ask about live data.';
-      action.textContent = 'Sign in'; action.addEventListener('click', () => void auth.login().catch(showError));
+      action.textContent = 'Sign in';
       $('site-list').replaceChildren(el('p', 'Sign in with your supervisor account to load the live workspace.', 'empty'));
+      if (resumeRequested) {
+        // Consume the non-secret hint before leaving. A denied/expired Auth0
+        // handoff returns here with no hint, so the page cannot loop.
+        clearResumeHint();
+        $('identity').textContent = 'Continuing sign-in…';
+        await auth.login();
+      }
       return;
     }
     $('identity').textContent = user.name || 'Signed-in user';
-    action.textContent = 'Sign out'; action.addEventListener('click', () => void (sessionExpired ? auth.login() : auth.logout()).catch(showError));
-    if (!hasSupervisorRole(user, config.auth.rolesClaim)) throw new Error('A supervisor role is required for this workspace. Ask the Auth0 administrator to configure the agreed role claim.');
+    action.textContent = 'Sign out';
+    if (!hasSupervisorRole(user, config.auth.rolesClaim)) {
+      clearResumeHint();
+      throw new Error('A supervisor role is required for this workspace. Ask the Auth0 administrator to configure the agreed role claim.');
+    }
+    markAuthenticated();
     api = createAPI({base: config.apiBase, token: auth.token, timeoutMs: config.requestTimeoutMs});
     setAskControls(true);
     $('ask-status').textContent = 'Ready for a question about live site data.';
