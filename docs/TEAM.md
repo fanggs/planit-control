@@ -64,8 +64,22 @@ What each role delivers:
   stranger can use the crew side without help and a phone-submitted report
   appears on the supervisor map.
 
-Stick to your own files. If you need a small change in someone else's, tell
-them first, keep it small, and pull right before and push right after.
+Ownership says who knows each area best. **From the final test until
+submission, anyone can test anything and fix anything**, with four rules:
+
+1. **Keep it small.** Pull first, change only what the fix needs, run the tests
+   for that area, and push right away.
+2. **Say it in the chat first**, e.g. "fixing the NWS card in `crew-ui.js`",
+   so two people don't edit the same file at once.
+3. **Only Alan deploys.** Push to `main`; Alan checks each push before it goes
+   live, so a bad push can't reach the site unseen.
+4. **Code freeze at 6:30 AM ET.** After that, only fixes for something actually
+   broken, so the submission and the expo run on a tested version.
+
+Two areas need a heads-up to Alan before any change, because a wrong fix hides
+a real safety alert or locks everyone out: the **lightning stop-work rule**
+(`jobs/lightning.py`, `jobs/replay.py`) and the **Auth0 login settings**
+(the tenant, `page/crew/crew-auth.js`, `page/supervisor/auth.js`).
 
 ## Git
 
