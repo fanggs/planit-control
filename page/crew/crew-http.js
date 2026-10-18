@@ -2,6 +2,7 @@
 import {createCrewRealtimeProvider} from './crew-realtime-source.js';
 import {contractSiteId, createContractMapper, mapSiteSummary, mapReport, subscribeContractEvents} from './crew-integration.js';
 import {createHazardReportPayload, validateReportPhoto, MAX_PHOTO_BYTES} from './crew-report-mapping.js';
+import {reportSessionExpired} from './crew-session.js';
 
 export const CONTRACT_ROUTES = Object.freeze({
   sites: '/sites', site: '/sites/{id}', alerts: '/alerts',
@@ -73,9 +74,11 @@ export function createHTTPAPI(settings, getToken, fetcher = fetch) {
         const fallback = response.status === 401 ? 'Your session expired. Sign in again.'
           : response.status === 403 ? 'Your account does not have permission for this action.'
           : `Service request failed (${response.status}).`;
-        throw new CrewAPIError(problem?.error?.message || fallback, {
+        const failure = new CrewAPIError(problem?.error?.message || fallback, {
           status: response.status, code: problem?.error?.code || 'request_failed', ambiguousWrite: method !== 'GET' && !readOnly && response.status >= 500
         });
+        reportSessionExpired(failure);
+        throw failure;
       }
       if (binary) {
         const photo = await response.blob();
@@ -232,7 +235,8 @@ export function createHTTPAPI(settings, getToken, fetcher = fetch) {
     return subscribeContractEvents({siteId: siteId === null ? null : String(contractSiteId(siteId)),
       getSource: getRealtimeSource,
       getToken, readSite, listSites, onEvent, onConnection,
-      heartbeatMs: settings.heartbeatMs, timers: settings.timers || globalThis, retryBaseMs: settings.retryBaseMs});
+      heartbeatMs: settings.heartbeatMs, timers: settings.timers || globalThis,
+      browser: settings.browser || globalThis, retryBaseMs: settings.retryBaseMs});
   }
   return {listSites, readSite, listReports, prepareReportPhoto, submitReport, listBriefings, readBriefing, ask,
     readPreferences: unsupported, savePreferences: unsupported, subscribeEvents};
