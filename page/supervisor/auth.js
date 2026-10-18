@@ -1,5 +1,7 @@
 // Auth0 SPA SDK validates the redirect/ID token and stores tokens in memory.
 // The API still validates access-token signature, issuer, audience, expiry and roles.
+import {expiredSessionError, isSessionExpired} from '../shared/auth-session.mjs';
+
 export function createAuth(settings, browser = window) {
   let client;
   const configured = Boolean(settings.domain && settings.clientId && settings.audience && settings.rolesClaim);
@@ -13,7 +15,9 @@ export function createAuth(settings, browser = window) {
       browser.document.head.append(script);
     });
     client = new browser.auth0.Auth0Client({domain: settings.domain, clientId: settings.clientId,
-      cacheLocation: 'memory', authorizationParams: {audience: settings.audience, redirect_uri: settings.redirectUri}});
+      cacheLocation: 'memory', useRefreshTokens: true, useRefreshTokensFallback: false,
+      authorizationParams: {audience: settings.audience, redirect_uri: settings.redirectUri,
+        scope: 'openid profile email offline_access'}});
     const query = new URLSearchParams(browser.location.search);
     if (query.has('state') && (query.has('code') || query.has('error'))) {
       try { await client.handleRedirectCallback(); }
@@ -21,7 +25,7 @@ export function createAuth(settings, browser = window) {
     } else {
       try { await client.checkSession(); }
       catch (error) {
-        if (!['login_required', 'interaction_required', 'consent_required'].includes(error.error)) throw error;
+        if (!isSessionExpired(error)) throw error;
       }
     }
     return await client.isAuthenticated() ? client.getUser() : null;
@@ -30,7 +34,8 @@ export function createAuth(settings, browser = window) {
     async login() { if (!client) throw new Error('Auth0 is not initialized.'); return client.loginWithRedirect(); },
     async logout() { if (client) return client.logout({logoutParams: {returnTo: settings.logoutReturnTo}}); },
     async token() {
-      if (!client || !(await client.isAuthenticated())) throw new Error('Sign in to access the live API.');
-      return client.getTokenSilently();
+      if (!client || !(await client.isAuthenticated())) throw expiredSessionError();
+      try { return await client.getTokenSilently(); }
+      catch (error) { if (isSessionExpired(error)) throw expiredSessionError(error); throw error; }
     }};
 }

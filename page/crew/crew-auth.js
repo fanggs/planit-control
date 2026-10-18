@@ -1,6 +1,8 @@
 /* Why: Keep the callback and workspace in one document so memory-only tokens survive. */
 import {config} from './crew-config.js';
 import {siteParameter} from './crew-routing.js';
+import {expiredSessionError, isSessionExpired} from '../shared/auth-session.mjs';
+import {reportSessionExpired, sessionExpired} from './crew-session.js';
 let client, demo = false, initializing;
 export const authConfigured = () => Boolean(config.auth.domain && config.auth.clientId);
 
@@ -17,7 +19,9 @@ export async function initAuth() {
     });
     client = new window.auth0.Auth0Client({
       domain: config.auth.domain, clientId: config.auth.clientId, cacheLocation: 'memory',
+      useRefreshTokens: true, useRefreshTokensFallback: false,
       authorizationParams: {redirect_uri: config.auth.redirectUri,
+        scope: 'openid profile email offline_access',
         ...(config.auth.audience ? {audience: config.auth.audience} : {})}
     });
     const query = new URLSearchParams(location.search);
@@ -33,7 +37,7 @@ export async function initAuth() {
     try { await client.checkSession(); }
     catch (error) {
       // An expired session or blocked silent consent still allows top-level login.
-      if (!['login_required', 'interaction_required', 'consent_required'].includes(error.error)) throw error;
+      if (!isSessionExpired(error)) throw error;
     }
     return {};
   })();
@@ -54,8 +58,13 @@ export function enterDemo() {
   demo = true;
 }
 export async function accessToken() {
+  if (sessionExpired()) throw expiredSessionError();
   if (!client || !config.auth.audience) throw new Error('A signed-in session and the API audience are required.');
-  return client.getTokenSilently();
+  try { return await client.getTokenSilently(); }
+  catch (error) {
+    if (isSessionExpired(error)) { reportSessionExpired(error); throw expiredSessionError(error); }
+    throw error;
+  }
 }
 export async function signOut() {
   if (demo) { demo = false; location.assign(config.auth.logoutReturnTo); return; }

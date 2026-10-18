@@ -28,6 +28,9 @@ test('callback is consumed once and the same in-memory client serves the workspa
   assert.equal(instances, 1);
   assert.equal(callbacks, 1);
   assert.equal(options.cacheLocation, 'memory');
+  assert.equal(options.useRefreshTokens, true);
+  assert.equal(options.useRefreshTokensFallback, false);
+  assert.match(options.authorizationParams.scope, /offline_access/);
   assert.equal(replaced, 'http://127.0.0.1:4174/login.html');
   assert.equal(await auth.session(), user);
 });

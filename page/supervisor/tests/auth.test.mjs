@@ -28,8 +28,20 @@ test('Auth0 uses memory tokens and the validated SDK identity, not role query st
   assert.equal((await auth.initialize()).sub, 'auth0|verified');
   assert.equal(await auth.token(), 'validated-access-token');
   assert.equal(calls[0][1].cacheLocation, 'memory');
+  assert.equal(calls[0][1].useRefreshTokens, true);
+  assert.equal(calls[0][1].useRefreshTokensFallback, false);
+  assert.match(calls[0][1].authorizationParams.scope, /offline_access/);
   assert.equal(calls[0][1].authorizationParams.audience, settings.audience);
   assert.deepEqual(calls[1], ['check']);
+});
+test('a missing rotated refresh token requires a new interactive sign-in', async () => {
+  const {browser} = fixture();
+  browser.auth0.Auth0Client.prototype.getTokenSilently = async () => {
+    throw Object.assign(new Error('No refresh token'), {error: 'missing_refresh_token'});
+  };
+  const auth = createAuth(settings, browser);
+  await auth.initialize();
+  await assert.rejects(auth.token(), error => error.code === 'session_expired' && error.status === 401);
 });
 test('redirect callbacks are validated by the SDK and callback parameters are removed', async () => {
   const {browser, calls} = fixture('?code=authorization-code&state=state');
