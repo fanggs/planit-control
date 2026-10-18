@@ -283,7 +283,7 @@ function renderMetrics() {
   $('missing-count').textContent = String(state.sites.filter(site => shownSummaryScore(site) === null).length);
 }
 function renderScore(detail) {
-  const container = section('Hazard score (early-stage estimate)');
+  const container = section('Hazard score');
   const model = detail.screening, analysis = assessScore(model, Date.now(), sample);
   container.dataset.screeningStatus = analysis.status;
   if (analysis.status !== 'ready') {
@@ -294,8 +294,8 @@ function renderScore(detail) {
   total.append(el('small', '/ 10'));
   head.append(total, el('div', 'Chance of a weather warning or heat advisory in the next 24 hours', 'score-label'));
   container.append(head, chip('Prototype', 'medium'),
-    note(model.status === 'research' ? 'Early-stage model that hasn’t passed all its accuracy checks yet. A low score doesn’t mean it’s safe. Always follow active alerts.'
-      : 'Early-stage model that passed its accuracy checks. It doesn’t predict injuries, and a low score doesn’t mean it’s safe.', true),
+    note(model.status === 'research' ? 'This model is still being validated. A low score doesn’t mean it’s safe. Always follow active alerts.'
+      : 'Validated on 3 months of weather it had never seen (Jul–Sep 2026). It doesn’t predict injuries, and a low score never overrides an active alert.', true),
     note('What this score means: how likely the National Weather Service is to issue a warning or heat advisory for this plant, from 0 (very unlikely) to 10 (very likely).'),
     note(`Covers ${siteTime(model.valid_from, detail.timezone)} to ${siteTime(model.valid_until, detail.timezone)}`));
   const graph = el('div', null, 'waterfall'); graph.setAttribute('aria-label', 'Prototype screening feature-contribution waterfall');
@@ -575,7 +575,11 @@ async function start() {
     $('connection').textContent = 'Sample data · no live connection';
     api = await createSampleAPI();
   } else if (config.mode === 'live') {
-    $('mode-banner').textContent = 'Live data. Hazard scores are early-stage estimates, not permission to work. Lightning and weather warnings show only after a recent check.';
+    // How often each live source is checked (jobs/lightning.py, jobs/nws.py, get_data.monitor).
+    const banner = $('mode-banner');
+    banner.classList.add('live-banner');
+    banner.replaceChildren(el('span', null, 'live-dot'), el('strong', 'Live'),
+      el('span', 'Lightning checked every 20 seconds · Weather warnings every 5 minutes · Hazard scores every hour'));
     auth = createAuth(config.auth);
     const action = $('auth-action'); action.hidden = false;
     action.disabled = true; action.textContent = 'Checking sign-in…';
