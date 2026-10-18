@@ -22,9 +22,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import OperationalError
 
-from api import db, site_data
+from api import ask, db, site_data
 from api.auth.hazard_auth import Auth0Config, Principal, create_auth_dependency, require_roles
 from api.schemas.alerts import Alert, Briefing
+from api.schemas.ask import AskAnswer, AskRequest, CannotAnswer
 from api.schemas.sites import SiteDetail, SiteSummary
 from db.screening_read import unavailable
 from get_data.site_context import for_site
@@ -215,6 +216,15 @@ def site_detail(site_id: int):
         "environmental_events": site_data.active_events(site_id) or site.get("environmental_events", []),
         "recent_reports": [r for r in _reports() if r["site_id"] == site_id],
     }
+
+
+@app.post("/ask", response_model=AskAnswer | CannotAnswer, dependencies=[Depends(_require_data_viewer)])
+def ask_question(body: AskRequest):
+    try:
+        return ask.answer(body.question)
+    except ask.AskUnavailable as e:
+        return JSONResponse(status_code=503,
+                            content={"error": {"code": "service_unavailable", "message": str(e)}})
 
 
 @app.get("/alerts", response_model=list[Alert], dependencies=[Depends(_require_data_viewer)])
