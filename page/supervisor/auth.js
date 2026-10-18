@@ -1,12 +1,24 @@
 // Auth0 SPA SDK validates the redirect/ID token and stores tokens in memory.
 // The API still validates access-token signature, issuer, audience, expiry and roles.
 import {expiredSessionError, isSessionExpired} from '../shared/auth-session.mjs';
+import {supportedSupervisorAuthOrigin} from '../shared/auth-origin.mjs';
+
+export function shouldResumeSignIn(search, hint) {
+  return new URLSearchParams(search).get('start') === '1' || hint;
+}
 
 export function createAuth(settings, browser = window) {
   let client;
-  const configured = Boolean(settings.domain && settings.clientId && settings.audience && settings.rolesClaim);
+  const settingsReady = Boolean(settings.domain && settings.clientId && settings.audience && settings.rolesClaim);
+  const callback = (() => { try { return new URL(settings.redirectUri); } catch { return null; } })();
+  const pageURL = browser.location?.href || settings.redirectUri;
+  const originApproved = Boolean(callback && callback.pathname === '/supervisor/index.html'
+    && !callback.search && !callback.hash && supportedSupervisorAuthOrigin(settings.redirectUri)
+    && supportedSupervisorAuthOrigin(pageURL) && new URL(pageURL).origin === callback.origin);
+  const configured = settingsReady && originApproved;
   async function initialize() {
-    if (!configured) throw new Error('Live mode needs an Auth0 domain, client ID, API audience and roles claim in config.js.');
+    if (!originApproved) throw new Error('Sign-in is unavailable from this preview. Open https://foresite.work/supervisor/index.html or http://127.0.0.1:4174/supervisor/index.html instead.');
+    if (!settingsReady) throw new Error('Live mode needs an Auth0 domain, client ID, API audience and roles claim in config.js.');
     if (!browser.auth0?.Auth0Client) await new Promise((resolve, reject) => {
       const script = browser.document.createElement('script');
       script.src = 'https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js';
@@ -31,7 +43,7 @@ export function createAuth(settings, browser = window) {
     return await client.isAuthenticated() ? client.getUser() : null;
   }
   return {configured, initialize,
-    async login() { if (!client) throw new Error('Auth0 is not initialized.'); return client.loginWithRedirect(); },
+    async login() { if (!client) await initialize(); return client.loginWithRedirect(); },
     async logout() { if (client) return client.logout({logoutParams: {returnTo: settings.logoutReturnTo}}); },
     async token() {
       if (!client || !(await client.isAuthenticated())) throw expiredSessionError();
