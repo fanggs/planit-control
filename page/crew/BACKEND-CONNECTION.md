@@ -1,6 +1,6 @@
-# Crew backend connection — contract v1.2
+# Crew backend connection — contract v1.3
 
-`api/CONTRACT.md` is the source of truth. An **adapter** translates API data into the existing screen fields. The adapter accepts v1.2 `screening`, feature contributions and separate `wildlife_context`, while retaining a visibly labeled bridge for the earlier API responses.
+`api/CONTRACT.md` is the source of truth. An **adapter** translates API data into the existing screen fields. It accepts v1.3 screening, watch status and wildlife evidence while retaining a visibly labeled bridge for earlier API responses.
 
 ## Screening migration and demo readiness (#6)
 
@@ -12,18 +12,22 @@
   It never falls back to a legacy number or clears a lightning stop-work alert.
 - Legacy API scores remain readable as **Legacy API score** or **Sample score**
   during rollout. A legacy number is never relabeled as a v1.2 model output.
-- Bulk site responses currently do not specify forecast-window fields. The map
-  preserves those fields when supplied, otherwise shows **Forecast window: not
-  supplied**. It does not infer a window or fetch 60 individual site details.
+- Bulk site responses currently do not specify exact forecast-window fields.
+  The map labels the target as **next 24 hours** and points to site detail for
+  exact times. It does not invent timestamps or fetch 60 details.
 - Wildlife sightings show recorded dates, sources, distances, uncertainty and
   limitations separately from scores and crew reports. An empty record list is
   never treated as confirmed wildlife absence.
 - Local demo conditions stay synthetic and use feature-shaped sample factors.
-  The homepage explains v1.2. A waterfall chart remains deferred at Isaiah's
-  direction; signed contributions are available in the existing details list.
-- At implementation time, both local and public `/openapi.json` still expose
-  the earlier `score` / `hazard_type` schema. Alan must finish the v1.2 API
-  schema and response integration; do not change `api/` from the crew work.
+  The homepage explains the prototype. The expanded breakdown shows a
+  baseline-to-final waterfall and the exact signed contributions beneath it.
+- An available list score must include valid feature-level `top_factors`.
+  Otherwise the crew map suppresses the number instead of showing an
+  unexplained 0–10 index. Detail breakdowns open with the signed features.
+- Contract v1.3 `lightning_status` and `warnings_status` are independent of
+  screening. A fresh checked `clear`/`ok` may show a clear watch or no active
+  NWS alerts. A missing or expired check shows unavailable even if the alert
+  list is empty. Open stop-work alerts always win.
 - Alan confirmed #7 is complete: Auth0 accepts the production callbacks and test users are ready. Phone acceptance is still pending. The crew callback is
   `https://foresite.work/crew/login.html`, logout URL
   `https://foresite.work/crew/index.html`, origin `https://foresite.work`, and a
@@ -32,7 +36,7 @@
 
 ## Configure a live connection
 
-In `crew-config.js`, supply the public Auth0 domain, client ID, API audience and API `baseURL`, then set `dataMode: 'live'` and retain `transport: 'http'`. See `AUTH0-HANDOFF.md` for callback URLs. The API must allow the frontend origin and validate the bearer access token on every protected request. Keep secrets out of frontend settings.
+`crew-config.js` already has the public Auth0 identifiers and the same-origin `/api` URL. On the exact `https://foresite.work` origin it uses live mode; loopback and IDE previews remain labeled samples. See `AUTH0-HANDOFF.md` for callback URLs. The API validates the bearer access token on every protected request. Keep secrets out of frontend settings.
 
 Default mode remains `mock`. Live errors never substitute synthetic conditions. The sample API's `model_version: 'sample'` is labeled as sample data rather than a trained model.
 
@@ -63,6 +67,7 @@ All calls request a fresh Auth0 bearer token. List responses follow the contract
 | --- | --- |
 | `GET /sites` | Maps summaries for the site picker. |
 | `GET /sites/{site_id}` | Unpacks score, weather, active alerts, events and recent reports. |
+| `POST /ask` | Sends a 3–500 character question with the viewer's token. An answer includes sources and read-only SQL; `cannot_answer` and 503 have separate UI states. Sample mode never calls Gemini. |
 | `GET /alerts` | Refreshes authoritative alert details after a realtime notice/reconnect. |
 | `GET /reports?site_id={site_id}` | Maps open/resolved reports; fetches attached photos with authorization. |
 | `POST /photos` | Multipart JPEG/PNG, at most 5 MB; returns `{photo_key}`. |
@@ -116,9 +121,11 @@ the subscription and ignores late source loads, responses and messages.
 
 Notification connection status describes the WebSocket and API refresh, not
 the health of the lightning observation feed. A countdown reaching zero is not
-permission to resume. Only a matching `alert.cleared` notice with a fresh API
-response lacking the hold confirms clearance. Existing holds cannot be
-shortened by older responses.
+permission to resume. Even after an `alert.cleared` notice and fresh detail,
+the screen shows a clear lightning watch only when the API's explicit
+`lightning_status: clear` check is still fresh (five minutes). Existing holds
+cannot be shortened by older responses. NWS "no active alerts" similarly
+requires an `ok` check within fifteen minutes.
 
 Advanced integrations can still supply `api.realtimeSource` to `createHTTPAPI`,
 or provide `window.PlanITCrewRealtime`. A source implements

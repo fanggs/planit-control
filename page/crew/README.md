@@ -1,11 +1,13 @@
 # ForeSite — complete frontend package
 
-Contract v1.2 support: the screening index uses feature explanations, a visible
+Contract v1.3 support: the screening index uses feature explanations, a visible
 Prototype label and forecast window, local expiry handling, and separate GBIF
-wildlife evidence. Local demos remain labeled samples. See
+wildlife evidence. Fresh lightning and NWS checks stay distinct from the score.
+Crew members can ask the authenticated `/ask` service questions. Local demos
+remain labeled samples. See
 `BACKEND-CONNECTION.md` for the temporary legacy API bridge and the remaining
-live API/Auth0/phone acceptance steps for issue #6. The waterfall is deferred;
-the existing signed contribution list remains available.
+live API/Auth0/phone acceptance steps for issue #6. The score breakdown includes
+a baseline-to-final waterfall and signed feature list.
 
 Dark welcome page, role-aware Auth0 entry, crew workspace, and primary 60-site 2D/3D map. All six challenge capabilities have frontend screens and service connections. Actual environmental feeds, trained ML, shared storage, Auth0 tenant configuration, notification delivery and 6 PM background jobs must be provided by the backend.
 
@@ -35,10 +37,11 @@ See **CREW-ATLAS.md** for roster refresh, controls and integration.
 4. **Flood warnings:** river proximity, overnight rain, observation window, rule explanation and a warning banner across crew views. Grand Gulf (6072) has a Mississippi River demonstration scenario. Real flood criteria remain backend-owned.
 5. **Briefing:** latest next-day text, date, generation time, available input evidence and print view. History, delivery preferences and email controls remain hidden pending a team contract update. The backend owns the 18:00 site-local job.
 6. **Photo reports:** optional JPEG/PNG up to 5 MB, preview, map click or draggable pin, accessible paired coordinates, validation, two-step upload/report state, stored receipt, open/all/resolved filters and report-map pins. Archived controls remain hidden.
-7. **Supervisor workspace:** Aryan's live dashboard is the canonical destination for supervisors. Isaiah's original dark supervisor screen remains a labeled sample preview with the 60-plant roster and demo storage; its **Open 2D / 3D map** control opens the separate Atlas with the selected plant.
-8. **Explainable 0–10 model display:** validated score, signed contributions in score points, baseline, model version, score time and forecast horizon. Mismatched totals show an unavailable explanation; missing values never become zero. Training/evaluation fields render only when supplied.
-9. **Backend adapters:** authenticated contract REST requests, separate photo upload and JSON report creation, protected image reads, and Alan’s shared DeepSpace listener with ID validation, batched score refresh, reconnect and cleanup. No legacy `/events` request or invented pagination.
-10. **Auth0 entry points:** Universal Login, callback handling and sign-out. Sample access is available only in mock mode. Supervisor live entry checks a configurable roles claim; the API must independently enforce authorization.
+7. **Ask data:** crew and supervisors may send a plain-English question to the protected `/ask` endpoint. The answer, source links, and collapsible SQL are rendered as text. Sample mode does not invoke Gemini.
+8. **Supervisor workspace:** Aryan's live dashboard is the canonical destination for supervisors. Isaiah's original dark supervisor screen remains a labeled sample preview with the 60-plant roster and demo storage; its **Open 2D / 3D map** control opens the separate Atlas with the selected plant.
+9. **Explainable 0–10 model display:** prototype score, signed contributions in score points, baseline, model version, score time and forecast horizon. Mismatched or absent explanations suppress the number; missing values never become zero.
+10. **Backend adapters:** authenticated contract REST requests, separate photo upload and JSON report creation, protected image reads, and Alan’s shared DeepSpace listener with ID validation, batched score refresh, reconnect and cleanup. No legacy `/events` request or invented pagination.
+11. **Auth0 entry points:** Universal Login, callback handling and sign-out. Sample access is available only in mock mode. Supervisor live entry checks a configurable roles claim; the API must independently enforce authorization.
 
 ## Connect the backend
 
@@ -46,9 +49,9 @@ Read **BACKEND-CONNECTION.md** first. An adapter is a small translation layer be
 
 - Set public Auth0 identifiers, API URL and route mapping in `crew-config.js`.
 - Use the included HTTP adapter and use the included default DeepSpace listener configured under `api.realtime`. An optional custom `window.PlanITCrewAPI` must supply the existing UI shapes.
-- `crew-contract.d.ts` separates API types from UI display aliases. `crew-integration.js` translates between them; `api/CONTRACT.md` v1.1 remains authoritative.
+- `crew-contract.d.ts` separates API types from UI display aliases. `crew-integration.js` translates between them; `api/CONTRACT.md` v1.3 remains authoritative.
 - Confirm `api.photoField` with Aryan. The contract specifies multipart images but not the field name; the configurable default is `file`.
-- Change `dataMode` to `live` only after these are configured. Live failures show errors and never substitute synthetic data. The six contract event types—including `scores.updated`—refresh crew details, reports, supervisor rankings and Atlas colors automatically.
+- Live mode activates only on the exact HTTPS production origin. Local previews remain samples. Live failures show errors and never substitute synthetic data. The six contract event types—including `scores.updated`—refresh crew details, reports, supervisor rankings and Atlas colors automatically.
 
 ## Local demonstration limits
 
