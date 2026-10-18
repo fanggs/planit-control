@@ -12,6 +12,7 @@ const paths = {
   site:'<path d="M12 22s8-7 8-13A8 8 0 0 0 4 9c0 6 8 13 8 13Z"/><circle cx="12" cy="9" r="2.5"/>',
   report:'<path d="M4 7h4l2-3h4l2 3h4v14H4V7Z"/><circle cx="12" cy="13" r="4"/>',
   briefing:'<path d="M6 3h9l4 4v14H6V3Z"/><path d="M14 3v5h5M9 12h7m-7 4h7"/>',
+  search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',
   switch:'<path d="M4 8h16l-4-4M20 16H4l4 4"/>',
   shield:'<path d="m12 2 8 3v6c0 5-8 11-8 11S4 16 4 11V5l8-3Z"/><path d="m8 11 3 3 5-6"/>'
 };
