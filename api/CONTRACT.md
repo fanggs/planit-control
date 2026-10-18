@@ -74,10 +74,10 @@ the request body.
 - Acceptance for login: Alan lands in the crew workspace rather than the
   "no workspace role" message.
   Full crew-to-API integration is a separate check: `page/crew/crew-config.js`
-  is currently in `mock` mode with no API base URL. Alan and Isaiah must
-  coordinate switching it to live data and pointing it at an authorized API
-  reachable from Alan's computer; a successful login alone does not prove
-  that reports or site data are backed by the API.
+  uses live data with a same-origin `/api` base URL on the exact HTTPS deployment,
+  while local loopback previews remain in mock mode. Alan and Aryan coordinate
+  verification of authorized site reads and report submission from Alan's
+  computer; a successful login alone does not prove API integration.
 
 ## 3. Database tables (Tiger Data / PostgreSQL)
 

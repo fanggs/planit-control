@@ -35,8 +35,12 @@ own part.
 | --- | --- | --- | --- |
 | Sid | `SidVal123` | Data + ML models | `get_data/`, `model/`, `db/` (except `db/hazard_report.sql`) |
 | Alan | `fanggs` | API, Gemini, real-time alerts, deploy | `api/` (except Aryan's files below), `jobs/`, `page/realtime/`, the DeepSpace bridge (`planit-realtime`) |
-| Aryan | `nimma-aryan` | Crew-report backend, supervisor dashboard | `api/schemas/hazard_report.py`, `api/services/hazard_report_service.py`, report and photo routes, `db/hazard_report.sql`, supervisor files in `page/`, shared styles |
-| Isaiah | `IsaiahCN` | Crew screens, demo readiness | `page/crew/` |
+| Aryan | `nimma-aryan` | Crew-report backend, crew and supervisor frontends, demo readiness | `api/schemas/hazard_report.py`, `api/services/hazard_report_service.py`, report and photo routes, `db/hazard_report.sql`, `page/crew/`, supervisor files in `page/`, shared styles |
+
+For now, Aryan is the single owner of both his original work and Isaiah's
+former crew-screen and demo-readiness work. Isaiah has no separate active
+deliverable under this temporary ownership arrangement. This does not change
+the app's `crew` and `supervisor` Auth0 permissions.
 
 What each role delivers:
 
@@ -47,11 +51,11 @@ What each role delivers:
   tagging), the lightning rule and real-time events, and the deploy. Done when
   a judge can open the domain on their phone and watch a lightning alert fire.
 - **Aryan:** report and photo endpoints, report storage, Auth0 role checks on
-  the API, the shared design system, and the supervisor dashboard. Done when
-  a report submitted from a phone shows up on the supervisor map.
-- **Isaiah:** the crew screens (login, alerts with countdown, report form,
-  score breakdown, briefing), phone testing, link checks, and the Devpost
-  draft. Done when a stranger can use the crew side without help.
+  the API, the shared design system, the supervisor dashboard, and the crew
+  screens (login, alerts with countdown, report form, score breakdown,
+  briefing). He also owns phone testing, link checks, and the Devpost draft.
+  Done when a stranger can use the crew side without help and a report
+  submitted from a phone shows up on the supervisor map.
 
 Stick to your own files. If you need a small change in someone else's, tell
 them first, keep it small, and pull right before and push right after.

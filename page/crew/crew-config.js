@@ -2,7 +2,7 @@
 import {isLiveDeploymentURL} from './crew-routing.js';
 
 const liveDeployment=isLiveDeploymentURL(import.meta.url);
-// Isaiah-owned frontend settings. Public identifiers only. Never put a client secret here.
+// Aryan-owned frontend settings. Public identifiers only. Never put a client secret here.
 export const config = {
   dataMode: liveDeployment?'live':'mock', // Only the exact HTTPS domain uses real API data.
   transport: 'http', // 'custom' uses window.PlanITCrewAPI; 'http' uses crew-http.js.
