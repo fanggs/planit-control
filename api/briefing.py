@@ -17,6 +17,7 @@ import json
 import re
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+from urllib.parse import urlsplit
 from zoneinfo import ZoneInfo
 
 from api import llm
@@ -141,16 +142,29 @@ SCREENING_SOURCE = {"source_name": "ForeSite screening model (prototype)",
                     "source_url": "https://github.com/fanggs/planit-control/blob/main/model/README.md"}
 
 
-def briefing_sources(site: dict, rows: list[dict], events: list[dict], facts: dict) -> list[dict]:
-    """Where the briefing's facts came from: the forecast, any NWS alerts named, the index."""
+def _safe_url(url) -> bool:
+    try:
+        u = urlsplit(url) if isinstance(url, str) else None
+    except ValueError:
+        return False
+    return bool(u and u.scheme in {"https", "http"} and u.hostname and not u.username and not u.password)
+
+
+def briefing_sources(site: dict, rows: list[dict], events: list[dict], facts: dict, for_date: date) -> list[dict]:
+    """Where the briefing's facts came from: that day's forecast, the NWS alerts it names, the index.
+
+    Only URLs from stored records; Gemini never supplies a source.
+    """
+    tz = ZoneInfo(site["timezone"])
     out: dict[str, str] = {}
     for r in rows:
-        if r["site_id"] == site["site_id"] and r.get("source_name") and r.get("source_url"):
-            out.setdefault(r["source_name"], r["source_url"])
+        if (r["site_id"] == site["site_id"] and _safe_url(r.get("source_url"))
+                and datetime.fromisoformat(r["valid_at"].replace("Z", "+00:00")).astimezone(tz).date() == for_date):
+            out.setdefault(r.get("source_name") or "Forecast", r["source_url"])
             break
     if facts.get("nws_alerts"):
         for e in events:
-            if e["site_id"] == site["site_id"] and e.get("source_url"):
+            if e["site_id"] == site["site_id"] and _safe_url(e.get("source_url")) and nws_for_day(site, [e], for_date):
                 out.setdefault("National Weather Service: " + _event_name(e["title"]), e["source_url"])
     if facts.get("screening_index_0_to_10") is not None:
         out.setdefault(SCREENING_SOURCE["source_name"], SCREENING_SOURCE["source_url"])
@@ -291,7 +305,7 @@ def briefing_for(site: dict, rows: list[dict], alerts: list[dict], now: datetime
     facts |= context_facts(site, events or [], tomorrow)
     result = write_briefing(site, facts, [a for a in alerts if a["site_id"] == site["site_id"]])
     first = min((r["valid_at"] for r in rows if r["site_id"] == site["site_id"]), default=None)
-    sources = briefing_sources(site, rows, events or [], facts)
+    sources = briefing_sources(site, rows, events or [], facts, tomorrow)
     return {
         "site_id": site["site_id"],
         "for_date": tomorrow.isoformat(),

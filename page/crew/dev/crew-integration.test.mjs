@@ -60,3 +60,11 @@ test('report and latest briefing mapping retain contract fields without fabricat
   assert.equal(briefing.timezone,'America/New_York');assert.equal(briefing.delivery_status,null);assert.deepEqual(briefing.forecast,[]);
   assert.throws(()=>mapper.briefing(fixture.briefings['9001'],9002),/different site/);
 });
+test('stored briefing evidence reaches the UI without borrowing current site sources',()=>{
+  const mapper=createContractMapper();
+  const raw=clone(fixture.briefings['9001']);
+  assert.deepEqual(mapper.briefing(raw,9001).sources,[]);
+  raw.inputs.sources=[{source_name:'Forecast run used by this briefing',source_url:'https://example.org/forecast-run'}];
+  assert.deepEqual(mapper.briefing(raw,9001).sources,raw.inputs.sources);
+  assert.equal(mapper.briefing(raw,9001).delivery_status,null);
+});

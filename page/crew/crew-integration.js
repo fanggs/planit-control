@@ -97,6 +97,9 @@ export function displayHazards(raw, activeAlerts, now = Date.now()) {
   const wildlife = raw.wildlife_context;
   const sightings = Array.isArray(wildlife?.sightings) ? wildlife.sightings : [];
   hazards.wildlife = {...hazards.wildlife,
+    source_name: ['recorded_sightings','no_records_in_sample'].includes(wildlife?.status)
+      ? 'GBIF historical sample · details below' : undefined,
+    observed_at: time(wildlife?.context_built_at), time_label: 'Context prepared',
     reading: wildlife?.status === 'recorded_sightings' ? `${sightings.length} recorded sighting${sightings.length === 1 ? '' : 's'} nearby · details below`
       : wildlife?.status === 'no_records_in_sample' ? 'No sightings in this limited sample · details below'
       : 'Wildlife evidence unavailable · details below',
@@ -200,7 +203,9 @@ export function createContractMapper({now = () => Date.now()} = {}) {
     return {...raw, id: `latest:${raw.site_id}:${raw.for_date}:${raw.generated_at}`, site_id: String(raw.site_id),
       title: 'Next-day safety briefing', valid_date: raw.for_date, body: raw.text,
       timezone: snapshots.get(String(siteId))?.timezone ?? null, forecast: [],
-      sources: (Array.isArray(raw.sources) ? raw.sources : []).filter(s => typeof s?.source_name === 'string' && typeof s?.source_url === 'string'),
+      // Newer briefings send sources at the top level; older ones only inside inputs.
+      sources: (Array.isArray(raw.sources) && raw.sources.length ? raw.sources : Array.isArray(raw.inputs?.sources) ? raw.inputs.sources : [])
+        .filter(s => typeof s?.source_name === 'string' && typeof s?.source_url === 'string'),
       delivery_status: null};
   }
   return {nextRevision, site, briefing};

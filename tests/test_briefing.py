@@ -3,9 +3,11 @@
 Run: .venv/bin/python -m unittest tests.test_briefing -v
 """
 import unittest
-from datetime import date
+from datetime import date, datetime, timezone
+from unittest.mock import patch
 
-from api.briefing import briefing_sources, context_facts, daily_facts, grounded, nws_for_day, template_briefing
+from api.briefing import briefing_for, briefing_sources, context_facts, daily_facts, grounded, nws_for_day, template_briefing
+from api.schemas.alerts import Briefing
 
 SITE = {"site_id": 621, "name": "Turkey Point", "timezone": "America/New_York"}
 
@@ -25,6 +27,22 @@ ROWS = [
 
 
 class FactsTest(unittest.TestCase):
+    def test_evidence_stays_with_the_site_and_local_forecast_day(self):
+        url = "https://example.org/forecast/621"
+        rows = [dict(r, source_url=url) for r in ROWS]
+        rows += [dict(rows[0], site_id=9, source_url="https://example.org/other-site"),
+                 dict(rows[-1], source_url="https://example.org/other-day"),
+                 dict(rows[0], source_url="javascript:alert(1)")]
+        events = [{"site_id": 621, "title": "Flood Warning", "starts_at": "2026-10-18T12:00:00Z",
+                   "ends_at": "2026-10-18T23:00:00Z", "source_name": "NWS", "source_url": "https://example.org/alert"}]
+        sources = briefing_sources(SITE, rows, events, {"nws_alerts": "Flood Warning"}, date(2026, 10, 18))
+        self.assertEqual([s["source_url"] for s in sources], [url, "https://example.org/alert"])
+        with patch("api.briefing.write_briefing", return_value={"text": "Test briefing", "method": "template"}):
+            result = briefing_for(SITE, rows, [], now=datetime(2026, 10, 17, 22, tzinfo=timezone.utc), events=events)
+        # Evidence must survive the actual response schema, not just generation/storage.
+        output = Briefing.model_validate(result).model_dump(mode="json")
+        self.assertEqual(output["inputs"]["sources"], sources)
+
     def test_daily_facts_use_site_local_day(self):
         f = daily_facts(SITE, ROWS, date(2026, 10, 18))
         self.assertEqual(f["forecast_hours"], 3)       # the 1 AM row belongs to the 19th
@@ -122,11 +140,11 @@ class ContextTest(unittest.TestCase):
                        source_url="https://api.weather.gov/alerts/urn:test")]
         site = dict(SITE, screening={"score": 1.9, "status": "validated_prototype"})
         facts = daily_facts(SITE, ROWS, DAY) | context_facts(site, events, DAY)
-        names = [s["source_name"] for s in briefing_sources(site, rows, events, facts)]
+        names = [s["source_name"] for s in briefing_sources(site, rows, events, facts, DAY)]
         self.assertEqual(names, ["Open-Meteo / ECMWF IFS HRES (modeled)", "National Weather Service: Heat Advisory",
                                  "ForeSite screening model (prototype)"])
         quiet = daily_facts(SITE, ROWS, DAY) | context_facts(SITE, [], DAY)
-        self.assertEqual([s["source_name"] for s in briefing_sources(SITE, rows, [], quiet)],
+        self.assertEqual([s["source_name"] for s in briefing_sources(SITE, rows, [], quiet, DAY)],
                          ["Open-Meteo / ECMWF IFS HRES (modeled)"])
 
     def test_made_up_warning_hours_are_caught(self):

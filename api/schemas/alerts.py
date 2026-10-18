@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from api.schemas.hazard_report import HazardType, SiteId
 
@@ -22,15 +22,16 @@ class Alert(BaseModel):
     trigger: dict  # e.g. {"strike_id": "...", "distance_mi": 6.2}
 
 
+class BriefingSource(BaseModel):
+    source_name: str
+    source_url: str
+
+
 class BriefingInputs(BaseModel):
     forecast_valid_from: datetime | None
     score_scored_at: datetime | None  # null until hazard scores exist
     method: str | None = None  # "gemini" or "template" (grounding fallback)
-
-
-class BriefingSource(BaseModel):
-    source_name: str
-    source_url: str
+    sources: list[BriefingSource] = Field(default_factory=list)
 
 
 class Briefing(BaseModel):

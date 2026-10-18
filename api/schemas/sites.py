@@ -148,6 +148,9 @@ class SiteDetail(BaseModel):
     timezone: str
     plant_type: str
     hazard_region: str
+    source_name: str | None = None
+    source_url: str | None = None
+    retrieved_at: datetime | None = None
     latest_weather: LatestWeather | None
     screening: ScreeningResult
     wildlife_context: WildlifeContext
