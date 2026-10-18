@@ -24,6 +24,7 @@ import argparse
 import json
 import logging
 import os
+import signal
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -68,6 +69,24 @@ def replay(storm: dict, sites: list[dict], speed: float = 1.0, publish=None, tic
     def shifted(orig: datetime) -> datetime:
         return t0_wall + (orig - t0_storm) / speed
 
+    try:
+        _play(storm, sites, pending, rule, store, publish, t0_storm, t0_wall, speed, shifted, tick)
+    except KeyboardInterrupt:  # Ctrl+C, or SIGTERM from systemctl stop (see __main__)
+        log.info("replay stopped early: clearing its alerts")
+        stop_early(rule, store, publish)
+
+
+def stop_early(rule: LightningRule, store, publish) -> None:
+    """End this replay's open alerts and tell screens, so no stop-work is left behind."""
+    for alert in list(rule.active.values()):
+        publish("alert.cleared", site_id=alert.site_id, alert_id=alert.alert_id)
+    rule.active.clear()
+    write_live_alerts([])
+    if store is not None:
+        store.end_all_open(datetime.now(timezone.utc))
+
+
+def _play(storm, sites, pending, rule, store, publish, t0_storm, t0_wall, speed, shifted, tick) -> None:
     while True:
         now = datetime.now(timezone.utc)
         storm_now = t0_storm + (now - t0_wall) * speed
@@ -112,6 +131,8 @@ if __name__ == "__main__":
             k, v = line.split("=", 1)
             os.environ.setdefault(k.strip(), v.strip())
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
+    # systemctl stop sends SIGTERM; treat it like Ctrl+C so the replay cleans up.
+    signal.signal(signal.SIGTERM, signal.default_int_handler)
     from api.site_data import load_sites
     sites = load_sites()
     replay(load_storm(args.storm), sites, speed=args.speed)
