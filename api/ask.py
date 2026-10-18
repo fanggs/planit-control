@@ -55,8 +55,11 @@ screening_predictions: hazard screening index, 0-10 = 10 x model probability tha
 alerts: safety alerts. id, site_id, hazard_type (lightning, heat, flooding, wildfire,
   soil_saturation, wildlife, other), level (warning, stop_work), message, started_at,
   clear_at, ended_at (NULL = still active)
-environmental_events: NWS warnings and historical storm events. site_id, hazard_type,
-  event_kind, title, severity, starts_at, ends_at, source_name, source_url
+environmental_events: site_id, hazard_type, event_kind, title, severity, starts_at, ends_at,
+  source_name, source_url. Live National Weather Service alerts have event_kind LIKE 'nws_%'
+  (nws_warning, nws_advisory, nws_watch, nws_statement); 'historical_storm_event' rows are past
+  storm records. For "active" or "current" NWS alerts, select ends_at > now() (or NULL) and
+  include starts_at, so alerts starting soon are listed too and can be called upcoming.
 """
 
 SQL_PROMPT = """You turn a question about utility power plant safety data into ONE PostgreSQL SELECT.
