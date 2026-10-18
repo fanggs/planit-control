@@ -1,7 +1,10 @@
 # Welcome page and Auth0 handoff
 
-The local UI follows: `index.html` → `login.html` → Auth0 Universal Login →
-`login.html` → the account's crew or supervisor workspace.
+The UI follows `/crew/index.html` → `/crew/login.html` → Auth0 Universal
+Login → the account's crew or supervisor workspace. A signed-in crew member
+moving to the crew map may make a brief top-level Auth0 round trip so the new
+HTML document gets its own memory-only token. With a valid Auth0 session this
+normally needs no second credential prompt.
 
 Set the public domain, client ID and API audience in `crew-config.js`.
 There are no Auth0 client secrets in frontend code. The namespaced roles claim
@@ -14,34 +17,36 @@ The API must independently validate access tokens and enforce permissions.
 
 ## Auth0 application URLs
 
-Register the full deployed URL of `login.html` as the Allowed Callback URL.
-Register the full deployed URL of `index.html` as the Allowed Logout URL.
-Register the application origin in Allowed Web Origins. Include the local
-development origin and callback/logout URLs separately when testing locally.
-Example, when publishing `page/crew/` as the website root:
+The development PlanIT Auth0 SPA has these exact crew callback URLs. Keep the
+supervisor callback `/supervisor/index.html` as well. The matching logout URLs
+are `/crew/index.html` and `/supervisor/index.html`; Allowed Web Origins are
+`https://foresite.work` and `http://127.0.0.1:4174`.
 
-| Setting | Local example |
+| Origin | Exact crew callback paths |
 | --- | --- |
-| Callback | `http://127.0.0.1:4174/login.html` |
-| Logout | `http://127.0.0.1:4174/index.html` |
-| Web origin | `http://127.0.0.1:4174` |
+| `https://foresite.work` | `/crew/login.html`, `/crew/crew.html`, `/crew/crew-atlas.html` |
+| `http://127.0.0.1:4174` | `/crew/login.html`, `/crew/crew.html`, `/crew/crew-atlas.html` |
 
-The same preview server also hosts Aryan’s dashboard at
-`http://127.0.0.1:4174/supervisor/index.html`. Add that exact URL to the
-Allowed Callback and Logout URLs for the dashboard’s separate Auth0 SDK
-session. If using Aryan’s standalone preview on port 4175, allow its exact
-callback/logout URL and web origin as well.
+The same preview server hosts the supervisor dashboard at
+`http://127.0.0.1:4174/supervisor/index.html`. Do not use PyCharm's built-in
+`localhost:63342` preview for Auth0: that callback is intentionally not
+registered. Open the actual development server on `127.0.0.1:4174`, or use
+`https://foresite.work`. A different port or path is a different callback.
 
 Use HTTPS for the deployed site. Keep local previews on `127.0.0.1` only;
 Auth0's SPA SDK requires a secure browser context (HTTPS or loopback 127.0.0.1).
-The callback keeps crew users in the same document, preserving their
-memory-only access token. A verified `supervisor` role opens Aryan’s canonical
-`/supervisor/index.html` dashboard instead. The fixed same-origin handoff URL
-never carries an access token, authorization code, role, or arbitrary return
-URL. Aryan’s dashboard establishes its own Auth0 SDK session; if browser
-cookie restrictions prevent silent renewal, the user may need to click its
-Sign in button once more. Never work around this by putting tokens in URLs or
-browser storage.
+Each callback returns to the exact page that requested sign-in, preserving its
+token in that page's memory. A verified `supervisor` role opens the canonical
+`/supervisor/index.html` dashboard and establishes a separate Auth0 SDK
+session there. The handoff carries no access token, role, or arbitrary return
+URL. A per-tab boolean may request a top-level SSO handoff after a full-page
+navigation; it is never treated as proof of identity or permission. If the
+Auth0 session has expired, the user must sign in again. Never work around this
+by putting tokens in URLs or browser storage.
+On loopback, Auth0 may still show its **Authorize App** consent screen during
+this round trip because a local callback is not a verifiable public origin.
+The `https://foresite.work` handoff is the meaningful no-repeat-prompt test;
+do not disable consent or broaden callback URLs merely to hide the local prompt.
 
 Isaiah’s `crew-supervisor.html` remains a labeled sample preview for the
 offline demo and direct development checks. The welcome page’s Supervisor

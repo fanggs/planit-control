@@ -139,15 +139,15 @@ replace nulls with old values or sample scores to make the map look populated.
    frontend origin and allow the Authorization header. The public `realtime`
    URL and app ID already match the team contract; keep the bridge's notify
    secret on the backend only.
-3. In the Auth0 SPA application, register the exact callback and logout URLs
-   in `config.auth`, and the frontend origin in Allowed Web Origins. Locally
-   the default callback/logout URL is
-   `http://127.0.0.1:4175/supervisor/index.html`, with origin
-   `http://127.0.0.1:4175`. Isaiah’s shared preview serves this dashboard at
-   `http://127.0.0.1:4174/supervisor/index.html`; allow that exact callback and
-   origin too when following the crew-to-supervisor navigation. For deployment these derive from the deployed module
-   URL. Auth0 must allow the chosen development callback; use an HTTPS local
-   proxy on 127.0.0.1 if the tenant's settings require it.
+3. The development Auth0 SPA permits the exact callback URLs
+   `https://foresite.work/supervisor/index.html`,
+   `http://127.0.0.1:4174/supervisor/index.html`, and
+   `http://127.0.0.1:4175/supervisor/index.html`. Their origins and logout
+   URLs are registered separately. Run the shared preview on
+   `127.0.0.1:4174` or the standalone supervisor preview on
+   `127.0.0.1:4175`; PyCharm's `localhost:63342` HTML preview is not an
+   approved callback and must not start Auth0. A different scheme, host, port,
+   or path requires deliberate tenant configuration.
 4. Auth0 must add the agreed role array to the ID token for UI gating, and to
    the access token for the API. For a supervisor, the claim value is
    `["supervisor"]`. The backend verifies the access token independently.
@@ -157,9 +157,15 @@ replace nulls with old values or sample scores to make the map look populated.
    back to sample data.
 
 `auth.js` loads the same Auth0 SPA SDK 2.0 CDN endpoint used by the team's crew
-app. Its tokens stay in memory. Deployed CSP must allow the Auth0 SDK CDN,
+app. Its tokens stay in memory. A crew-to-supervisor or reload handoff may
+briefly revisit Auth0 in a top-level redirect; an active Auth0 session should
+return without another credential prompt, while an expired session requires
+sign-in. No access or refresh token is stored in browser storage. Deployed CSP must allow the Auth0 SDK CDN,
 configured tenant, API and basemap tile origins. Prefer a pinned, team-reviewed
 SDK version when Alan prepares the deployment asset policy.
+Auth0 can still display **Authorize App** consent on loopback callbacks because
+they are not verifiable public origins. Check prompt-free SSO on the deployed
+HTTPS site after the local commits are pushed and deployed.
 
 ## DeepSpace real-time notices
 
