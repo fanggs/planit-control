@@ -2,11 +2,44 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {createContractMapper} from '../crew-integration.js';
-import {dateLabel, hazardHTML, refreshHazardAges} from '../crew-ui.js';
+import {dateLabel, hazardHTML, refreshHazardAges, floodHTML} from '../crew-ui.js';
 import {heatIndexDisplay} from '../../shared/environment-readings.mjs';
 
 const fixture = JSON.parse(await fs.readFile(new URL('./fixtures/contract-v1.1.json', import.meta.url)));
 const rawSite = () => structuredClone(fixture.details['9002']);
+
+test('rainfall period and attribution exist without an active flood warning, including zero rain',()=>{
+  const raw=rawSite(),now=Date.parse('2026-10-17T18:05:00Z');
+  raw.active_alerts=[];raw.environmental_events=[];
+  raw.warnings_status={status:'ok',checked_at:'2026-10-17T18:04:00Z',source_name:'NWS',source_url:'https://api.weather.gov/alerts/active'};
+  raw.latest_weather.precip_24h_in=0;raw.latest_weather.observed_at='2026-10-17T18:00:00Z';
+  raw.river_context={site_id:raw.site_id,status:'mapped',river_name:'Test River',distance_miles:1.23,
+    source_name:'USGS',source_url:'https://example.org/river',retrieved_at:'2026-10-17T17:00:00Z',limitations:'Not a flood-risk assessment.'};
+  const site=createContractMapper({now:()=>now}).site(raw),html=floodHTML(site,now);
+  assert.equal(site.flood.rainfall_period_start,'2026-10-16T18:00:00.000Z');
+  assert.equal(site.flood.rainfall_period_end,'2026-10-17T18:00:00Z');
+  assert.match(html,/Rainfall period/);assert.match(html,/0 in/);assert.match(html,/Test River · approx. 1.2 mi/);
+  assert.ok(html.includes(dateLabel(raw.latest_weather.observed_at,raw.timezone)));
+  assert.match(html,/Warning feed:.*NWS/);assert.match(html,/River mapping:.*USGS/);
+  assert.match(html,/No active NWS flood warning/);
+  raw.latest_weather.precip_24h_in=null;
+  const missing=createContractMapper({now:()=>now}).site(raw);
+  assert.equal(missing.flood.rainfall_period_start,null);assert.equal(missing.flood.rainfall_period_end,null);
+  raw.river_context.site_id=raw.site_id+1;
+  assert.equal(createContractMapper({now:()=>now}).site(raw).flood.river_name,null);
+});
+
+test('rainfall period stays distinct from a warning period and stale checks cannot clear the panel',()=>{
+  const raw=rawSite(),now=Date.parse('2026-10-17T18:05:00Z');
+  raw.latest_weather.observed_at='2026-10-17T18:00:00Z';
+  const site=createContractMapper({now:()=>now}).site(raw);
+  assert.equal(site.flood.rainfall_period_start,'2026-10-16T18:00:00.000Z');
+  assert.notEqual(site.flood.rainfall_period_start,site.flood.warning_valid_from);
+  const clear=rawSite();clear.active_alerts=[];clear.environmental_events=[];
+  clear.warnings_status={status:'ok',checked_at:'2026-10-17T18:04:00Z'};
+  const mapped=createContractMapper({now:()=>now}).site(clear);
+  assert.match(floodHTML(mapped,now+3600000),/Flood status unavailable/);
+});
 
 test('heat-index reasons distinguish cool, missing inputs, high out-of-range and real zero', () => {
   assert.match(heatIndexDisplay({temperature_f: 63, heat_index_f: null}), /Not calculated below 80/);

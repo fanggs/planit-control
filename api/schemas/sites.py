@@ -154,6 +154,7 @@ class SiteDetail(BaseModel):
     latest_weather: LatestWeather | None
     screening: ScreeningResult
     wildlife_context: WildlifeContext
+    river_context: dict | None = None
     lightning_status: LightningStatus
     warnings_status: WarningsStatus
     active_alerts: list[dict]

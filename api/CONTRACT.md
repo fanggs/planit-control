@@ -261,6 +261,12 @@ and has been watched for 30 minutes, and there's no stop-work alert), or
 `score`, `scored_at`, `top_factors` are `null` when the screening index is unavailable; `score_status` says why (`no_data`, `stale`, `invalid`, `research_unapproved`) or is `research` / `validated_prototype` when shown. `active_alert` is `null` if none.
 
 ### `GET /sites/{site_id}`: site detail + breakdown panel
+Site-detail responses also include optional `river_context`: cached USGS
+river/stream proximity with `site_id`, `status` (`mapped`, `no_mapped_river`,
+or `unavailable`), `river_name`, approximate `distance_miles`, search radius,
+source and retrieval metadata. This is geographic context, not an alert or
+model input. See `get_data/RIVERS.md` for collection and distance semantics.
+
 Returns the site fields, plus:
 `latest_weather` (with `observed_at`), `screening` (full section 4 output, or
 the null/status/reason form), `wildlife_context` (section 4), `lightning_status`

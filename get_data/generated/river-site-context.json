@@ -1,0 +1,1168 @@
+{
+  "built_at": "2026-10-18T08:04:07.104707+00:00",
+  "source_layer": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50",
+  "search_radius_km": 25,
+  "sites": [
+    {
+      "site_id": 9,
+      "latitude": 31.7569,
+      "longitude": -106.375,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 1.5134995334563877,
+      "feature_id": "8TTYD",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+13493475&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:00:46.218876+00:00",
+      "source_sha256": [
+        "1b224a75673e64b1f6abdfdccb698a9e03c72ac82284be53271776ecf0df6199"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 88,
+      "latitude": 41.949,
+      "longitude": -74.2063,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Esopus Creek",
+      "distance_miles": 0.16617284266677126,
+      "feature_id": "3UU29",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+5118412&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:00:55.726433+00:00",
+      "source_sha256": [
+        "0fea82a163669867c84a0c412fcceb7dc7fd449b6446ffc2d43f77d1c99a0390",
+        "1286d4c6ec81974d562b55149be330694e4da18cc185f7fcb677c1175bd2e93f",
+        "0054cf0a7480ff1e096773f7d76bc172540bcf4663c2c2ed15fc25ff09f34519"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 114,
+      "latitude": 31.364122,
+      "longitude": -109.5538,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.3539669080249382,
+      "feature_id": "EL6U9",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+23192301&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:00:53.984139+00:00",
+      "source_sha256": [
+        "2d81addd624e8a24df42f08784c42f055638ce175f34a65a13b526c3dd954929",
+        "cc78a26140e1cb77b079e87e22b986e89b83f3e80c7540681de59c5e7d4935bf",
+        "cbb5fec5c9432f388b2f9f0108a02abecef2f91b1beebab9e1e975531bb2a365"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 120,
+      "latitude": 32.7214,
+      "longitude": -114.7106,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 1.2460543775689317,
+      "feature_id": "3H651",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+4478924&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:00:53.239248+00:00",
+      "source_sha256": [
+        "c06aa877b1c06722f144edaeb27c78832040fe09c64b7e6c407eaf74c2299b42",
+        "843f54da17dc72f1b1b12f78efa480b99907062c87e1b563e8662c7844c8f328",
+        "891a2775da5c682d3131917c0e042279d94337e1016cadbd230098c9741aca35",
+        "78e30f85e3cedd5d08a8976fd86a91cf62f0fa447ef09ae352da02614e6fab72"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 327,
+      "latitude": 37.3499,
+      "longitude": -118.4628,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Bishop Creek",
+      "distance_miles": 0.008301839807376357,
+      "feature_id": "GPKXP",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+26763546&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:01:03.366277+00:00",
+      "source_sha256": [
+        "d9a1d10b493bb9a4c6100046f770643a09e357f7b0f16c35f4f61f7d0f944cbd",
+        "c4fdbb6b2b0e81f7870e3e096056e4bab60fb01e8e5662ca36b5ccfe07f74f13",
+        "ccfa9a4671d5532c1b5be46f4987ad0843c9acb9d92d121f186c225dddd0f0af",
+        "40108fc09cc331328109c2d5185d3020a89c4abc5f0695c1705c719f1dd5c89a",
+        "5344ac21fb00ffc73e034bd00ae99fad225c4c21203fc6ca8084f05ac2ccb977",
+        "794466c7677088091d9a3258842698f549ed0f456e9a2791d42cf0f5699443f4"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 437,
+      "latitude": 39.542985,
+      "longitude": -121.4922,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.29004899373161724,
+      "feature_id": "94RN9",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+14005296&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:01:21.894483+00:00",
+      "source_sha256": [
+        "80f67bcd54f81909f14530351952156f26053df228c4d8405aaf878f5cbfc547",
+        "4eb60596b2474c8892461f12d4bb254c5020b2fdd524cd612674015d4851d105",
+        "3f57ce413ac31cc2721d3b2f103cc214a82248efde076bc354f88c4fefe5c895",
+        "79e43b5da84ab71a3bdfa6e8f0bff7472474967bf0fff83630cf2f2cb8f5bffe",
+        "da7273187bff1aefffc96efffc775c1a8baf45bc20c23d85bfd3355501bd9506",
+        "c34a940cda82c12fa2d60a9d928a39c950d7bf2129c4deb69572a2499ba21af1",
+        "db134d1c4abaf48b6201ac227aceeda7370899dbd26c0be28618b70a2766294d",
+        "f06f639a383553194383a40c04789e01581c8735f32ba52d57256ab259fc7a4a"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 445,
+      "latitude": 40.717455,
+      "longitude": -122.4223,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.26519220897882606,
+      "feature_id": "2GKQV",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+2501159&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:01:20.241258+00:00",
+      "source_sha256": [
+        "854c6209f4fc6e214f28268fae562e7da3704ae6f021948338a0b3e0ddcde8b5",
+        "bce5ac77304310da8755828d36c74e14dfd767d49d4261b88bfc1b7ee6a7c562",
+        "5178dc4f726c5d0896a1473a81369ee2a75516f8d5568bcca7eae2b2cd26e6a6",
+        "b110c74bbcc119b41025a397f5e315ef9707df14b2525b6d2aed9aafb2f86b52",
+        "eb4a9c86801de6cf097d1addfe379ca47fc0ace35ca586a4fce8d890dd209f9e",
+        "394079660d22190d6ded3571f22c75a23014c357f35c92b3547b8ec8ed4c5e34",
+        "74855e4cf1004c3cf953d925cc94c46513841e70ef504fc5aba339818a661b43",
+        "4ccb3f1fc2451d4e9b27b0dc0d863b93ddb3f64f575cf3bf575635404a0408ec",
+        "9db8a75af601a0c205ea493e55a83bc40f9b37735c42233e261cd8256f304c77"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 621,
+      "latitude": 25.4356,
+      "longitude": -80.3308,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 1.104751202494165,
+      "feature_id": "ASOKA",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+16808323&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:00:59.330426+00:00",
+      "source_sha256": [
+        "4d3d3c3b534babd7ac1864affc4dfb8cfdc2027e05e8f4cf2afbe967c25f3945"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 886,
+      "latitude": 41.8508,
+      "longitude": -87.6533,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 4.78193019613278,
+      "feature_id": "3NA2S",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+4765395&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:01:02.618812+00:00",
+      "source_sha256": [
+        "e7c300b62c2fc77c2bb602b411c6f9fd24a851e78536658c059434af8188ec5d"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 1417,
+      "latitude": 32.7047,
+      "longitude": -93.9597,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.23969890690364953,
+      "feature_id": "T8FE",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+29935534&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:01:27.963923+00:00",
+      "source_sha256": [
+        "81a20a10bfe6a35ee17f48f38b46c21839cc96e2e9c64289dec7142646e60716",
+        "f81549d1035784e116a57bad08bf09ac63c075a83d4966a7f6a5c11bb048c520",
+        "3af6793c193820de3dafee85e39c624959eec157b4ffe501011d5f4f52b95851",
+        "79146e5cde4c1642b69b2b6b0931e7dfc9e5611ebc6964f3ce574be2d3c7188b",
+        "b24374ccbdfa87f00798443a77faf567a98b0396026bb5db81efdc736d26120d"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 1705,
+      "latitude": 44.435381,
+      "longitude": -83.44072,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.8462468810873144,
+      "feature_id": "4COVL",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+5954494&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:01:08.409402+00:00",
+      "source_sha256": [
+        "8636fe631d20c44d8a71fbce3c215ca9ac56baedb582318a86dd5ff19a9e4a05"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 1757,
+      "latitude": 46.564601,
+      "longitude": -90.41615,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.0003452839708816869,
+      "feature_id": "9AYOK",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+14295783&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:01:12.717543+00:00",
+      "source_sha256": [
+        "87505eb4aef8bf07fd3808a9a161af8ccbc2ca6ff660b53db70e5df5ddf54761"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 1925,
+      "latitude": 44.622,
+      "longitude": -92.6333,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.8600273015823267,
+      "feature_id": "E1K9D",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+22274458&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:01:18.914465+00:00",
+      "source_sha256": [
+        "b22a431209197a434eb3ce412e4b6c02cf633959c9bfa2d1f8a2f970cbe75e43",
+        "c00442267cdf6cdbb70e6348b12025ebeca1db0d1c935305e49e72fe177d9211"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 2107,
+      "latitude": 38.915479,
+      "longitude": -90.29025,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.28792962731024446,
+      "feature_id": "FXQIX",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+25462040&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:01:31.054451+00:00",
+      "source_sha256": [
+        "8c22cfb9b27e1dea58a4e11dd1dd2553f9ea6c40f904828699cdc6a1e7046668",
+        "a940f115b6de4ed457ba120ec5ae49c0219398b83598dcade2445b9a1b8399fa",
+        "2b0376ca58df3ce44281fc7dd2da39750fb7fc59c4a94662e065fa0b321c0894"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 2199,
+      "latitude": 47.96048,
+      "longitude": -115.7336,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "McKay Creek",
+      "distance_miles": 0.8478763118514637,
+      "feature_id": "6BSW6",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+9282666&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:01:29.574212+00:00",
+      "source_sha256": [
+        "e20784166a6d1784c0762e84d84cb311affcef11a901101e65c25a728e9f78e7",
+        "0cbc08cde49bc75837794bab09281946fbedca73adc09da4119fd407db3ec3c0"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 2832,
+      "latitude": 39.1128,
+      "longitude": -84.8036,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Dark Hollow Run",
+      "distance_miles": 0.32588592259813187,
+      "feature_id": "E29RA",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+22307123&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:01:55.661231+00:00",
+      "source_sha256": [
+        "d8cf411deda338956bd0a8b15576e88658c11616034b7505492565513ba4c760",
+        "ba6d75616472edefe8595802428ea303fae03a30da688183c328e0a65c1b24bd",
+        "a8d7b33a42d7fe20fee6111b80d773fb8a54b77a7eebb53ddf74378b4280736b",
+        "e7d18c8a51b0bc2437d96124f06ecacbec581a5c4fc11d47102b2b1dc701e999",
+        "a4ff678576accab7d9f4c4540b0fe92d9a9753f3df132391ba92a0070331a25b",
+        "ef09205dd3238088beaffc32e1131a943216648265861580dbb61e4648c2148a",
+        "1b860a519eee9a827c8060b2ff8806443096e1a8c36b95bf23707d477c88de76",
+        "41ebf4435a6d21a5a1d54aa1438eb571614d540b6d3e76dea46486ff25b3b9e1",
+        "3993d8740bed8e54805ae5454c489c061e2f3485bd31621542f71b81e42ff5c3",
+        "ffa5a26a61d2dd30d28295e697db4077e9ae91f6b22401eded39097124902cfc"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 3262,
+      "latitude": 34.9594,
+      "longitude": -82.9147,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.02272537336363123,
+      "feature_id": "ER6F5",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+23472043&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:01:45.133869+00:00",
+      "source_sha256": [
+        "702c4cc9aef28155b543cc76799902166a18bc84dbfe617bcd34ccdd5a024e5e",
+        "259feedab6c4ec5ecc750a318a7a2358d6e69f6212cf55836483494319d79f39",
+        "7eaec61e303b48824762b53939a066c7372d99727db42580e3151e764aa06a7b",
+        "5b3c4eca6c1a91d8f015f3db371971e43730cfaf6b11f180d2415ab417a74bc2",
+        "6071373c6162e2473c40eb0e0e3150c989069542fc83fb32d9ee2b68efa00721"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 3559,
+      "latitude": 25.9131,
+      "longitude": -97.5214,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 2.1196789074071183,
+      "feature_id": "15WX9",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+276545&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:01:32.273715+00:00",
+      "source_sha256": [
+        "73b91b608c54cf27ea61e6aaa198d2f471cabc95bca6a011aba94cfa49af98fb"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 3699,
+      "latitude": 37.9858,
+      "longitude": -111.4383,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.03725565243178027,
+      "feature_id": "G2U2Q",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+25700163&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:01:36.699663+00:00",
+      "source_sha256": [
+        "68de32c21c23144d3837e16cdcb7da6d8ab57f3fece805402494b384d72da321",
+        "618fa2d93de8f532075c39ee68b2d75d0232369385fec353ca4571587099dc91"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 4148,
+      "latitude": 45.370922,
+      "longitude": -86.93082,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 1.5872628807794902,
+      "feature_id": "5PK5P",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+8241983&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:01:33.686411+00:00",
+      "source_sha256": [
+        "c5ec523b2ae12e7057f15cb231a91746af4e5d5d8bbba846428418d9721e6e88"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 6072,
+      "latitude": 32.0081,
+      "longitude": -91.0478,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.10820323240729061,
+      "feature_id": "1BZ98",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+560770&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:01:58.489956+00:00",
+      "source_sha256": [
+        "a517e228d739add18656c3a5d01718fb4f1ea0bf1973c064f74bf183bdad6d4b",
+        "e8bd75d1778f629c20b94b12a344e3f1bc4a5da39b3f46b6ee9ef77d87f89f4d",
+        "e05e002ede36d2df24ac4e8b700d9e7784fee66b10e0132fac9f188a336e5a1e",
+        "1759350fd82c39c820ae6a70332c0a8fd246e5c012145e99f64138bde15757d1",
+        "7917bd326b37d626e2226f2d10a9e96f2d34ae1da392d76ca763c5183f3eb3a2",
+        "892d0603cc620956ac9b2a08a1c31eda75e2edd5779505e31fce71abcd0d8023",
+        "a51df99732a283b1f558f1999ffb8673335ad3a7295f59630df201d6c3105d99",
+        "35fe589ecdc777b154cc17b1ebb9da405778c1289df17d55b6ada9e7aaa85650"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 6138,
+      "latitude": 36.2561,
+      "longitude": -94.5241,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.08829674373165307,
+      "feature_id": "6LECP",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+9731226&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:01:57.864569+00:00",
+      "source_sha256": [
+        "462a84c2d40235ab07780f240070d4a33624ddac3a0fa62c8fbb0c3b3234f296",
+        "a21a3ae1664dd8b3b8bcbfa52cf351bd6cca96ef1e5635dc20b4acdddc005875",
+        "5ede813ffdb8c6665b927b01e03f9df56191a025fcab9edea841b49907d18949",
+        "0cad2e011d9a56ef4d23af92ae18f6a34b313e710e7eb2ca22edb19adbff9dc1",
+        "b71f79425989954cb92aea944bebd907c2c85da28109b1adcfd9c418943ff63b"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 6595,
+      "latitude": 31.173484,
+      "longitude": -93.56588,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.3086384428397408,
+      "feature_id": "AGQTP",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+16249708&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:02:04.345733+00:00",
+      "source_sha256": [
+        "b09a4d6801528389fd67659d68d7866b03c82bb2e8380e7b3be44bd2f53c5f05",
+        "8193b322b089c2170185be348b8196411db1992ebf3f4bc7b1493326364b16dc",
+        "b6078563b38d72453094603f0de721a2b56b4675df19a71892e2541fcc9c6986"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 6623,
+      "latitude": 48.0122,
+      "longitude": -106.4123,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.34725428515329343,
+      "feature_id": "GRBOD",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+26845195&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:02:06.753292+00:00",
+      "source_sha256": [
+        "7a947e3f61fd0a04003042dc3c22b82d66d621522bcd7cf556858f42f220f6fe",
+        "1d6116f306f3e40fdcbbb046f27ea4d5b16713a68089ffb01aeba01b8a7741d9"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 10216,
+      "latitude": 31.5825,
+      "longitude": -87.4889,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.4174688382416383,
+      "feature_id": "46OB5",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+5673415&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:02:08.954292+00:00",
+      "source_sha256": [
+        "7f777a80e4eeee4710504b4d9981002d83354421f0326b8ac4d9d2a0b3584454",
+        "e2b77ee2f4d197ce6264e8458a5bb4208770df207de5ea3e050f2a3ec4364a79"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 10325,
+      "latitude": 42.260844,
+      "longitude": -111.6656,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Mink Creek",
+      "distance_miles": 0.012609675860223466,
+      "feature_id": "DTVWJ",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+21914640&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:02:10.357009+00:00",
+      "source_sha256": [
+        "2c20f696246cd458603db7f52020e5f9eaba7795a18862c74783023c6a2b078c",
+        "4ee7da149ff4571197c8a766e39f7e28957b623598568c58f5f64c296487c571"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 54213,
+      "latitude": 48.593158,
+      "longitude": -97.17608,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.4995881311717984,
+      "feature_id": "FNV7H",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+25000334&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:02:09.539138+00:00",
+      "source_sha256": [
+        "ec21a35ffc0d72e59747601748acb4d7bcb7d0d0fab706fa22127a65450fa381"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 54214,
+      "latitude": 47.927202,
+      "longitude": -97.00715,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 1.1141384408759443,
+      "feature_id": "8CIW7",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+12684149&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:02:11.086803+00:00",
+      "source_sha256": [
+        "e9539e5721f06f9985548ae0c095e12a4616b2891a66db03a6c395f3547538c1"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 54249,
+      "latitude": 48.959547,
+      "longitude": -116.5574,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Smith Creek",
+      "distance_miles": 0.015043087191440695,
+      "feature_id": "69TFG",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+9189056&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:02:16.491235+00:00",
+      "source_sha256": [
+        "7dd740e4c52b96cef93a6944ff2c9711b54c4b1ae06b139729908b9d3699df08",
+        "299a048baf25b4c94a17b172f965deda4cb68506a3f911dd1f13e92131a62364"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 54927,
+      "latitude": 29.252062,
+      "longitude": -89.9721,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.6347982155703819,
+      "feature_id": "A2ZZF",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+15606795&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:02:11.252854+00:00",
+      "source_sha256": [
+        "ba8fe9e2ca34b593614fc31d85992a24711d3cd00020a033fb86f71d484c0b09"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 55198,
+      "latitude": 38.191661,
+      "longitude": -82.60459,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Mill Branch",
+      "distance_miles": 0.1637312853031861,
+      "feature_id": "3MAP4",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+4719045&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:02:26.057435+00:00",
+      "source_sha256": [
+        "5a66b78e44bb2b9150d5b844c2c999d07b6c2b9d6274f940cdc0df0f24cba2e5",
+        "8ec2a57fed54ff949857bd928460d4ccc70d48890e8819bb49154eab369f5ee0",
+        "95049a2df19fbb11e0bc7bb289d588d75d4ef55d5ee5defb648747666b3886a5",
+        "800241cebd62cd832368026cc533d1f9c545997fa516e0b150cfdc4ae14a5402"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 56561,
+      "latitude": 36.4453,
+      "longitude": -101.8761,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 1.8218487598209498,
+      "feature_id": "69C1D",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+9167034&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:02:14.843011+00:00",
+      "source_sha256": [
+        "efff55c42aca7abca4a3f6f9abf7e71eaaf0fc4caf23f86449e245f4c2bb48d4"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 56767,
+      "latitude": 40.575,
+      "longitude": -95.5228,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.1669575813430754,
+      "feature_id": "FL6IG",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+24874091&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:02:23.149265+00:00",
+      "source_sha256": [
+        "8410d87ce4492dd81a1bc1966ac6a7c30ec489f346c109b7df002b92e10659bf",
+        "6807a4912252746dcbb19cc6f2fbf98d585c8d35ccb07bce6fb072924a4daaef"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 57098,
+      "latitude": 34.6596,
+      "longitude": -110.2842,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.4222947943141913,
+      "feature_id": "CAIVR",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+19326448&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:02:23.863986+00:00",
+      "source_sha256": [
+        "5d3d611fba71d2842449040f4c06583835c5adaff691deebbcd123ef10a73cbb",
+        "927c4e40253d5bc8b4977af1c4e5f11d9ad8bf4b69528d31570ea6e24f47af1e"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 57290,
+      "latitude": 40.9881,
+      "longitude": -102.8969,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.23870372221198372,
+      "feature_id": "C5Z6Q",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+19113564&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:02:21.892169+00:00",
+      "source_sha256": [
+        "1f79e893d4830853c2188fb7873ea7e3a0b75163eab2b64de60d6ad24c4396e0"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 57364,
+      "latitude": 32.7792,
+      "longitude": -114.6344,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.05870277567908431,
+      "feature_id": "F7Z4F",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+24257330&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:02:33.407384+00:00",
+      "source_sha256": [
+        "3476395a3e583ad9dee51ecd68f9134b9e22489357920db911e3ffcfa7a521ff",
+        "db523758b2e145a6494f64e8b69936da092e758b3ebe374f83685c68812cc608",
+        "0854a8dd3532a7317d70a2cd1816548ba60a5a3b784f3bdedcfcfecdb2f4a10d",
+        "2b3c2d779f523cca04f98bae741276884af51471f42df1d58b36366bd470477c"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 57489,
+      "latitude": 37.6297,
+      "longitude": -94.6414,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Cox Creek",
+      "distance_miles": 0.30082111768692665,
+      "feature_id": "CMHPC",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+19884957&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:02:34.882140+00:00",
+      "source_sha256": [
+        "ad94bb619bc0739b8f44a9ac562d8220fd5c46f911a53e89089e77940d44083b",
+        "e2050e14d403461441d29b9eda051c7460cdab9de75c73e4eff04174b12ce8e3",
+        "67cb5b5cb0a533ac85a19057bae58f8f19f707c0b70f2cab1cebfcfaaa7ec430"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 57595,
+      "latitude": 39.445,
+      "longitude": -79.03,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Thunderhill Run",
+      "distance_miles": 0.3753541560322427,
+      "feature_id": "BLLS2",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+18160946&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:02:32.016767+00:00",
+      "source_sha256": [
+        "acee3e7912e76bd3060e639a2b07fcb82b37b23bbdaa180fdbf2cf74f37b4dca",
+        "1d0d0057104613a2c984813cc8cc1ea7d66c7817864ec7758b5a5a9f1cf6ca46"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 57756,
+      "latitude": 46.793581,
+      "longitude": -124.0654,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.06174037950111911,
+      "feature_id": "CYH5G",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+20446510&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:03:03.878798+00:00",
+      "source_sha256": [
+        "66252ee018be0b81dc558dab25962cd767938324452ced3af41df458434bdc84",
+        "962b40aefcbba44f73bf7de3ea96fb83ffa685ec6f52c4b2e63eeca4f4fe8989",
+        "1092566b3bdceec4a9be70988808d52943ace6fe1f1735dc2d346e5f40e30bb7",
+        "3edae9d5217e1ad014f87ee6335333ae9d09cf43644ba28621a3bf2ad81ea9a0",
+        "27a8cb33574fa357b2c82452c5501571ddd5c72c953f342cc71e7ab9ca0cf84c",
+        "df91dccd84302e7f6149b4902e382f7108463c1ba2f6821454e80c48d6b73d71",
+        "536990ebe68b148c0900bf632771212dbec2f7905bd2bddbd2465da21c308407",
+        "3ecd3860b09216ef761d5201962a27772fa4ce1e864918830a6d685e891dd027",
+        "88b39511bd447c3ec75aa29e9fa90f2dc7e061fefb5ff2fe138e3ba95a65d69e",
+        "c53593c292e407f0d0f34e79570abf33635a869b6527ef5514e5f6bc2a33fa4a",
+        "308e91a3733a7ec57ee28b90ddeab6841711f74577df54eae4b6477cf5c08753",
+        "8dcea7e5f329c98c05a232fd54261d41be43beff01fc7dfa81693cce76413427",
+        "e982b80050c38c1498efdb7bd5c9b77d5cc918ce870c44510643cbde86893bbc",
+        "82e195b7e109ad0512e13fb41a8a4db4c449305e36eff3a8c5d2921f34e8ba6e",
+        "5b7a8be51fbead17c639c2dcf403da6bc1d1c8f0c9a30f2aa3a8190b98a6e524",
+        "4f3aaae811979a7a0fa49da21840dabcf0c8884792b0ee974d9de4bdab5bee36"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 58310,
+      "latitude": 30.148889,
+      "longitude": -93.33556,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.26295675639603583,
+      "feature_id": "72935",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+10519773&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:02:45.036086+00:00",
+      "source_sha256": [
+        "c8ba19e725dab8327262e59741eb81587283825565b314b5d621dd075b853ff1",
+        "a3bc0d4685d763b6014bdbb5c7600cec916c2517fe6833cd3b862ed57b1b9287",
+        "77463d03fb3eac8365fd898077c4555875649e8e80fefd1df64147a73a344326",
+        "6b06e3b506875bde20a5445431200a54765e7c6c9924182097252e3a21450d01"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 58695,
+      "latitude": 42.608056,
+      "longitude": -98.42833,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.19403550349833606,
+      "feature_id": "FYFOV",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+25494304&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:02:42.820988+00:00",
+      "source_sha256": [
+        "02b87354a442a65a1791f5d01cef0797eb1dab25f4f6401d6ecbc8cdb76f13e1",
+        "d07ed4003915149f79933d0567b91808e9485ba79a69ee6468a960765a68ca4b"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 59357,
+      "latitude": 43.786667,
+      "longitude": -122.9581,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.0900100198793819,
+      "feature_id": "EF2V0",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+22905983&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:03:42.432769+00:00",
+      "source_sha256": [
+        "231f628c3e411ad935505b1db1b59e1f7b8912b814d7a12d31f09ccefd84c050",
+        "116dd7bcd249c5ebf89a7ee19098a2b0d69b6afa3e85f509675040a96754421b",
+        "9d3a48f82c4d845d18a2f300587b88473f5ad08bb087666d5c59b3cdcf14c614",
+        "e2b4bf2b902599cebb3d1b6994b9dcc1382de173ece9c0c58686fd9a50a69875",
+        "69cb4e6756535d4efe5b5652e2d38b53528aae44c93fbf9b9cd9222df992e8e6",
+        "219fb09f2d3f666a1edb00f98befcb6ca92f29f70851dec7fd06a5f4f26b17dc",
+        "f71c66266d00095fe5f3a0b99fde43ba4bf167c2a294ac62b4fe9402e619a512",
+        "b81950f3ea8f394b96a7a5f0c1bb4c63aff81085562255605963a493350d9aa8",
+        "7591a0dfe2b9f7221b128f08bf87d60bd0228f290230085f2394fcfa1cf14f96",
+        "60a7031620e1384fd654b2b0e8d5bf0f9ff65eb30bb6b50101c78a234baf2f81",
+        "d41aebac3977f05a6edf3f612bc3f080a6ca17e15bc988060664ebdef23f9534",
+        "83dac2fece1ec820c1ffea992befca2ead699c01edd0e2196abada283e7cc242",
+        "1ef109a25d4c4f5d62e67c7f9af76a04116ed55bd3f864d0b71327212fbf339e",
+        "3386d4b68f24297b5f04c672578f1f9db0e12cc33c417dab031c39ad1d1a83aa",
+        "caf3a2b4e74981097af20b14a8f5a3879bbbe78cae8ef47d09f8f86850bac213"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 59826,
+      "latitude": 36.518,
+      "longitude": -116.497,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.4486715859706798,
+      "feature_id": "8V19U",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+13549791&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:02:52.599707+00:00",
+      "source_sha256": [
+        "dffed430f11c3647d6ebc32e0a0fd522903bed2bb927c1a82c3d20ca31844ef3",
+        "a76fa557d77054cafa5a13a3be0d713d3d1413830b7b3845cb155bacfdbfe6b2"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 60152,
+      "latitude": 34.727007,
+      "longitude": -103.1668,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 2.3736258944577213,
+      "feature_id": "3MRUU",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+4741483&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:02:49.309403+00:00",
+      "source_sha256": [
+        "3fc7c181b2010f0f7fdeee571678ad99b64b053395d8596564d9a0278835bce4"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 61080,
+      "latitude": 30.459813,
+      "longitude": -84.26003,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.3870480159692021,
+      "feature_id": "GQGIQ",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+26804972&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:02:58.288180+00:00",
+      "source_sha256": [
+        "517a7bde33b734aa39d3070dbf99ceff2630438dc88c58e9766a16bf5889ee1e",
+        "1ab341705d1aef2fdc36ab92888370a1aa17bbb487eb8901952bcde14f232f10"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 61605,
+      "latitude": 37.777,
+      "longitude": -106.22,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 1.0822631770527358,
+      "feature_id": "1YXZC",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+1658377&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:03:10.271200+00:00",
+      "source_sha256": [
+        "67680e5aea0b922f3ad193ea5a0277442a4aa960cac6e49ea4e0e88142c34fa7",
+        "c4374257c18083ebe60170c554422296fe9ba28a8cf3e967aaaab452b705e30e",
+        "81a6dcca57908434ea7766907824075d4b59c548b92c677c08f00f52140aae5e",
+        "acc10832a2672b6bf4b1599db0e7242a353949435eeab46fc11dc1bd81ef39a5",
+        "9dca9d905911e9a798585945a02b990a30634f1ad48da51f8374b200e9878db2",
+        "819a4a889a34919cd1937174cdaeeed6f1ff4bc27c3582347dd9d33db26b6c38"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 61780,
+      "latitude": 28.790186,
+      "longitude": -81.08902,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 2.0330143404867975,
+      "feature_id": "5GI5H",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+7817598&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:03:02.492213+00:00",
+      "source_sha256": [
+        "87bdc3662380186a99be5b6d26a56b7e539be1af1164cb1478b686eba3d1bd54"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 61844,
+      "latitude": 44.465334,
+      "longitude": -118.2041,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.6798374035991449,
+      "feature_id": "7CLNF",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+11003424&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:03:18.332658+00:00",
+      "source_sha256": [
+        "a6afa59d03590ae6d40293d952ea4e68fcc71a45a34e14d1accd90bc959bf886",
+        "6234e6fc3a9385abdd697a9f4d50e69493272d1dcd3105379e41027fec23615f",
+        "3137f8dbd53daea6734811af66fb183a54736ab0042939fe0b08d8137cb2cf55"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 62113,
+      "latitude": 34.579835,
+      "longitude": -120.5643,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.08852524093364471,
+      "feature_id": "HE0SH",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+27880339&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:03:16.332660+00:00",
+      "source_sha256": [
+        "291e48a898490f913d202f0bdaae932f81f507a14d2d0f3fe8ff82b7f7e2a88c",
+        "c5cd8dbebb218f763b0aeeb86e2d6f179d2e20970ba750f238f53d42f5936c73",
+        "1170385b777be545df0db2b618a516a6a30510660710c49446afd8901715fe92",
+        "d7f942cb8c5eec2a8060f735778e56561ecf91813921cae7b27c86f8d5b78279",
+        "2c50afb2bceee6bacae022934c4a262b95770706fe833735f37a5da4af7b64da"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 63446,
+      "latitude": 34.773578,
+      "longitude": -77.18577,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Freemans Creek",
+      "distance_miles": 0.22159581188398583,
+      "feature_id": "A42B3",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+15657035&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:03:16.818969+00:00",
+      "source_sha256": [
+        "2cd99218ab6fe997a1174a22c9da2f8eea09cb3ace522c5ab18fa31e627ebd85",
+        "53a89bd0737129ce6ae8ed12a58466c3a842bec6efc474a2707fb0cf8e817409"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 63719,
+      "latitude": 35.06,
+      "longitude": -86.34,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.042244930554232396,
+      "feature_id": "8L0PL",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+13081179&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:03:27.737124+00:00",
+      "source_sha256": [
+        "929769448d738c7df7e77d7feddda00d60c8c05100b1df45aae0e7bf115c2459",
+        "954e97d59d9a7adc236a2643b26e789cbc9d6c20af381ca10a5d88eb92519774",
+        "4f8b5e0d35daa60592c54e96686799d3af29cc9400524e65d40f423a538008e3"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 63721,
+      "latitude": 30.747916,
+      "longitude": -84.68049,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Butlers Creek",
+      "distance_miles": 0.3596958195835478,
+      "feature_id": "3S32J",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+4990405&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:03:25.118529+00:00",
+      "source_sha256": [
+        "f6ebdf8094d8a495d1391d80a02e2e571d04f28c1e68884e15cda436996fd5ca",
+        "f5525eb92f71472a0c28ae5a235df5b788366238c984d70ae07ca1d6615e067d"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 63913,
+      "latitude": 40.713024,
+      "longitude": -119.4672,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Dry Creek",
+      "distance_miles": 0.002111824817110416,
+      "feature_id": "C997I",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+19266908&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:03:32.018930+00:00",
+      "source_sha256": [
+        "60894c18e9b3706fb2fb924959b2506cd4e5c2b691ef28110b9cf2bf9e8a7fb0",
+        "cc722c8ab432eb7856d6a3fc205e3c4c3c806ba87c55289ef0e89456f6d77abf",
+        "e5a71472fb19ef902f65774e4eea7bf55bbac1d5fd15f588fc00a49acdfb8042"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 66267,
+      "latitude": 41.88605,
+      "longitude": -112.1817,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.30448069306726916,
+      "feature_id": "4GQDP",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+6143897&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:03:33.043282+00:00",
+      "source_sha256": [
+        "9e9b4751e6ccd4e3341e177d5d78d52c84410a4e4e2681604e96806f4289d5fb",
+        "8d122926f5ee98504363aee5a70558d15761eb9ddecd621653d87a9828bb35e5"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 66369,
+      "latitude": 34.962,
+      "longitude": -90.184,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.005547267572719508,
+      "feature_id": "8THZN",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+13478242&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:03:58.027873+00:00",
+      "source_sha256": [
+        "ae1b44978109287e29cf35e45fe818495834b779c4bafeea0e3af7f8fb2ea6df",
+        "fe37a65a0095dddb317d7901f0cb0791ed5137e68b762be32a613fcf796f6888",
+        "55acacf15af9bed030ed9e1efd524dfc7cbcd10eb36db9c804ff3c3dee766344",
+        "a377440ff6aed2d8aa4658a83febb4662bccb7d92e5e1b75a5691266edebf10e",
+        "d9ee15f1d50665ec0cb3d4d71479db78dd199f6709aeeeb1a74ec7f0168f3f59",
+        "bfb71c80a1025a4e83eb5f16b35041dcc4267e1168d777b5e4ae23a655d81b40"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 66381,
+      "latitude": 43.897,
+      "longitude": -69.947,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Mare Brook",
+      "distance_miles": 0.21035487620927965,
+      "feature_id": "AAIWD",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+15958874&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:03:41.241146+00:00",
+      "source_sha256": [
+        "68bc94f8d6737c534051b90b7cf7ad175d39eadfcaf794134926840df6dd776d",
+        "715a57c58d8cc4d326081650f910567fb9d300e42163e0ffcc8f4ff46dd400f8"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 67488,
+      "latitude": 34.829551,
+      "longitude": -86.63035,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.0564519421355148,
+      "feature_id": "AQVZ0",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+16723636&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:03:39.712539+00:00",
+      "source_sha256": [
+        "6745f334dfa60b5c122aad516a2f1962d6672e8195234e19ab7000e556a644d5",
+        "a028419ddadcdd72fb6e562a7e534b8adffde79178f2e1d0feefa6081ff5de7f",
+        "5a89714f93c9243678c8fe3a84a4f31124ac892ee7240aef7a6b9f5e2a9e8524"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 67769,
+      "latitude": 41.58263,
+      "longitude": -106.0773,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Seepage Creek",
+      "distance_miles": 0.07779488312087474,
+      "feature_id": "7ATHY",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+10920390&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:03:58.027834+00:00",
+      "source_sha256": [
+        "2ea6a2ebf6c9f9fc372447c1d4c58158c0affa59d7110eabdec994dc6b1ad939",
+        "26ffe1ed00d35b9054ef8843fe57dfd5ed098c8a86a0a6182ec3aac013e0b12b",
+        "325731f11bb1dafde7cd7bd4bdb694a383b9001adf16e7a2a1aefc6cde02a501"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 67771,
+      "latitude": 47.31,
+      "longitude": -68.164,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Thibodeau Brook",
+      "distance_miles": 0.22808679901888979,
+      "feature_id": "C7DRD",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+19179237&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:03:48.204781+00:00",
+      "source_sha256": [
+        "a6c53bddfa62ccf6a55fbb986395ae522e07f07818ff5ecef83aceb1400289b8"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    },
+    {
+      "site_id": 67915,
+      "latitude": 33.096086,
+      "longitude": -91.94791,
+      "status": "mapped",
+      "search_radius_km": 25,
+      "river_name": "Unnamed river/stream",
+      "distance_miles": 0.27133952449627086,
+      "feature_id": "DOGKX",
+      "source_name": "USGS 3D Hydrography Program",
+      "source_url": "https://3dhp.nationalmap.gov/arcgis/rest/services/usgs_3dhp_all/FeatureServer/50/query?f=json&where=OBJECTID+%3D+21661274&outFields=%2A&outSR=4326&returnGeometry=true",
+      "retrieved_at": "2026-10-18T08:04:04.691559+00:00",
+      "source_sha256": [
+        "b20f99bea7f52796bc7e4ea4bb28c657c127e240ebd40eb2b802926b2adf78db",
+        "222b75b8bd9736eba9aca2efb97c72e57dc682da961860b631d014dfd9753e38"
+      ],
+      "limitations": "Approximate distance from the plant coordinate to a mapped river/stream centerline, not its bank. Canals, coastlines and connector classes are excluded. Mapping can be incomplete or outdated; proximity is not a flood-risk assessment."
+    }
+  ]
+}

@@ -106,6 +106,18 @@ class ScreeningTest(unittest.TestCase):
         self.assertEqual(out["screening"], {"score": None, "baseline": None, "factors": [],
                                             "status": "no_data", "reason": "No stored screening prediction"})
 
+    def test_river_context_survives_response_without_changing_alerts_or_score(self):
+        site = load([prediction(621, 6.4)])[0]
+        context = {"site_id": 621, "status": "mapped", "river_name": "Test River", "distance_miles": 0.0,
+                   "source_name": "USGS", "source_url": "https://example.org/river"}
+        with patch.object(site_data, "load_sites", return_value=[site]), \
+             patch.object(main, "_alerts", return_value=[]), patch.object(main, "_reports", return_value=[]), \
+             patch.object(main, "river_context", return_value=context):
+            detail = SiteDetail.model_validate(main.site_detail(621)).model_dump(mode="json")
+        self.assertEqual(detail["river_context"], context)
+        self.assertEqual(detail["screening"]["score"], 6.4)
+        self.assertEqual(detail["active_alerts"], [])
+
     def test_database_outage_is_503(self):
         down = OperationalError("SELECT 1", {}, Exception("connection refused"))
         with patch.object(site_data, "load_sites", side_effect=down):

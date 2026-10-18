@@ -93,5 +93,29 @@ export function wildlifeHTML(site){
     ${rows.length?rows.slice(0,20).map(row=>`<article class="crew-factor"><strong>${esc(row.species||'Species unavailable')}</strong><p>Observed: ${esc(row.observed_calendar_date||row.event_date_raw||dateLabel(row.observed_at,'UTC'))}${Number.isFinite(row.distance_km)?' · '+esc(row.distance_km.toFixed(1))+' km from the site':''}</p><small>${sourceLink(row)}${Number.isFinite(row.coordinate_uncertainty_m)?' · Coordinate uncertainty: '+esc(row.coordinate_uncertainty_m)+' m':' · Coordinate uncertainty unavailable'}</small></article>`).join(''):`<p>${context?.status==='no_records_in_sample'?'No sightings in the supplied sample. This does not mean wildlife is absent.':'Wildlife evidence is unavailable. This does not mean wildlife is absent.'}</p>`}
     <p class="crew-muted">${esc(context?.limitations||'Sighting coverage is incomplete and depends on where people report observations.')}${context?.context_built_at?' Context prepared: '+dateLabel(context.context_built_at,site.timezone):''}</p></section>`;
 }
-export function floodHTML(site,now=Date.now()){const f=site.flood,checked=warningsWatch(site.warnings_status,site.environmental_events,now),status=f?.status==='normal'&&checked.status!=='ok'?'unknown':f?.status;return `<section class="crew-card crew-flood" data-active="${status==='warning'}"><p class="crew-eyebrow">${icon("flood")} FLOOD WATCH</p><h2>${esc(status==='warning'?'Flood-risk warning':status==='normal'?'No active NWS flood warning':'Flood status unavailable')}</h2><p>${esc(status==='unknown'&&f?.status==='normal'?'The NWS check is no longer fresh. Warning status is unavailable.':f?.message||'Waiting for river and overnight rainfall data.')}</p><div class="crew-metrics"><span>River proximity<strong>${esc(f?.river_name||'Unavailable')}${Number.isFinite(f?.river_distance_miles)?` · ${f.river_distance_miles} mi`:''}</strong></span><span>${esc(f?.rainfall_label||'Overnight rain')}<strong>${esc(f?.rainfall_reading??(Number.isFinite(f?.overnight_rain_mm)?`${f.overnight_rain_mm} mm`:'Unavailable'))}</strong></span><span>Observation window<strong>${esc(f?.window_label||'Unavailable')}</strong></span></div><small>${sourceLink(f)} · Updated ${dateLabel(f?.observed_at)}</small>${f?.rule_description?`<small>Rule: ${esc(f.rule_description)}</small>`:''}</section>`;}
+export function floodHTML(site,now=Date.now()){
+  const f=site.flood, zone=site.timezone;
+  const checked=warningsWatch(site.warnings_status,site.environmental_events,now);
+  const status=f?.status==='normal'&&checked.status!=='ok'?'unknown':f?.status;
+  const distance=f?.river_distance_miles;
+  const river=f?.river_status==='no_mapped_river'
+    ? `No mapped river/stream within ${f.river_search_radius_km} km`
+    : `${f?.river_name||'Unavailable'}${Number.isFinite(distance)?' · approx. '+(distance<.1?'<0.1':distance.toFixed(1))+' mi':''}`;
+  const period=f?.rainfall_period_start&&f?.rainfall_period_end
+    ? `${dateLabel(f.rainfall_period_start,zone)} – ${dateLabel(f.rainfall_period_end,zone)} · ${zone||'Local time'}`
+    : f?.window_label||'Unavailable';
+  return `<section class="crew-card crew-flood" data-active="${status==='warning'}">
+    <p class="crew-eyebrow">${icon("flood")} FLOOD WATCH</p>
+    <h2>${esc(status==='warning'?'Flood-risk warning':status==='normal'?'No active NWS flood warning':'Flood status unavailable')}</h2>
+    <p>${esc(status==='unknown'&&f?.status==='normal'?'The NWS check is no longer fresh. Warning status is unavailable.':f?.message||'Waiting for flood and rainfall data.')}</p>
+    <div class="crew-metrics"><span>River / stream proximity<strong>${esc(river)}</strong></span>
+    <span>${esc(f?.rainfall_label||'Overnight rain')}<strong>${esc(f?.rainfall_reading??(Number.isFinite(f?.overnight_rain_mm)?`${f.overnight_rain_mm} mm`:'Unavailable'))}</strong></span>
+    <span>Rainfall period<strong>${esc(period)}</strong></span></div>
+    <small>Rainfall: ${sourceLink(f?.rainfall_source||f)} · Reading ${dateLabel(f?.observed_at,zone)}</small>
+    <small>Warning feed: ${sourceLink(f?.warning_source)} · Checked ${dateLabel(f?.warning_checked_at,zone)}</small>
+    ${f?.warning_valid_from?`<small>Warning period: ${dateLabel(f.warning_valid_from,zone)} – ${dateLabel(f.warning_valid_until,zone)} · ${esc(zone||'Local time')}</small>`:''}
+    ${f?.river_source?.source_name?`<small>River mapping: ${sourceLink(f.river_source)} · Retrieved ${dateLabel(f.river_source.retrieved_at,zone)}</small><p class="crew-muted">${esc(f.river_source.limitations)}</p>`:''}
+    ${f?.rule_description?`<small>Rule: ${esc(f.rule_description)}</small>`:''}
+    </section>`;
+}
 export function makeMap(id,center,zoom=14){if(!window.L)return null;const map=L.map(id,{scrollWheelZoom:false,preferCanvas:true}).setView(center,zoom);const tiles=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);tiles.on('tileerror',()=>{const status=document.getElementById(id+'-status');if(status)status.textContent='Basemap unavailable. Locations and coordinate controls remain available.';});const observer=new ResizeObserver(()=>map.invalidateSize());observer.observe(document.getElementById(id));map.on('unload',()=>observer.disconnect());return map;}

@@ -29,6 +29,7 @@ from api.schemas.ask import AskAnswer, AskRequest, CannotAnswer
 from api.schemas.sites import SiteDetail, SiteSummary
 from db.screening_read import unavailable
 from get_data.site_context import for_site
+from get_data.rivers import for_site as river_context
 
 LIVE_ALERTS = site_data.ROOT / "data" / "live" / "alerts.json"
 LEVEL_RANK = {"stop_work": 2, "warning": 1}
@@ -214,6 +215,7 @@ def site_detail(site_id: int):
         "latest_weather": site.get("latest_weather"),
         "screening": _screening(site),
         "wildlife_context": for_site(site_id),
+        "river_context": river_context(site),
         "lightning_status": live_status.lightning_status(site_id, alerts, live_status.read_lightning()),
         "warnings_status": live_status.warnings_status(site_id, live_status.read_nws()),
         "active_alerts": _site_alerts(site_id, alerts),

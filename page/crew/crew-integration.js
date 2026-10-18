@@ -172,6 +172,11 @@ export function createContractMapper({now = () => Date.now()} = {}) {
     const floodEvent = (raw.environmental_events || []).find(e => e.hazard_type === 'flooding' && activeEvent(e, now()));
     const screening = modern ? screeningDetail(raw.screening,now()) : null;
     const warningWatch = warningsWatch(raw.warnings_status, raw.environmental_events, now());
+    const river = raw.river_context?.site_id === raw.site_id ? raw.river_context : null;
+    const rain = raw.latest_weather;
+    const rainEnd = time(rain?.observed_at);
+    const rainStart = rainEnd && finite(rain?.precip_24h_in)
+      ? new Date(Date.parse(rainEnd)-24*60*60*1000).toISOString() : null;
     const mapped = {...mapSiteSummary({...raw, score: value, scored_at: model?.scored_at},{now:now()}),
       revision, server_time: null, timezone: raw.timezone ?? null, sample: model?.model_version === 'sample',
       score_method: model?.model_version === 'sample' ? 'Sample API score. Not a live trained-model result.'
@@ -190,9 +195,15 @@ export function createContractMapper({now = () => Date.now()} = {}) {
         message: floodAlert?.message || floodEvent?.title || (warningWatch.status === 'ok'
           ? 'No active NWS flood warning was returned. This is not a hydrologic all-clear.'
           : 'Flood warning status unavailable. No hydrologic assessment was supplied.'),
-        river_name: null, river_distance_miles: null, overnight_rain_mm: null,
+        river_name: river?.status === 'mapped' ? river.river_name : null,
+        river_distance_miles: river?.status === 'mapped' && finite(river.distance_miles) && river.distance_miles >= 0 ? river.distance_miles : null,
+        river_status: river?.status ?? 'unavailable', river_search_radius_km: river?.search_radius_km,
+        river_source: river, overnight_rain_mm: null,
         rainfall_label: 'Rain · rolling 24 hours', rainfall_reading: finite(raw.latest_weather?.precip_24h_in) ? `${raw.latest_weather.precip_24h_in} in` : 'No data',
-        window_label: floodEvent ? `${floodEvent.starts_at} — ${floodEvent.ends_at || 'End unavailable'}` : 'Unavailable', observed_at: null},
+        rainfall_source: source(rain), rainfall_period_start: rainStart,
+        rainfall_period_end: rainStart ? rainEnd : null, observed_at: rainEnd,
+        warning_source: source(raw.warnings_status), warning_checked_at: time(raw.warnings_status?.checked_at),
+        warning_valid_from: time(floodEvent?.starts_at), warning_valid_until: time(floodEvent?.ends_at)},
       recent_reports: (raw.recent_reports || []).map(mapReport)};
     snapshots.set(id, mapped);
     return mapped;
