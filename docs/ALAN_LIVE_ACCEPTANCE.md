@@ -1,0 +1,42 @@
+# Alan handoff: Auth0 renewal, live notices, and final signed-in test
+
+This is the handoff for [#19](https://github.com/fanggs/planit-control/issues/19), [#20](https://github.com/fanggs/planit-control/issues/20), [#22](https://github.com/fanggs/planit-control/issues/22), and [#23](https://github.com/fanggs/planit-control/issues/23). It supplements `api/CONTRACT.md`; it does not change the wire contract. Do not put access tokens, publisher secrets, photos, or private report text in GitHub comments or browser logs.
+
+## Deployment order
+
+1. Aryan pushes the reviewed frontend commits. Alan pulls the new commit and deploys the static `page/` files together. Do not deploy only one JavaScript module: both apps now import `page/shared/auth-session.mjs`, and the crew and supervisor screens share the heat-index wording helper.
+2. In the Auth0 **development** tenant, confirm the PlanIT SPA has refresh-token rotation on, zero-second rotation overlap, and the API `https://planit-control.aasi/api` has **Allow Offline Access** on. Keep `page/crew/crew-auth.js` and `page/supervisor/auth.js` at `cacheLocation: 'memory'`; do not put refresh tokens in local storage. The SPA requests `offline_access` and disables the silent-iframe fallback.
+3. After the deploy, every tester signs out and signs back in once. Old sessions do not acquire refresh tokens retroactively. A new page/document also loses the memory-only token. If a crew link opens a different HTML page and silent session recovery is blocked, the app must use a top-level sign-in again; do not diagnose that as a dead API or silently show sample data. Seamless cross-page SSO would require a separate, agreed architecture change (such as one SPA document or a same-site Auth0 custom domain).
+   Alan's existing account has both `crew` and `supervisor` in the development tenant; the additional role appears in app tokens only after he signs out and back in. His old token may still show `crew` alone.
+4. Alan verifies the deployed API and `planit-realtime` bridge use the same public bridge URL/app ID. Keep `PLANIT_NOTIFY_SECRET` only in server/job environments. The frontend sends bearer tokens only to the API; the anonymous notice socket receives IDs, never photos, report bodies, tokens, or the publisher secret.
+
+## Trace one notice through both browsers (#20)
+
+Use one designated development site and a clearly labeled private test report. Record the deployed Git SHA and approximate UTC time; coordinate with Alan before publishing an alert/replay. In two signed-in browsers, open DevTools → Network and filter by `WS`, `/api/`, and `planit-realtime`. Record status codes and event type/ID only.
+
+| Hop | Alan checks | Aryan checks |
+| --- | --- | --- |
+| Database commit | Report/alert/score change is committed; no test insert is left ambiguous | Crew POST receipt has the agreed site/report ID |
+| Publisher | `api/realtime.py` returns true or logs a sanitized failure; bridge URL and secret match | No publisher secret in page source or Network requests |
+| Bridge | `events` record accepted; `site_id`, `report_id`/`alert_id`, or `site_ids` match `api/CONTRACT.md` | WebSocket opens and `core.query_result` confirms the `events` subscription; an empty collection is not an error |
+| Browser | No bridge error or proxy/origin block | `core.record_change` triggers an authorized `/api/sites/{id}`, `/api/alerts`, `/api/reports`, or `/api/sites` refetch, then a visible update |
+
+The notification indicator describes **transport only**. Weather/lightning/NWS freshness is separate. A quiet site should remain connected without fake hazard activity; the crew heartbeat starts only after a confirmed subscription. On offline/online recovery both apps reconnect and refetch authoritative API state. An expired Auth0 session stops the reconnect loop and asks for sign-in, while retaining a warning that displayed data may be stale. A missing/stale hazard feed never becomes an all-clear because the socket reconnected.
+
+If the notice does not reach a browser, isolate the first missing hop. HTTP 401 means renew/sign in; HTTP 403 means role/API policy; a failed WebSocket handshake or missing `core.query_result` points to bridge/origin/protocol configuration; a bridge record with no refetch points to event shape or site-ID filtering. Do not print the Authorization header or private payload while diagnosing.
+
+## Conditions acceptance (#19)
+
+Compare crew cards and supervisor detail against the same signed-in `/api/sites/{id}` response. The weather and soil cards show measurements with units, source, and observation time while stating that no safety severity was inferred. Below 80 °F, the implemented heat-index formula is not applicable; above 112 °F it is outside its supported range; a null index in the middle of that range is unavailable, not safe. The API does not yet expose humidity or an explicit null reason, so the UI must not claim a more precise cause. Lightning uses `lightning_status` and active holds; flood/fire-weather use `warnings_status` and actual active event types. A failed or stale check is unavailable even if the event list is empty. Historical wildlife sightings are not live encounter clearance. Test real zero readings, an existing lightning hold, a cancelled NWS warning, and disconnected notifications independently.
+
+## Final phone + supervisor run (#22)
+
+This is a **post-deploy, two-person** test, not a unit-test substitute. Alan coordinates the designated development site and labeled replay; Aryan uses the supervisor account in a second signed-in browser; a crew tester uses a real phone. Do not post screenshots that reveal private report text or photos.
+
+- Phone: sign in; select the designated site; check lightning state/reason, conditions and source times, Prototype screening target/factors, wildlife limitations, and tomorrow's briefing. Submit one high-severity private test report with a photo. Confirm the receipt and private retrieval. A crew PATCH to resolve must receive 403.
+- Supervisor: without manually refreshing, see the report and warning; check the map score/Prototype label; resolve it; verify the crew view updates without refresh. Ask one `/ask` question and verify answer, source links, and SQL.
+- Alan: run only the labeled Turkey Point replay; verify stop-work countdown on both screens and authoritative clear after 30 quiet minutes. Verify any *actual* NWS warning from `/alerts` without inventing one. Restart `planit-api` and verify persistence. Logged-out data routes return 401.
+- Sid: confirm 60/60 current screening rows and collector freshness within the agreed one-hour window.
+- Auth renewal: with Alan coordinating a harmless test notice, verify a newly signed-in session remains live beyond an access-token lifetime. Then test a deliberately expired/revoked session: both apps stop reconnecting and show a sign-in action, never a false connected indicator or unmarked sample fallback. Restore any temporary tenant lifetime setting immediately and record old/new values.
+
+Only mark #22 complete after the deployed SHA, two-device observations, and sanitized result for each item are recorded. Local commits alone cannot satisfy this acceptance test.
