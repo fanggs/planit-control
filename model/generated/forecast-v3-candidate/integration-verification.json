@@ -1,0 +1,21 @@
+{
+  "candidate_sha256": "0d9889fe29e7004041f1d9e12905e128beda983cb6be028e06cf37d2fc8e42c5",
+  "database_writes": 0,
+  "deployed": false,
+  "failed_sites": [],
+  "holdout_support_audit": {
+    "evaluated_rows": 16301,
+    "note": "Published study metrics include every eligible test window. Runtime retains original strict input support; unsupported windows receive no score.",
+    "out_of_support": {
+      "heat_index_max_f": 32,
+      "rows": 50,
+      "temperature_min_f": 18
+    }
+  },
+  "maximum_explanation_error": 1.1102230246251565e-16,
+  "network_requests": 0,
+  "recorded_input_sites": 60,
+  "recorded_run": "data/raw/runtime/runs/20261018T030602954372Z",
+  "supported_sites": 60,
+  "verified_at": "2026-10-18T03:08:05.535364+00:00"
+}

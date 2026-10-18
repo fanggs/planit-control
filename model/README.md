@@ -1,5 +1,7 @@
 # Model experiments
 
+Latest update: the separately stored `forecast-v3-candidate` passed its predeclared Q3 follow-up checks. Serving v2 remains unchanged until Alan explicitly deploys the candidate. See [study results and rollout](handoffs/ISSUES-14-22-IMPLEMENTATION.md). Keep the Prototype label.
+
 The corrected forecast-based pipeline and operating instructions are in
 [CORRECTIONS.md](CORRECTIONS.md). The report below preserves the original interval
 5 experiment; its realized-weather inputs are not used by the new live scorer.

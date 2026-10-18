@@ -12,6 +12,11 @@ NODES={'RawStmt','SelectStmt','ResTarget','ColumnRef','String','Integer','Float'
 FUNCTIONS={'count','sum','avg','min','max','abs','round','date_trunc','extract','date_part','now','greatest','least'}
 TYPES={'int2','int4','int8','float4','float8','numeric','text','bool','date','timestamp','timestamptz','interval','varchar'}
 OPERATORS={'=','<>','!=','<','>','<=','>=','+','-','*','/','%','~~','!~~','~~*','!~~*'}
+MAX_SELECT_DEPTH=5
+MAX_EXPRESSION_DEPTH=32
+MAX_AST_NODES=1500
+MAX_JSON_DEPTH=160
+EXPRESSION_NODES={'A_Expr','BoolExpr','CaseExpr','CaseWhen','FuncCall','CoalesceExpr','MinMaxExpr','NullTest','TypeCast'}
 
 
 def strings(values):
@@ -26,13 +31,27 @@ def validate_query(query):
     statements=tree.get('stmts',[])
     if len(statements)!=1 or set(statements[0]['stmt'])!={'SelectStmt'}:raise ValueError('One SELECT is required')
     referenced=set()
-    def walk(value,depth=0):
-        if depth>30:raise ValueError('Query nesting is too deep')
+    # SQL nesting and expression complexity are independent of JSON wrappers.
+    # An iterative walk also bounds traversal without Python recursion growth.
+    stack=[(tree,0,0,0)];nodes=0;containers=0
+    while stack:
+        value,depth,select_depth,expression_depth=stack.pop()
+        if depth>MAX_JSON_DEPTH:raise ValueError('SQL representation is too deep')
+        if isinstance(value,(list,dict)):
+            containers+=1
+            if containers>15000:raise ValueError('SQL representation is too large')
         if isinstance(value,list):
-            for item in value:walk(item,depth+1)
+            stack.extend((item,depth+1,select_depth,expression_depth) for item in value)
         elif isinstance(value,dict):
             for key,item in value.items():
                 if key and key[0].isupper() and key not in NODES:raise ValueError('Unsupported SQL construct: '+key)
+                if key in NODES:
+                    nodes+=1
+                    if nodes>MAX_AST_NODES:raise ValueError('Too many SQL nodes')
+                child_select_depth=select_depth+(key=='SelectStmt')
+                child_expression_depth=expression_depth+(key in EXPRESSION_NODES)
+                if child_select_depth>MAX_SELECT_DEPTH:raise ValueError('Too many nested SELECTs')
+                if child_expression_depth>MAX_EXPRESSION_DEPTH:raise ValueError('SQL expression nesting is too deep')
                 if key=='SelectStmt' and any(item.get(k) for k in ('intoClause','lockingClause','withClause')):
                     raise ValueError('SELECT INTO, locking and WITH are not supported')
                 if key=='RangeVar':
@@ -50,8 +69,7 @@ def validate_query(query):
                 if key=='A_Expr':
                     name=strings(item.get('name',[]))
                     if len(name)!=1 or name[0] not in OPERATORS:raise ValueError('Operator is not allowlisted')
-                walk(item,depth+1)
-    walk(tree)
+                stack.append((item,depth+1,child_select_depth,child_expression_depth))
     if not referenced:raise ValueError('Query must read an approved data table')
     return query.strip().rstrip(';')
 

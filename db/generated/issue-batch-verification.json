@@ -1,0 +1,22 @@
+{
+  "verified_at": "2026-10-18T03:09:23.444022+00:00",
+  "migration_004_applied": true,
+  "live_collector_status": "ok",
+  "screening_committed_sites": 60,
+  "weather_committed_sites": 60,
+  "fresh_screening_sites_within_one_hour": 60,
+  "monitored_sites_with_predictions": 60,
+  "oldest_input_age_minutes": 3.33182255,
+  "weather_sites_within_two_hours": 60,
+  "pending_delivery_events": 60,
+  "notifications_configured_locally": false,
+  "real_database_prediction_and_notice_rollback_verified": true,
+  "precommit_dispatch_blocked": true,
+  "bridge_delivery_verified": false,
+  "recorded_run": "data/raw/runtime/runs/20261018T030602954372Z",
+  "candidate_deployed": false,
+  "owned_tests_passed": 119,
+  "synced_supervisor_tests_passed": 44,
+  "test_recorded_at": "2026-10-18T03:14:45.247654+00:00",
+  "synced_base_commit": "4aeeec935ea48e11dda003a3a0e7de1d0ea2d280"
+}

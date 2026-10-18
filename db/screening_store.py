@@ -33,15 +33,24 @@ def validate(snapshot,prediction):
         raise ValueError('Prediction/input mismatch')
 
 
-def load(connection, snapshots, predictions, artifact, validation):
+def register_model(connection,artifact,validation):
+    from psycopg.types.json import Jsonb
+    artifact_hash=hashlib.sha256(canonical(artifact).encode()).hexdigest()
+    if artifact.get('format')==2 and validation.get('artifact_sha256')!=artifact_hash:
+        raise ValueError('Model evaluation hash mismatch')
+    connection.execute('INSERT INTO public.screening_models (artifact_sha256,artifact,validation) VALUES (%s,%s,%s) ON CONFLICT DO NOTHING',
+                       (artifact_hash,Jsonb(artifact),Jsonb(validation)))
+    return artifact_hash
+
+
+def load(connection, snapshots, predictions, artifact, validation,*,register=True):
     from psycopg.types.json import Jsonb
     if not snapshots or len(snapshots)!=len(predictions):raise ValueError('Complete evidence batch required')
     if len({s['site_id'] for s in snapshots})!=len(snapshots):raise ValueError('Duplicate sites')
     artifact_hash=hashlib.sha256(canonical(artifact).encode()).hexdigest()
     with connection.transaction():
         connection.execute('SELECT pg_advisory_xact_lock(781028)')
-        connection.execute('INSERT INTO public.screening_models (artifact_sha256,artifact,validation) VALUES (%s,%s,%s) ON CONFLICT DO NOTHING',
-                           (artifact_hash,Jsonb(artifact),Jsonb(validation)))
+        if register:register_model(connection,artifact,validation)
         for snapshot,prediction in zip(snapshots,predictions):
             validate(snapshot,prediction)
             if prediction['artifact_sha256']!=artifact_hash:raise ValueError('Artifact hash mismatch')

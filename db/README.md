@@ -1,5 +1,7 @@
 # db/
 
+Latest update: migration 004 adds the ordinary transactional score-notification outbox and is verified on the shared service. The restricted `/ask` login has no access to it. See [verification and deployment instructions](../model/handoffs/ISSUES-14-22-IMPLEMENTATION.md).
+
 Tiger Data (PostgreSQL + time-series) schema and migrations. Run commands from
 the repository root.
 

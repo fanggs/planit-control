@@ -1,0 +1,1390 @@
+{
+  "artifact_sha256": "0d9889fe29e7004041f1d9e12905e128beda983cb6be028e06cf37d2fc8e42c5",
+  "code_hashes": {
+    "batch_predict.py": "e58e6deb13f512d03393aede51eeffd086271a7d4853c1174f8903d32d7767dc",
+    "followup.py": "c9d36fbad8966409fb00720d44cb886cdede76b2d5a33a3ace20bf9bdd71555d",
+    "portable.py": "8ba48fe620f408791c424e0c2cc0b9894d60025a837505610195211dcb9f2fae"
+  },
+  "completed_at": "2026-10-18T03:04:32.816097+00:00",
+  "final_tests": {
+    "geo_test": {
+      "counties": 12,
+      "model": {
+        "average_precision": 0.5273545839648299,
+        "brier": 0.1447142759616268,
+        "calibration_bins": [
+          {
+            "count": 1813,
+            "lower": 0,
+            "mean_prediction": 0.06528813476563872,
+            "reported_fraction": 0.07225592939878654,
+            "upper": 0.1
+          },
+          {
+            "count": 1308,
+            "lower": 0.1,
+            "mean_prediction": 0.13879619641319463,
+            "reported_fraction": 0.1720183486238532,
+            "upper": 0.2
+          },
+          {
+            "count": 897,
+            "lower": 0.2,
+            "mean_prediction": 0.28105176649651964,
+            "reported_fraction": 0.5250836120401338,
+            "upper": 0.4
+          },
+          {
+            "count": 59,
+            "lower": 0.4,
+            "mean_prediction": 0.43552206452771675,
+            "reported_fraction": 0.6440677966101694,
+            "upper": 0.6
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          3212,
+          0,
+          862,
+          3
+        ],
+        "log_loss": 0.4451180814005039,
+        "positives": 865,
+        "precision_at_0_5": 1.0,
+        "prevalence": 0.21216580819229827,
+        "recall_at_0_5": 0.003468208092485549,
+        "roc_auc": 0.8005332243969507,
+        "rows": 4077
+      },
+      "prior": {
+        "average_precision": 0.21216580819229827,
+        "brier": 0.18366448798302742,
+        "calibration_bins": [
+          {
+            "count": 4077,
+            "lower": 0,
+            "mean_prediction": 0.08366285119667016,
+            "reported_fraction": 0.21216580819229827,
+            "upper": 0.1
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          3212,
+          0,
+          865,
+          0
+        ],
+        "log_loss": 0.5952087275994054,
+        "positives": 865,
+        "precision_at_0_5": 0.0,
+        "prevalence": 0.21216580819229827,
+        "recall_at_0_5": 0.0,
+        "roc_auc": 0.5,
+        "rows": 4077
+      },
+      "seasonal": {
+        "average_precision": 0.23693934590472127,
+        "brier": 0.1795564662339712,
+        "calibration_bins": [
+          {
+            "count": 2925,
+            "lower": 0,
+            "mean_prediction": 0.08586205494970961,
+            "reported_fraction": 0.19623931623931623,
+            "upper": 0.1
+          },
+          {
+            "count": 1152,
+            "lower": 0.1,
+            "mean_prediction": 0.12170079507107559,
+            "reported_fraction": 0.2526041666666667,
+            "upper": 0.2
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          3212,
+          0,
+          865,
+          0
+        ],
+        "log_loss": 0.5726281655562918,
+        "positives": 865,
+        "precision_at_0_5": 0.0,
+        "prevalence": 0.21216580819229827,
+        "recall_at_0_5": 0.0,
+        "roc_auc": 0.5612295654302146,
+        "rows": 4077
+      }
+    },
+    "time_test": {
+      "counties": 36,
+      "model": {
+        "average_precision": 0.5539045329315344,
+        "brier": 0.15932606908669972,
+        "calibration_bins": [
+          {
+            "count": 5467,
+            "lower": 0,
+            "mean_prediction": 0.05954734170849283,
+            "reported_fraction": 0.06584964331443205,
+            "upper": 0.1
+          },
+          {
+            "count": 3649,
+            "lower": 0.1,
+            "mean_prediction": 0.13936883244390508,
+            "reported_fraction": 0.2367771992326665,
+            "upper": 0.2
+          },
+          {
+            "count": 2345,
+            "lower": 0.2,
+            "mean_prediction": 0.2838638994911739,
+            "reported_fraction": 0.5471215351812366,
+            "upper": 0.4
+          },
+          {
+            "count": 729,
+            "lower": 0.4,
+            "mean_prediction": 0.4758437253104368,
+            "reported_fraction": 0.6707818930041153,
+            "upper": 0.6
+          },
+          {
+            "count": 34,
+            "lower": 0.6,
+            "mean_prediction": 0.6248672583057577,
+            "reported_fraction": 0.5,
+            "upper": 0.8
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          9101,
+          110,
+          2871,
+          142
+        ],
+        "log_loss": 0.4801151185964553,
+        "positives": 3013,
+        "precision_at_0_5": 0.5634920634920635,
+        "prevalence": 0.24648232984293195,
+        "recall_at_0_5": 0.047129107202124126,
+        "roc_auc": 0.8144777076629867,
+        "rows": 12224
+      },
+      "prior": {
+        "average_precision": 0.24648232984293195,
+        "brier": 0.21223897354477256,
+        "calibration_bins": [
+          {
+            "count": 12224,
+            "lower": 0,
+            "mean_prediction": 0.08366285119667013,
+            "reported_fraction": 0.24648232984293195,
+            "upper": 0.1
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          9211,
+          0,
+          3013,
+          0
+        ],
+        "log_loss": 0.6773483872236534,
+        "positives": 3013,
+        "precision_at_0_5": 0.0,
+        "prevalence": 0.24648232984293195,
+        "recall_at_0_5": 0.0,
+        "roc_auc": 0.5,
+        "rows": 12224
+      },
+      "seasonal": {
+        "average_precision": 0.29816987177962107,
+        "brier": 0.2058364835606834,
+        "calibration_bins": [
+          {
+            "count": 8778,
+            "lower": 0,
+            "mean_prediction": 0.08586937585825609,
+            "reported_fraction": 0.21964000911369333,
+            "upper": 0.1
+          },
+          {
+            "count": 3446,
+            "lower": 0.1,
+            "mean_prediction": 0.12170079507107559,
+            "reported_fraction": 0.3148578061520604,
+            "upper": 0.2
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          9211,
+          0,
+          3013,
+          0
+        ],
+        "log_loss": 0.6414642094162358,
+        "positives": 3013,
+        "precision_at_0_5": 0.0,
+        "prevalence": 0.24648232984293195,
+        "recall_at_0_5": 0.0,
+        "roc_auc": 0.6094511270471534,
+        "rows": 12224
+      }
+    }
+  },
+  "limitations": [
+    "January-June 2026 outcomes were previously inspected as final tests. They are now development/calibration evidence, not fresh evaluation.",
+    "Site-specific support remains unchanged. Original forecast publication times remain unverified; nominal fixed-lead latency margin retained. Neighboring plants/overlapping windows are dependent observations.",
+    "Retrospective warning-exposure discrimination and probability error; not injury risk or operational safety certification.",
+    "Temporal test uses known development counties; geographic counties were inspected for January\u2013June but Q3 outcomes were unused.",
+    "No confidence interval or independent prospective incident-outcome validation; correlated windows are not independent trials."
+  ],
+  "max_portable_probability_difference": 4.996003610813204e-16,
+  "old_data_sha256": "abca2d01e2608f1d591dc00abd325c505951876848a2542cdd0b2f5bb8315c5d",
+  "package_versions": {
+    "numpy": "2.5.4",
+    "scikit-learn": "1.7.2",
+    "scipy": "1.18.1"
+  },
+  "parent_artifact_sha256": "207c76d8ab9b0eb7387f17ce07c82fd348f70d667c9a5215aac737943e42b808",
+  "partition_counts": {
+    "fit": 10944,
+    "geo_selection": 4032,
+    "refit": 24025,
+    "season_train": 100411,
+    "time_selection": 12073
+  },
+  "plan": {
+    "acceptance": "Positive combined calibration slope; AP strictly exceeds prior and seasonal and Brier strictly improves on both baselines on each new final partition",
+    "baseline_prior": "Positive frequency in final refit calibration rows",
+    "baseline_seasonal": "Month sine/cosine logistic regression C1 fitted on 2024-2025 development counties, calibrated on final refit calibration rows",
+    "calibration_fit": "2026-01-08 through 2026-03-24, original development counties",
+    "candidates": [
+      "unchanged_v2",
+      "logit_intercept_only",
+      "sigmoid_C1",
+      "sigmoid_C1000"
+    ],
+    "development_disclosure": "January-June 2026 outcomes were previously inspected as final tests. They are now development/calibration evidence, not fresh evaluation.",
+    "embargo": "Purge shared warning-event IDs from earlier calibration/selection phases. July 1-7 excluded to separate this test from previously collected first-July warning intervals.",
+    "policy": "Keep serving forest and features frozen. Select a recalibration on development outcomes, freeze selection before reading reserved test labels, and evaluate once. Never overwrite the serving artifact.",
+    "refit": "Selected recalibration only, 2026-01-08 through 2026-06-23 development counties; forest remains unchanged",
+    "release": "Record passing or failing result honestly in a separate candidate directory; production_approved stays false. Alan reviews deployment, with current artifact retained for rollback. No shared target/contract changes.",
+    "selection": "2026-04-01 through 2026-06-23, separate original development and geographic-validation county partitions; minimize their mean Brier error, ties resolved by listed candidate order",
+    "serving_artifact_sha256": "207c76d8ab9b0eb7387f17ce07c82fd348f70d667c9a5215aac737943e42b808",
+    "study": "q3-2026-calibration-followup-v1",
+    "target": "Unchanged selected NWS warning or heat-advisory exposure during next 24 hours; not injury probability",
+    "unused_final_test": "2026-07-08 through 2026-09-30; temporal=original development counties, geographic=original geographic-test counties; 00/06/12/18 UTC cutoffs",
+    "validation_scope": "Site-specific support remains unchanged. Original forecast publication times remain unverified; nominal fixed-lead latency margin retained. Neighboring plants/overlapping windows are dependent observations."
+  },
+  "plan_sha256": "5ab277b33086ef2113d41d19b15289e4ac1e29c23da9ba3a4106c520d9ca354f",
+  "production_approved": false,
+  "reserved_data_sha256": "e38f00557c30f261ffd2df66784325d2c91c63eee3259dbcdcc2a5f696a253dc",
+  "reserved_manifest": {
+    "built_at": "2026-10-18T02:57:38.215546+00:00",
+    "code_hashes": {
+      "followup_data.py": "18e353f4cdb15656fb98e776e461a3e1206385d98c3cbbdb01e8d93a6b228b85",
+      "forecast_inputs.py": "5a1304e7b6697c8f7b4e5c6fbac64b4b2742bf8a6cf48a84331521a342fd50f1",
+      "warnings_archive.py": "9d4617a531a2bcc88c50148758043fd3b99ad6cc9cf19abe61ddefb704d870d7"
+    },
+    "examples_sha256": "e38f00557c30f261ffd2df66784325d2c91c63eee3259dbcdcc2a5f696a253dc",
+    "plan_sha256": "5ab277b33086ef2113d41d19b15289e4ac1e29c23da9ba3a4106c520d9ca354f",
+    "schema": "gfs-fixed-lead48-v1",
+    "sites_sha256": "734782bbcb28858ee231d4613544c69a396e326bbc0c285f44f2c8cf7fb94785",
+    "sources": {
+      "gfs48-10216-2026-07-01-2026-09-30": {
+        "bytes": 68117,
+        "local_path": "data/raw/followup-q3/sources/gfs48-10216-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:04.055348+00:00",
+        "sha256": "f7b4e9c02f29ea95482edbfb43c3fbda2c487c194602310d24ca52f4934e1892",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=31.5825&longitude=-87.4889&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-10325-2026-07-01-2026-09-30": {
+        "bytes": 68845,
+        "local_path": "data/raw/followup-q3/sources/gfs48-10325-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:04.785935+00:00",
+        "sha256": "6b3f25db6c60cde9e3663e8d109da64c20584db3c123d31ccc15ab9938bf6506",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=42.260844&longitude=-111.6656&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-114-2026-07-01-2026-09-30": {
+        "bytes": 68610,
+        "local_path": "data/raw/followup-q3/sources/gfs48-114-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:56:46.354665+00:00",
+        "sha256": "3576b5300badf93edde0463a55b9b61b827612b432ff8ea65e2a55be73a8209d",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=31.364122&longitude=-109.5538&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-120-2026-07-01-2026-09-30": {
+        "bytes": 69176,
+        "local_path": "data/raw/followup-q3/sources/gfs48-120-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:56:47.116172+00:00",
+        "sha256": "19190676247679b1952824813acd382fe4ee451230f1abe55972e16190c740b3",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=32.7214&longitude=-114.7106&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-1417-2026-07-01-2026-09-30": {
+        "bytes": 68542,
+        "local_path": "data/raw/followup-q3/sources/gfs48-1417-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:56:51.945088+00:00",
+        "sha256": "ca2f11575cd8680fc6c037693d718e29496c4a0803608ebf6ae2c2249f61dd3b",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=32.7047&longitude=-93.9597&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-1705-2026-07-01-2026-09-30": {
+        "bytes": 68706,
+        "local_path": "data/raw/followup-q3/sources/gfs48-1705-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:56:52.746280+00:00",
+        "sha256": "a32008b40e7289a294aa995303403cf218b04b2814abea5ffe60b4920f0d36b4",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=44.435381&longitude=-83.44072&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-1757-2026-07-01-2026-09-30": {
+        "bytes": 68979,
+        "local_path": "data/raw/followup-q3/sources/gfs48-1757-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:56:53.538017+00:00",
+        "sha256": "e79b4b006fb4ca796337c5095a82571302ad71c69eec3b4fb91b8578c6a3eafb",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=46.564601&longitude=-90.41615&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-1925-2026-07-01-2026-09-30": {
+        "bytes": 69251,
+        "local_path": "data/raw/followup-q3/sources/gfs48-1925-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:56:54.356677+00:00",
+        "sha256": "bc1a5cbc444b472673aa15511ae607e137d95891ba44b06ad902072ca26234b3",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=44.622&longitude=-92.6333&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-2107-2026-07-01-2026-09-30": {
+        "bytes": 69197,
+        "local_path": "data/raw/followup-q3/sources/gfs48-2107-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:56:55.162900+00:00",
+        "sha256": "df4c2c3c945e3e7c1a0130af443f216d7278b9f46fe23dd7a6fc331c9a01d809",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=38.915479&longitude=-90.29025&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-2199-2026-07-01-2026-09-30": {
+        "bytes": 67798,
+        "local_path": "data/raw/followup-q3/sources/gfs48-2199-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:56:55.953267+00:00",
+        "sha256": "99e88184e442beb2d30f0c308d0595f3a58c651869191e98b2c7d5da57b30e10",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=47.96048&longitude=-115.7336&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-2832-2026-07-01-2026-09-30": {
+        "bytes": 68428,
+        "local_path": "data/raw/followup-q3/sources/gfs48-2832-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:56:57.758976+00:00",
+        "sha256": "765340565f1834d29efac63255b9a7a79f73d47b9518f76805e5e86face0cd6a",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=39.1128&longitude=-84.8036&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-3262-2026-07-01-2026-09-30": {
+        "bytes": 68061,
+        "local_path": "data/raw/followup-q3/sources/gfs48-3262-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:56:57.568620+00:00",
+        "sha256": "f6782a84d58e25b360eab3d137499d1a81d48c6cd65c87be8f58140133083276",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=34.9594&longitude=-82.9147&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-327-2026-07-01-2026-09-30": {
+        "bytes": 68137,
+        "local_path": "data/raw/followup-q3/sources/gfs48-327-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:56:47.918099+00:00",
+        "sha256": "8b9307a10e5174ac02945a62f69d8f4386052f432e373b9e22262d2404fe7b3a",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=37.3499&longitude=-118.4628&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-3559-2026-07-01-2026-09-30": {
+        "bytes": 69976,
+        "local_path": "data/raw/followup-q3/sources/gfs48-3559-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:56:58.378426+00:00",
+        "sha256": "6ce339613810b946dd9e42296d5b862c9a258c1a3799af223a736c71931adec3",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=25.9131&longitude=-97.5214&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-3699-2026-07-01-2026-09-30": {
+        "bytes": 69355,
+        "local_path": "data/raw/followup-q3/sources/gfs48-3699-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:56:59.163776+00:00",
+        "sha256": "14448d668d4979fde1840dbb20fbae2e33aec635f0756c890db43de41e0f19c3",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=37.9858&longitude=-111.4383&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-4148-2026-07-01-2026-09-30": {
+        "bytes": 69773,
+        "local_path": "data/raw/followup-q3/sources/gfs48-4148-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:56:59.968886+00:00",
+        "sha256": "3f7f6079b25afee82ab12dcb94d8898ead96561974d0ab5fe38c23eb5ec76699",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=45.370922&longitude=-86.93082&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-437-2026-07-01-2026-09-30": {
+        "bytes": 68322,
+        "local_path": "data/raw/followup-q3/sources/gfs48-437-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:56:48.719928+00:00",
+        "sha256": "ef9ec5eff018e3f41202a3bb977bd3428447aeaa0b5c43b57e07ad20631c0f05",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=39.542985&longitude=-121.4922&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-445-2026-07-01-2026-09-30": {
+        "bytes": 68801,
+        "local_path": "data/raw/followup-q3/sources/gfs48-445-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:56:49.537291+00:00",
+        "sha256": "25a5d34c59758d386d150143e0f14cf5f39f38f6184ad67c36e20628922b0e77",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=40.717455&longitude=-122.4223&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-54213-2026-07-01-2026-09-30": {
+        "bytes": 69525,
+        "local_path": "data/raw/followup-q3/sources/gfs48-54213-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:05.610706+00:00",
+        "sha256": "669e8a0557f097d485bcad90ffd401f70aa3b303d5f833edea541cd8e06517ae",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=48.593158&longitude=-97.17608&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-54214-2026-07-01-2026-09-30": {
+        "bytes": 69574,
+        "local_path": "data/raw/followup-q3/sources/gfs48-54214-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:06.505777+00:00",
+        "sha256": "d9ae9625e2b929834320af8247aedb7ae9c89e80ef2e7081e5c4c0db472b36d4",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=47.927202&longitude=-97.00715&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-54249-2026-07-01-2026-09-30": {
+        "bytes": 67670,
+        "local_path": "data/raw/followup-q3/sources/gfs48-54249-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:07.197140+00:00",
+        "sha256": "4fb0b0ae27e4d30377c1293c61cc98c3bc7a490ac6e1e7f0d9861b719e685738",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=48.959547&longitude=-116.5574&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-54927-2026-07-01-2026-09-30": {
+        "bytes": 69478,
+        "local_path": "data/raw/followup-q3/sources/gfs48-54927-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:08.026288+00:00",
+        "sha256": "5c019721ffd5385bd87ebc58eb49a598b1ae88146023d31410632e78debb24ad",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=29.252062&longitude=-89.9721&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-55198-2026-07-01-2026-09-30": {
+        "bytes": 68153,
+        "local_path": "data/raw/followup-q3/sources/gfs48-55198-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:08.802020+00:00",
+        "sha256": "9011b24ebd1c6e8cec9f686fe2bdfdee3553111cb799c4a5a1991ad98685e76e",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=38.191661&longitude=-82.60459&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-56561-2026-07-01-2026-09-30": {
+        "bytes": 69828,
+        "local_path": "data/raw/followup-q3/sources/gfs48-56561-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:09.597611+00:00",
+        "sha256": "e1818524f20757bb424b20361d5d816fe52fc582695896b49d7715fa21b06e1f",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=36.4453&longitude=-101.8761&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-56767-2026-07-01-2026-09-30": {
+        "bytes": 69525,
+        "local_path": "data/raw/followup-q3/sources/gfs48-56767-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:10.414909+00:00",
+        "sha256": "b461098393e99a350bf2bb207f460d513d1df17c878f1e17950e77b2159d6618",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=40.575&longitude=-95.5228&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-57098-2026-07-01-2026-09-30": {
+        "bytes": 69401,
+        "local_path": "data/raw/followup-q3/sources/gfs48-57098-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:11.231562+00:00",
+        "sha256": "e7101572dca24c26b0d724fe949f9ab92f22abeb7cf5c79878cd9dbec064d2e7",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=34.6596&longitude=-110.2842&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-57290-2026-07-01-2026-09-30": {
+        "bytes": 69476,
+        "local_path": "data/raw/followup-q3/sources/gfs48-57290-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:12.020881+00:00",
+        "sha256": "57b4f14f0a2fec779ef84fb11b03a55193b8f6cdeb476fd054626fef8e6bd688",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=40.9881&longitude=-102.8969&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-57364-2026-07-01-2026-09-30": {
+        "bytes": 69179,
+        "local_path": "data/raw/followup-q3/sources/gfs48-57364-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:12.820286+00:00",
+        "sha256": "1dda85622d6cd0ffc30352d7076de4463946862efd439ee3f5de844bda4c4d55",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=32.7792&longitude=-114.6344&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-57489-2026-07-01-2026-09-30": {
+        "bytes": 69784,
+        "local_path": "data/raw/followup-q3/sources/gfs48-57489-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:13.626119+00:00",
+        "sha256": "bbdfd2aa2bdfe3966b2d60c01d901db0a16c46e2dadc82f5635a61f50f5321e5",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=37.6297&longitude=-94.6414&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-57595-2026-07-01-2026-09-30": {
+        "bytes": 68081,
+        "local_path": "data/raw/followup-q3/sources/gfs48-57595-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:14.423101+00:00",
+        "sha256": "02d7693246830f1fb907a7f90ddd3a1ae39ec60fde5a9bb2a099c26efe4a1f53",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=39.445&longitude=-79.03&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-57756-2026-07-01-2026-09-30": {
+        "bytes": 68401,
+        "local_path": "data/raw/followup-q3/sources/gfs48-57756-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:15.275048+00:00",
+        "sha256": "ae22284997ce9b11016223d9e47ac465074044ec218def9f21dd10651b223553",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=46.793581&longitude=-124.0654&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-58310-2026-07-01-2026-09-30": {
+        "bytes": 68788,
+        "local_path": "data/raw/followup-q3/sources/gfs48-58310-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:16.025706+00:00",
+        "sha256": "e24a905278cd565d6bcb1a181deed15524618e6a0ae6accb37dc284904203a71",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=30.148889&longitude=-93.33556&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-58695-2026-07-01-2026-09-30": {
+        "bytes": 69679,
+        "local_path": "data/raw/followup-q3/sources/gfs48-58695-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:16.836258+00:00",
+        "sha256": "d6c274d93c72045ed0d0c213f84487f5a4751331e53e1d7483862cff1df4a9c0",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=42.608056&longitude=-98.42833&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-59357-2026-07-01-2026-09-30": {
+        "bytes": 67881,
+        "local_path": "data/raw/followup-q3/sources/gfs48-59357-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:17.655556+00:00",
+        "sha256": "e09d9595c80b9c2e6f28d18091a211e8bc18ad505a08082bb8f2a101681335dd",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=43.786667&longitude=-122.9581&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-59826-2026-07-01-2026-09-30": {
+        "bytes": 68681,
+        "local_path": "data/raw/followup-q3/sources/gfs48-59826-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:18.482844+00:00",
+        "sha256": "6df5c5a01dd33a5398d6b3f637a78e4980b4e7a6cc4c64a90b85a1e4b7d5ec07",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=36.518&longitude=-116.497&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-60152-2026-07-01-2026-09-30": {
+        "bytes": 69918,
+        "local_path": "data/raw/followup-q3/sources/gfs48-60152-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:19.254744+00:00",
+        "sha256": "25b308ab035958b2c0f0e0c13edaf5a06b938e75f0b9b49b2dc71c45987a0a15",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=34.727007&longitude=-103.1668&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-6072-2026-07-01-2026-09-30": {
+        "bytes": 68536,
+        "local_path": "data/raw/followup-q3/sources/gfs48-6072-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:00.764670+00:00",
+        "sha256": "4fca92811a2a2eb7a23bd954390639fc1d5dec0a651ab847fd758e3652f01dea",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=32.0081&longitude=-91.0478&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-61080-2026-07-01-2026-09-30": {
+        "bytes": 68326,
+        "local_path": "data/raw/followup-q3/sources/gfs48-61080-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:20.070031+00:00",
+        "sha256": "2d58da541439d2f1bc442827c4f839e27f467f662b11792546095c89f3d61d15",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=30.459813&longitude=-84.26003&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-6138-2026-07-01-2026-09-30": {
+        "bytes": 69811,
+        "local_path": "data/raw/followup-q3/sources/gfs48-6138-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:01.572576+00:00",
+        "sha256": "27eacfb6d2d5b3b7598288d2ca15669f6a9fc4d8f4ff1ea1a9e5017063b81a43",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=36.2561&longitude=-94.5241&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-61605-2026-07-01-2026-09-30": {
+        "bytes": 68358,
+        "local_path": "data/raw/followup-q3/sources/gfs48-61605-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:20.890452+00:00",
+        "sha256": "0fbc40365df8dc081dd21ff37e41912cb8bfd3309d3f0ae95c9e07943ef66b32",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=37.777&longitude=-106.22&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-61780-2026-07-01-2026-09-30": {
+        "bytes": 68393,
+        "local_path": "data/raw/followup-q3/sources/gfs48-61780-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:21.738749+00:00",
+        "sha256": "a4ad5c353b99ba86a5bf9ea451966bc45b23b454aa585fcd2a39b768b70bd1f9",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=28.790186&longitude=-81.08902&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-61844-2026-07-01-2026-09-30": {
+        "bytes": 68221,
+        "local_path": "data/raw/followup-q3/sources/gfs48-61844-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:22.455046+00:00",
+        "sha256": "4d2c69e2dbc22ebd9c17fc75f9b187cc8a392057c57f3493206644cf494abe0c",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=44.465334&longitude=-118.2041&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-621-2026-07-01-2026-09-30": {
+        "bytes": 69628,
+        "local_path": "data/raw/followup-q3/sources/gfs48-621-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:56:50.323778+00:00",
+        "sha256": "9996c06f34e96713bfd46900ec651b349e51bdef8115224ea9e806bd3317d297",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=25.4356&longitude=-80.3308&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-62113-2026-07-01-2026-09-30": {
+        "bytes": 69876,
+        "local_path": "data/raw/followup-q3/sources/gfs48-62113-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:23.273222+00:00",
+        "sha256": "16bb943bce225bea21d19b4f573d51de0159c04546adb5fe2ade7fe80269d511",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=34.579835&longitude=-120.5643&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-63446-2026-07-01-2026-09-30": {
+        "bytes": 68935,
+        "local_path": "data/raw/followup-q3/sources/gfs48-63446-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:24.071312+00:00",
+        "sha256": "054880587581015693e00fe6c003a9a3b6f5414c9cbdcc2f9888092555890d70",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=34.773578&longitude=-77.18577&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-63719-2026-07-01-2026-09-30": {
+        "bytes": 68238,
+        "local_path": "data/raw/followup-q3/sources/gfs48-63719-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:25.038849+00:00",
+        "sha256": "c8496ee5313e576fe5f421eb8486895e9015c1aca8759cb2f1e0eb70e501496a",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=35.06&longitude=-86.34&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-63721-2026-07-01-2026-09-30": {
+        "bytes": 68675,
+        "local_path": "data/raw/followup-q3/sources/gfs48-63721-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:25.779672+00:00",
+        "sha256": "767f4446b34b46659587558e2971f42d06afd7ec7b3fa0878f3223f7ebf1ff01",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=30.747916&longitude=-84.68049&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-63913-2026-07-01-2026-09-30": {
+        "bytes": 68364,
+        "local_path": "data/raw/followup-q3/sources/gfs48-63913-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:26.497249+00:00",
+        "sha256": "4e15695a41f917d693883a8269fc1e08b2f20488e22ffd438b36cbcbee11210e",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=40.713024&longitude=-119.4672&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-6595-2026-07-01-2026-09-30": {
+        "bytes": 68540,
+        "local_path": "data/raw/followup-q3/sources/gfs48-6595-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:02.386251+00:00",
+        "sha256": "1cf8c4955307dfb89b049a80f705645137650314dbe7395e51e8192475f1863c",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=31.173484&longitude=-93.56588&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-6623-2026-07-01-2026-09-30": {
+        "bytes": 69447,
+        "local_path": "data/raw/followup-q3/sources/gfs48-6623-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:03.192904+00:00",
+        "sha256": "943d902001391bebd4a38021c7bae24087150a90ea4b6b2092dc84d1e96559c1",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=48.0122&longitude=-106.4123&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-66267-2026-07-01-2026-09-30": {
+        "bytes": 68521,
+        "local_path": "data/raw/followup-q3/sources/gfs48-66267-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:27.297852+00:00",
+        "sha256": "1cac12c092f173f17a18d163f285b93a0159cc3f83e1019ac94ca2f195f1bcc8",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=41.88605&longitude=-112.1817&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-66369-2026-07-01-2026-09-30": {
+        "bytes": 69318,
+        "local_path": "data/raw/followup-q3/sources/gfs48-66369-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:28.066768+00:00",
+        "sha256": "2a44d4914088d130567cbf5ab74bd132408e450ec948998a62e1d99f5059828f",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=34.962&longitude=-90.184&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-66381-2026-07-01-2026-09-30": {
+        "bytes": 68995,
+        "local_path": "data/raw/followup-q3/sources/gfs48-66381-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:28.880925+00:00",
+        "sha256": "8ba68038734fcfc2e1a24c02816626a1d2baa4d7f5c5f3ab095277cd0147ba52",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=43.897&longitude=-69.947&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-67488-2026-07-01-2026-09-30": {
+        "bytes": 68232,
+        "local_path": "data/raw/followup-q3/sources/gfs48-67488-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:29.681264+00:00",
+        "sha256": "31f0cdcc8250f10a89ba5aeb67926aa160574b067d71c57611073d775a3b650b",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=34.829551&longitude=-86.63035&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-67769-2026-07-01-2026-09-30": {
+        "bytes": 69255,
+        "local_path": "data/raw/followup-q3/sources/gfs48-67769-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:30.506522+00:00",
+        "sha256": "9e58d132d6b6ec96e050b447e7e48dfae367f1620bf67a2ab3e5d867608c0c2c",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=41.58263&longitude=-106.0773&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-67771-2026-07-01-2026-09-30": {
+        "bytes": 68283,
+        "local_path": "data/raw/followup-q3/sources/gfs48-67771-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:31.324830+00:00",
+        "sha256": "edad68b934f3d53a7f9c6a1e55aad3cda827ead4c460fd33c00e6e3eb1cf8a63",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=47.31&longitude=-68.164&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-67915-2026-07-01-2026-09-30": {
+        "bytes": 68414,
+        "local_path": "data/raw/followup-q3/sources/gfs48-67915-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:57:32.187022+00:00",
+        "sha256": "e57d24be1ddf2478f97c203c87249d4fa8259802d0833f3a8f3cdc90e2786f1e",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=33.096086&longitude=-91.94791&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-88-2026-07-01-2026-09-30": {
+        "bytes": 68189,
+        "local_path": "data/raw/followup-q3/sources/gfs48-88-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:56:45.509715+00:00",
+        "sha256": "cd8dcb9add6b887f34e40923eaadc03f5839f70d35c7c12680f2c468a3784ed2",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=41.949&longitude=-74.2063&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-886-2026-07-01-2026-09-30": {
+        "bytes": 69063,
+        "local_path": "data/raw/followup-q3/sources/gfs48-886-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:56:51.154874+00:00",
+        "sha256": "7a93d05ebc25ee0ee14230b211c9d5c94f269e2b75af5ab45ddfe4c5c7793252",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=41.8508&longitude=-87.6533&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "gfs48-9-2026-07-01-2026-09-30": {
+        "bytes": 69154,
+        "local_path": "data/raw/followup-q3/sources/gfs48-9-2026-07-01-2026-09-30.json",
+        "retrieved_at": "2026-10-18T02:56:44.718414+00:00",
+        "sha256": "cce2601d8f9fbcc69aaea8c8dc051966491ff86e8aa052466acb6997c97a39bd",
+        "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=31.7569&longitude=-106.375&hourly=temperature_2m_previous_day2%2Crelative_humidity_2m_previous_day2%2Cprecipitation_previous_day2%2Cwind_speed_10m_previous_day2&models=gfs_global&start_date=2026-06-24&end_date=2026-10-01&timezone=UTC&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm"
+      },
+      "warnings-AL": {
+        "bytes": 11316092,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-AL.zip",
+        "retrieved_at": "2026-10-18T02:55:12.223013+00:00",
+        "sha256": "ba7428b61d1073432eb3e5b9bd4c30b14cc6aa31b8b7b0c9b3e0dc00961c1694",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=AL&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-AR": {
+        "bytes": 6404797,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-AR.zip",
+        "retrieved_at": "2026-10-18T02:55:11.817458+00:00",
+        "sha256": "87f70d32bc3ed427953b2af2bedc6a77ccf002288a23b4405c86c9c9efb8fbc6",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=AR&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-AZ": {
+        "bytes": 12996254,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-AZ.zip",
+        "retrieved_at": "2026-10-18T02:55:15.216674+00:00",
+        "sha256": "9d51c5ea5986859f13e56fdcd4dfcf0a1201c9a2c18dfe5308d5aa6d76dcd525",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=AZ&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-CA": {
+        "bytes": 18626507,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-CA.zip",
+        "retrieved_at": "2026-10-18T02:55:21.428320+00:00",
+        "sha256": "6603e31b56810ecfdaf4a6fd1ce7b9b00784bdeffe3579101dc7cb89daec7a0d",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=CA&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-CO": {
+        "bytes": 7173546,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-CO.zip",
+        "retrieved_at": "2026-10-18T02:55:18.878540+00:00",
+        "sha256": "f4beac6def41332dd61a643e7aacb6544b28de6b23c1ef2e4660b301c96eb901",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=CO&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-FL": {
+        "bytes": 59666404,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-FL.zip",
+        "retrieved_at": "2026-10-18T02:56:26.105060+00:00",
+        "sha256": "b9e25749b13c953f621e5cba62e7dd7b6b68c9d0e03d23d15a093f216271ecd9",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=FL&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-GA": {
+        "bytes": 15842424,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-GA.zip",
+        "retrieved_at": "2026-10-18T02:55:29.612414+00:00",
+        "sha256": "6e270979a1c6f4414513f5c0555cd863493e877433458ff32f0b30755db5acd5",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=GA&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-ID": {
+        "bytes": 2715424,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-ID.zip",
+        "retrieved_at": "2026-10-18T02:55:24.432163+00:00",
+        "sha256": "08892da677e76685f6e6aab3d65a5d2637401eb1b6864a9484404c06d942990c",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=ID&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-IL": {
+        "bytes": 4887439,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-IL.zip",
+        "retrieved_at": "2026-10-18T02:55:34.030820+00:00",
+        "sha256": "cba45268a4c193183497c25d1a0d055093f666f54184acb5f35cce6d2335ad40",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=IL&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-KS": {
+        "bytes": 3724479,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-KS.zip",
+        "retrieved_at": "2026-10-18T02:55:36.143253+00:00",
+        "sha256": "6d951c2584b7e81aca98eae8749db5c4809a131c2e93a42501a6e6d5e12004dd",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=KS&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-KY": {
+        "bytes": 7411840,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-KY.zip",
+        "retrieved_at": "2026-10-18T02:55:40.981331+00:00",
+        "sha256": "8a2f9ae8dac3400aafb693d3cd9c3283f40836f5d6ed638142563966d6915a41",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=KY&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-LA": {
+        "bytes": 27508305,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-LA.zip",
+        "retrieved_at": "2026-10-18T02:55:55.245150+00:00",
+        "sha256": "a80593c21f346fc260611c0390ec9aa64d4d0b9442b96af547fa870b18767e74",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=LA&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-ME": {
+        "bytes": 5759547,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-ME.zip",
+        "retrieved_at": "2026-10-18T02:55:45.758540+00:00",
+        "sha256": "cf8429c826d24d9d110ad7c2ab3e3835d68b367fae20ba7d4d2e3548807d6b53",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=ME&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-MI": {
+        "bytes": 6449348,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-MI.zip",
+        "retrieved_at": "2026-10-18T02:55:51.159808+00:00",
+        "sha256": "dae2021d7dedcffd9410a455c7ed847b1375c2ba7c5cc2d563b4f82579930160",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=MI&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-MN": {
+        "bytes": 4661285,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-MN.zip",
+        "retrieved_at": "2026-10-18T02:55:55.084457+00:00",
+        "sha256": "d822b99df0e0c753fbeb52e79ae5cd5c2bbbf44942b47c53eabd2eee73a5c52a",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=MN&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-MO": {
+        "bytes": 6137821,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-MO.zip",
+        "retrieved_at": "2026-10-18T02:56:02.845687+00:00",
+        "sha256": "47514e8b420dd05ee51b9945246b17c8e09be54bd3c83c1ed2ce8df1440a11e3",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=MO&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-MS": {
+        "bytes": 5507264,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-MS.zip",
+        "retrieved_at": "2026-10-18T02:56:01.071809+00:00",
+        "sha256": "586a8d9fa9df5b09eca557531260935ca6214f8b2add4a58b60806b8afc73699",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=MS&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-MT": {
+        "bytes": 5751504,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-MT.zip",
+        "retrieved_at": "2026-10-18T02:56:05.485957+00:00",
+        "sha256": "0bf9e5a58b75b5b30355db3bd95bfccde36e686ac9468048117a8d93ba78ff03",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=MT&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-NC": {
+        "bytes": 36488571,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-NC.zip",
+        "retrieved_at": "2026-10-18T02:56:21.092700+00:00",
+        "sha256": "eadf555867531ed4978bf574a461868bcd438ada02781c33712f7b107f4f431c",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=NC&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-ND": {
+        "bytes": 2833335,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-ND.zip",
+        "retrieved_at": "2026-10-18T02:56:08.481607+00:00",
+        "sha256": "051b72a50e7ef0e8f3734abb6457d1f3665b1d1eb10d0796a52cd4f2e4f2bd60",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=ND&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-NE": {
+        "bytes": 3052939,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-NE.zip",
+        "retrieved_at": "2026-10-18T02:56:15.031989+00:00",
+        "sha256": "6d514be249405928e3db7f7d52c57f84b4b4269af072eeb1f949b80e839906ca",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=NE&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-NM": {
+        "bytes": 10128861,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-NM.zip",
+        "retrieved_at": "2026-10-18T02:56:20.846982+00:00",
+        "sha256": "a344fe0bee8a6f35d122bf0f6ee434fe92be53568e7b3e6084231c588a99248f",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=NM&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-NV": {
+        "bytes": 826160,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-NV.zip",
+        "retrieved_at": "2026-10-18T02:56:22.564578+00:00",
+        "sha256": "ec00948a2e7bd2a0ad6905fa57e02af669e30ee850d6d66699bf782062f8e962",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=NV&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-NY": {
+        "bytes": 9074875,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-NY.zip",
+        "retrieved_at": "2026-10-18T02:56:30.694749+00:00",
+        "sha256": "4a84fc69b3836d6da91ebad24ea462b3643db92d90b2146bf1da28496257a517",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=NY&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-OH": {
+        "bytes": 5219952,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-OH.zip",
+        "retrieved_at": "2026-10-18T02:56:29.647064+00:00",
+        "sha256": "2bc6d919a92cc0281560267f51af0e65801063f7e1ca433971140f87ecdd0154",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=OH&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-OR": {
+        "bytes": 7358848,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-OR.zip",
+        "retrieved_at": "2026-10-18T02:56:31.983020+00:00",
+        "sha256": "abe2b948a05026cff572b156ad3f80dd8c6aff74420c8d94d4f7815e734c97c8",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=OR&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-SC": {
+        "bytes": 8175288,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-SC.zip",
+        "retrieved_at": "2026-10-18T02:56:35.475161+00:00",
+        "sha256": "b67b9b73e83b52c8fa25d41ef9a8ea11cf0b69ed43a1f9d19bb3dde034d06069",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=SC&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-TN": {
+        "bytes": 4596431,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-TN.zip",
+        "retrieved_at": "2026-10-18T02:56:34.600507+00:00",
+        "sha256": "a54329b085a0dd7b74453df11aa79c53d10523e65cfc2271eac4d20a1b312156",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=TN&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-TX": {
+        "bytes": 58170549,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-TX.zip",
+        "retrieved_at": "2026-10-18T02:57:19.861283+00:00",
+        "sha256": "ed2f4bc6b288cae0642007dee5c53b1e028a134238261fc47c2625ab062669c6",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=TX&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-UT": {
+        "bytes": 3173831,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-UT.zip",
+        "retrieved_at": "2026-10-18T02:56:37.573570+00:00",
+        "sha256": "074d722d80ff9811e338b41ef86dd48ee02a1bdc08f488aa2cc723459f3e2bff",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=UT&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-WA": {
+        "bytes": 6481271,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-WA.zip",
+        "retrieved_at": "2026-10-18T02:56:39.316689+00:00",
+        "sha256": "cb2dbed948b211121bc8c3507e934ebad64a37c8ebe9b773c45af582890113a4",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=WA&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-WI": {
+        "bytes": 3776816,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-WI.zip",
+        "retrieved_at": "2026-10-18T02:56:40.994556+00:00",
+        "sha256": "beb86f03a2ccd9df23f56bc08486eb36de79597b4b5ff4c301c9d64788b5ff10",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=WI&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-WV": {
+        "bytes": 5866154,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-WV.zip",
+        "retrieved_at": "2026-10-18T02:56:44.538516+00:00",
+        "sha256": "223ac22447c2ff5f389e4fa11a6deb738b9da1f7efeaf80438235f7bf729a57b",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=WV&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      },
+      "warnings-WY": {
+        "bytes": 2903613,
+        "local_path": "data/raw/followup-q3/sources/warnings-2026-Q3-WY.zip",
+        "retrieved_at": "2026-10-18T02:56:44.025028+00:00",
+        "sha256": "a1be9da3e82f6899b324f32b765a59867f985c7c984768951a0223a576fdea81",
+        "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/watchwarn.py?accept=shapefile&sts=2026-01-01T00%3A00Z&ets=2026-10-02T00%3A00Z&location_group=states&states=WY&limitps=1&phenomena=HT%2CEH%2CXH%2CFF%2CFA%2CFL%2CFW%2CSV%2CHW%2CTO&significance=Y%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW%2CW&addsvs=false&simple=false"
+      }
+    },
+    "status": "ok",
+    "unknown_labels_excluded": 19
+  },
+  "selected": "sigmoid_C1",
+  "selection": {
+    "logit_intercept_only": {
+      "geo_selection": {
+        "average_precision": 0.18135509818922313,
+        "brier": 0.1287504453245714,
+        "calibration_bins": [
+          {
+            "count": 2317,
+            "lower": 0,
+            "mean_prediction": 0.030800915951365044,
+            "reported_fraction": 0.12343547690979716,
+            "upper": 0.1
+          },
+          {
+            "count": 881,
+            "lower": 0.1,
+            "mean_prediction": 0.15257156548567616,
+            "reported_fraction": 0.12258796821793416,
+            "upper": 0.2
+          },
+          {
+            "count": 556,
+            "lower": 0.2,
+            "mean_prediction": 0.2807908862172394,
+            "reported_fraction": 0.2014388489208633,
+            "upper": 0.4
+          },
+          {
+            "count": 265,
+            "lower": 0.4,
+            "mean_prediction": 0.4478759486282594,
+            "reported_fraction": 0.1320754716981132,
+            "upper": 0.6
+          },
+          {
+            "count": 13,
+            "lower": 0.6,
+            "mean_prediction": 0.6148236647501153,
+            "reported_fraction": 0.6923076923076923,
+            "upper": 0.8
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          3451,
+          31,
+          530,
+          20
+        ],
+        "log_loss": 0.46271957040236605,
+        "positives": 550,
+        "precision_at_0_5": 0.39215686274509803,
+        "prevalence": 0.13640873015873015,
+        "recall_at_0_5": 0.03636363636363636,
+        "roc_auc": 0.5824886428907106,
+        "rows": 4032
+      },
+      "time_selection": {
+        "average_precision": 0.2964893447240494,
+        "brier": 0.09382871114022573,
+        "calibration_bins": [
+          {
+            "count": 9693,
+            "lower": 0,
+            "mean_prediction": 0.02977839845566699,
+            "reported_fraction": 0.060352831940575676,
+            "upper": 0.1
+          },
+          {
+            "count": 1225,
+            "lower": 0.1,
+            "mean_prediction": 0.1399056644337471,
+            "reported_fraction": 0.23591836734693877,
+            "upper": 0.2
+          },
+          {
+            "count": 422,
+            "lower": 0.2,
+            "mean_prediction": 0.2660293994120231,
+            "reported_fraction": 0.41706161137440756,
+            "upper": 0.4
+          },
+          {
+            "count": 123,
+            "lower": 0.4,
+            "mean_prediction": 0.5168802383014713,
+            "reported_fraction": 0.3170731707317073,
+            "upper": 0.6
+          },
+          {
+            "count": 596,
+            "lower": 0.6,
+            "mean_prediction": 0.6873000163060434,
+            "reported_fraction": 0.28187919463087246,
+            "upper": 0.8
+          },
+          {
+            "count": 14,
+            "lower": 0.8,
+            "mean_prediction": 0.8333406734962205,
+            "reported_fraction": 0.7142857142857143,
+            "upper": 1
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          10311,
+          495,
+          1076,
+          191
+        ],
+        "log_loss": 0.3153561085730605,
+        "positives": 1267,
+        "precision_at_0_5": 0.2784256559766764,
+        "prevalence": 0.10494491841298766,
+        "recall_at_0_5": 0.15074980268350435,
+        "roc_auc": 0.786452752650936,
+        "rows": 12073
+      }
+    },
+    "sigmoid_C1": {
+      "geo_selection": {
+        "average_precision": 0.18135509818922313,
+        "brier": 0.12045924588550122,
+        "calibration_bins": [
+          {
+            "count": 2182,
+            "lower": 0,
+            "mean_prediction": 0.04694693441736049,
+            "reported_fraction": 0.12190650779101742,
+            "upper": 0.1
+          },
+          {
+            "count": 1304,
+            "lower": 0.1,
+            "mean_prediction": 0.1453522117982782,
+            "reported_fraction": 0.1411042944785276,
+            "upper": 0.2
+          },
+          {
+            "count": 546,
+            "lower": 0.2,
+            "mean_prediction": 0.26108924943646183,
+            "reported_fraction": 0.18315018315018314,
+            "upper": 0.4
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          3482,
+          0,
+          550,
+          0
+        ],
+        "log_loss": 0.41701596558371423,
+        "positives": 550,
+        "precision_at_0_5": 0.0,
+        "prevalence": 0.13640873015873015,
+        "recall_at_0_5": 0.0,
+        "roc_auc": 0.5824886428907106,
+        "rows": 4032
+      },
+      "time_selection": {
+        "average_precision": 0.2964893447240494,
+        "brier": 0.08679858309827145,
+        "calibration_bins": [
+          {
+            "count": 9364,
+            "lower": 0,
+            "mean_prediction": 0.048093937121954186,
+            "reported_fraction": 0.05638615976078599,
+            "upper": 0.1
+          },
+          {
+            "count": 1824,
+            "lower": 0.1,
+            "mean_prediction": 0.13450799201822747,
+            "reported_fraction": 0.24287280701754385,
+            "upper": 0.2
+          },
+          {
+            "count": 438,
+            "lower": 0.2,
+            "mean_prediction": 0.3136964212197248,
+            "reported_fraction": 0.3378995433789954,
+            "upper": 0.4
+          },
+          {
+            "count": 446,
+            "lower": 0.4,
+            "mean_prediction": 0.43889212253197146,
+            "reported_fraction": 0.33183856502242154,
+            "upper": 0.6
+          },
+          {
+            "count": 1,
+            "lower": 0.6,
+            "mean_prediction": 0.602907430693679,
+            "reported_fraction": 0.0,
+            "upper": 0.8
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          10799,
+          7,
+          1254,
+          13
+        ],
+        "log_loss": 0.2962000671793469,
+        "positives": 1267,
+        "precision_at_0_5": 0.65,
+        "prevalence": 0.10494491841298766,
+        "recall_at_0_5": 0.010260457774269928,
+        "roc_auc": 0.786452752650936,
+        "rows": 12073
+      }
+    },
+    "sigmoid_C1000": {
+      "geo_selection": {
+        "average_precision": 0.18135509818922313,
+        "brier": 0.12046251192408133,
+        "calibration_bins": [
+          {
+            "count": 2182,
+            "lower": 0,
+            "mean_prediction": 0.04693445109179636,
+            "reported_fraction": 0.12190650779101742,
+            "upper": 0.1
+          },
+          {
+            "count": 1304,
+            "lower": 0.1,
+            "mean_prediction": 0.14537491899346414,
+            "reported_fraction": 0.1411042944785276,
+            "upper": 0.2
+          },
+          {
+            "count": 546,
+            "lower": 0.2,
+            "mean_prediction": 0.2611807459082913,
+            "reported_fraction": 0.18315018315018314,
+            "upper": 0.4
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          3482,
+          0,
+          550,
+          0
+        ],
+        "log_loss": 0.41703373104942976,
+        "positives": 550,
+        "precision_at_0_5": 0.0,
+        "prevalence": 0.13640873015873015,
+        "recall_at_0_5": 0.0,
+        "roc_auc": 0.5824886428907106,
+        "rows": 4032
+      },
+      "time_selection": {
+        "average_precision": 0.2964893447240494,
+        "brier": 0.08679980845001528,
+        "calibration_bins": [
+          {
+            "count": 9364,
+            "lower": 0,
+            "mean_prediction": 0.04808135985581458,
+            "reported_fraction": 0.05638615976078599,
+            "upper": 0.1
+          },
+          {
+            "count": 1824,
+            "lower": 0.1,
+            "mean_prediction": 0.13452508585576495,
+            "reported_fraction": 0.24287280701754385,
+            "upper": 0.2
+          },
+          {
+            "count": 437,
+            "lower": 0.2,
+            "mean_prediction": 0.31362287212699025,
+            "reported_fraction": 0.33638443935926776,
+            "upper": 0.4
+          },
+          {
+            "count": 447,
+            "lower": 0.4,
+            "mean_prediction": 0.4390003299436291,
+            "reported_fraction": 0.3333333333333333,
+            "upper": 0.6
+          },
+          {
+            "count": 1,
+            "lower": 0.6,
+            "mean_prediction": 0.6031626670014917,
+            "reported_fraction": 0.0,
+            "upper": 0.8
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          10799,
+          7,
+          1253,
+          14
+        ],
+        "log_loss": 0.29620011886316805,
+        "positives": 1267,
+        "precision_at_0_5": 0.6666666666666666,
+        "prevalence": 0.10494491841298766,
+        "recall_at_0_5": 0.011049723756906077,
+        "roc_auc": 0.786452752650936,
+        "rows": 12073
+      }
+    },
+    "unchanged_v2": {
+      "geo_selection": {
+        "average_precision": 0.18135509818922313,
+        "brier": 0.13188713531069896,
+        "calibration_bins": [
+          {
+            "count": 2144,
+            "lower": 0,
+            "mean_prediction": 0.03107559089748817,
+            "reported_fraction": 0.12173507462686567,
+            "upper": 0.1
+          },
+          {
+            "count": 794,
+            "lower": 0.1,
+            "mean_prediction": 0.15143065355828148,
+            "reported_fraction": 0.1385390428211587,
+            "upper": 0.2
+          },
+          {
+            "count": 708,
+            "lower": 0.2,
+            "mean_prediction": 0.26546411278555443,
+            "reported_fraction": 0.1709039548022599,
+            "upper": 0.4
+          },
+          {
+            "count": 360,
+            "lower": 0.4,
+            "mean_prediction": 0.4694178980648828,
+            "reported_fraction": 0.11944444444444445,
+            "upper": 0.6
+          },
+          {
+            "count": 26,
+            "lower": 0.6,
+            "mean_prediction": 0.6443486221164308,
+            "reported_fraction": 0.5769230769230769,
+            "upper": 0.8
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          3405,
+          77,
+          527,
+          23
+        ],
+        "log_loss": 0.46148860655631024,
+        "positives": 550,
+        "precision_at_0_5": 0.23,
+        "prevalence": 0.13640873015873015,
+        "recall_at_0_5": 0.04181818181818182,
+        "roc_auc": 0.5824886428907106,
+        "rows": 4032
+      },
+      "time_selection": {
+        "average_precision": 0.2964893447240494,
+        "brier": 0.0945076337923577,
+        "calibration_bins": [
+          {
+            "count": 9288,
+            "lower": 0,
+            "mean_prediction": 0.03249019164879835,
+            "reported_fraction": 0.05566322136089578,
+            "upper": 0.1
+          },
+          {
+            "count": 1418,
+            "lower": 0.1,
+            "mean_prediction": 0.14087132466222616,
+            "reported_fraction": 0.2002820874471086,
+            "upper": 0.2
+          },
+          {
+            "count": 581,
+            "lower": 0.2,
+            "mean_prediction": 0.2609584443711979,
+            "reported_fraction": 0.38209982788296043,
+            "upper": 0.4
+          },
+          {
+            "count": 127,
+            "lower": 0.4,
+            "mean_prediction": 0.4820378021866019,
+            "reported_fraction": 0.4566929133858268,
+            "upper": 0.6
+          },
+          {
+            "count": 622,
+            "lower": 0.6,
+            "mean_prediction": 0.7148657439315418,
+            "reported_fraction": 0.25884244372990356,
+            "upper": 0.8
+          },
+          {
+            "count": 37,
+            "lower": 0.8,
+            "mean_prediction": 0.8310459080016968,
+            "reported_fraction": 0.6756756756756757,
+            "upper": 1
+          }
+        ],
+        "confusion_at_0_5_tn_fp_fn_tp": [
+          10294,
+          512,
+          1070,
+          197
+        ],
+        "log_loss": 0.3130706001726968,
+        "positives": 1267,
+        "precision_at_0_5": 0.2778561354019746,
+        "prevalence": 0.10494491841298766,
+        "recall_at_0_5": 0.15548539857932123,
+        "roc_auc": 0.786452752650936,
+        "rows": 12073
+      }
+    }
+  },
+  "serving_artifact_unchanged": true,
+  "study": "q3-2026-calibration-followup-v1",
+  "validation_passed": true
+}

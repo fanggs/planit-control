@@ -1,0 +1,13 @@
+{
+  "verified_at": "2026-10-18T03:07:05.450792+00:00",
+  "restricted_role_verified": true,
+  "real_query_result_counts": [
+    1,
+    60,
+    60
+  ],
+  "plants": 60,
+  "malicious_queries_rejected": 5,
+  "outbox_read_denied": true,
+  "credentials_printed": false
+}

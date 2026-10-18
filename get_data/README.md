@@ -1,5 +1,7 @@
 # Data ingestion
 
+Latest collector update: `get_data.monitor` now commits healthy plants independently, reports committed/failed IDs for each phase, and queues durable post-commit notices. See [operating and deployment instructions](../model/handoffs/ISSUES-14-22-IMPLEMENTATION.md) and [heat-index missingness](HEAT-INDEX.md). The lower-level weather store still validates its explicit requested subset atomically.
+
 For multi-year forecast training, verified warning geometries, wildlife context,
 and the recurring collection worker, see [model/CORRECTIONS.md](../model/CORRECTIONS.md).
 

@@ -1,0 +1,41 @@
+{
+  "kind": "calculation fixtures; not live data",
+  "cases": [
+    {
+      "temperature_f": 63,
+      "relative_humidity_pct": 60,
+      "heat_index_f": null,
+      "reason": "not_applicable"
+    },
+    {
+      "temperature_f": 90,
+      "relative_humidity_pct": 60,
+      "heat_index_f": 99.6777179000001,
+      "reason": "available"
+    },
+    {
+      "temperature_f": 90,
+      "relative_humidity_pct": null,
+      "heat_index_f": null,
+      "reason": "missing_humidity"
+    },
+    {
+      "temperature_f": null,
+      "relative_humidity_pct": 60,
+      "heat_index_f": null,
+      "reason": "missing_temperature"
+    },
+    {
+      "temperature_f": 115,
+      "relative_humidity_pct": 60,
+      "heat_index_f": null,
+      "reason": "outside_supported_range"
+    },
+    {
+      "temperature_f": 80,
+      "relative_humidity_pct": 0,
+      "heat_index_f": null,
+      "reason": "below_initial_screen"
+    }
+  ]
+}
