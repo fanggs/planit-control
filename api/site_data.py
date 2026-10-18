@@ -43,6 +43,16 @@ SITE_COLUMNS = """site_id, name, utility, state, county, county_fips, latitude, 
     source_name, source_url, source_vintage, retrieved_at"""
 
 
+# Decimal places shown for each weather reading (sensors aren't more precise).
+WEATHER_DECIMALS = {"temperature_f": 1, "heat_index_f": 1, "wind_mph": 1,
+                    "precip_1h_in": 2, "precip_24h_in": 2, "soil_moisture": 3}
+
+
+def _rounded(reading: dict) -> dict:
+    return {k: round(v, WEATHER_DECIMALS[k]) if k in WEATHER_DECIMALS and v is not None else v
+            for k, v in reading.items()}
+
+
 def mode() -> str:
     if os.environ.get("PLANIT_DATA", "").lower() == "sample":
         return "sample"
@@ -73,7 +83,7 @@ def load_sites() -> list[dict]:
     screening = {r["site_id"]: r for r in db.query(LATEST_SCREENING_SQL)}
     for s in sites:
         w = weather.get(s["site_id"])
-        s["latest_weather"] = {k: v for k, v in w.items() if k != "site_id"} if w else None
+        s["latest_weather"] = _rounded({k: v for k, v in w.items() if k != "site_id"}) if w else None
         # Research scores are allowed under contract v1.2; screens must label them "Prototype".
         s["screening"] = present(screening.get(s["site_id"]), allow_research=True)
     return sites
@@ -86,5 +96,6 @@ def active_events(site_id: int) -> list[dict]:
     return db.query("""
         SELECT id, hazard_type, event_kind, title, severity, starts_at, ends_at, source_name, source_url
         FROM public.environmental_events
-        WHERE site_id = :site_id AND starts_at <= now() AND (ends_at IS NULL OR ends_at > now())
+        WHERE site_id = :site_id AND (ends_at IS NULL OR ends_at > now())
+          AND (starts_at <= now() OR event_kind LIKE 'nws_%')  -- upcoming NWS alerts count too
         ORDER BY starts_at DESC LIMIT 20""", site_id=site_id)

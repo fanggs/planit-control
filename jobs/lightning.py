@@ -182,6 +182,21 @@ def write_live_alerts(rows: list[dict]) -> None:
     os.replace(tmp, LIVE_ALERTS)
 
 
+# How the live watch is doing, so the API can say "clear" only when it knows.
+# Written every poll by the live job (never by the replay).
+LIVE_STATUS = LIVE_ALERTS.with_name("lightning_status.json")
+
+
+def write_status(now: datetime, feed_ok_since: datetime | None, error: str | None) -> None:
+    tmp = LIVE_STATUS.with_suffix(".tmp")
+    tmp.write_text(json.dumps({
+        "checked_at": _iso(now),
+        "feed_ok_since": _iso(feed_ok_since) if feed_ok_since else None,
+        "error": error,
+    }, indent=2))
+    os.replace(tmp, LIVE_STATUS)
+
+
 def _tiger_store(replay: bool):
     """TigerStore when DATABASE_URL is set, else None (file-only)."""
     from api import db
@@ -208,6 +223,7 @@ def run(sites: list[dict], poll_seconds: float = 20.0, publish=None) -> None:
     while True:
         now = datetime.now(timezone.utc)
         flashes: list[dict] = []
+        error = None
         try:
             for sat in glm.SATELLITES:
                 keys = glm.latest_keys(sat, count=6, now=now)
@@ -222,11 +238,13 @@ def run(sites: list[dict], poll_seconds: float = 20.0, publish=None) -> None:
         except Exception as e:  # network or parse failure: feed is down
             log.warning("lightning feed unavailable: %s", e)
             feed_ok_since = None
+            error = "Lightning feed is unavailable"
 
         if store is not None and flashes:
             store.save_strikes(flashes, sites)
         notices = rule.process(flashes, now, feed_ok_since)
         write_live_alerts(rule.alerts())  # before publishing, so screens fetch fresh data
+        write_status(now, feed_ok_since, error)
         for notice in notices:
             log.info("notice %s", notice)
             ids = {k: v for k, v in notice.items() if k != "type"}

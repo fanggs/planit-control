@@ -67,6 +67,25 @@ class WildlifeContext(BaseModel):
     numeric_score_contribution: None = None
 
 
+class LightningStatus(BaseModel):
+    """Lightning watch for this site. "clear" only when the watch is fresh and working."""
+
+    status: Literal["clear", "stop_work", "unknown"]
+    checked_at: datetime | None
+    reason: str | None
+    source_name: str
+    source_url: str
+
+
+class WarningsStatus(BaseModel):
+    """NWS active-warnings check for this site. "ok" means checked recently."""
+
+    status: Literal["ok", "unknown"]
+    checked_at: datetime | None
+    source_name: str
+    source_url: str
+
+
 class ActiveAlertSummary(BaseModel):
     level: Literal["warning", "stop_work"]
     hazard_type: HazardType
@@ -89,6 +108,7 @@ class SiteSummary(BaseModel):
     top_factors: list[FeatureFactor] | None
     active_alert: ActiveAlertSummary | None
     open_report_count: int
+    lightning_status: LightningStatus
 
 
 class LatestWeather(BaseModel):
@@ -131,6 +151,8 @@ class SiteDetail(BaseModel):
     latest_weather: LatestWeather | None
     screening: ScreeningResult
     wildlife_context: WildlifeContext
+    lightning_status: LightningStatus
+    warnings_status: WarningsStatus
     active_alerts: list[dict]
     environmental_events: list[EnvironmentalEvent]
     recent_reports: list[dict]

@@ -22,7 +22,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import OperationalError
 
-from api import ask, db, site_data
+from api import ask, db, live_status, site_data
 from api.auth.hazard_auth import Auth0Config, Principal, create_auth_dependency, require_roles
 from api.schemas.alerts import Alert, Briefing
 from api.schemas.ask import AskAnswer, AskRequest, CannotAnswer
@@ -129,7 +129,7 @@ def _screening(site: dict) -> dict:
     return site.get("screening") or unavailable("no_data", "No stored screening prediction")
 
 
-def _summary(site: dict, alerts: list[dict], reports: list[dict]) -> dict:
+def _summary(site: dict, alerts: list[dict], reports: list[dict], lightning_watch: dict | None = None) -> dict:
     top = _site_alerts(site["site_id"], alerts)
     screening = _screening(site)
     shown = screening["score"] is not None  # a real 0 is still a score
@@ -153,6 +153,7 @@ def _summary(site: dict, alerts: list[dict], reports: list[dict]) -> dict:
         "open_report_count": sum(
             r["site_id"] == site["site_id"] and r["status"] == "open" for r in reports
         ),
+        "lightning_status": live_status.lightning_status(site["site_id"], alerts, lightning_watch),
     }
 
 
@@ -198,8 +199,8 @@ def health():
 
 @app.get("/sites", response_model=list[SiteSummary], dependencies=[Depends(_require_data_viewer)])
 def sites():
-    alerts, reports = _alerts(), _reports()
-    return [_summary(s, alerts, reports) for s in site_data.load_sites()]
+    alerts, reports, watch = _alerts(), _reports(), live_status.read_lightning()
+    return [_summary(s, alerts, reports, watch) for s in site_data.load_sites()]
 
 
 @app.get("/sites/{site_id}", response_model=SiteDetail, dependencies=[Depends(_require_data_viewer)])
@@ -207,12 +208,15 @@ def site_detail(site_id: int):
     site = next((s for s in site_data.load_sites() if s["site_id"] == site_id), None)
     if site is None:
         raise HTTPException(404, f"Site {site_id} not found")
+    alerts = _alerts()
     return {
         **site,
         "latest_weather": site.get("latest_weather"),
         "screening": _screening(site),
         "wildlife_context": for_site(site_id),
-        "active_alerts": _site_alerts(site_id, _alerts()),
+        "lightning_status": live_status.lightning_status(site_id, alerts, live_status.read_lightning()),
+        "warnings_status": live_status.warnings_status(site_id, live_status.read_nws()),
+        "active_alerts": _site_alerts(site_id, alerts),
         "environmental_events": site_data.active_events(site_id) or site.get("environmental_events", []),
         "recent_reports": [r for r in _reports() if r["site_id"] == site_id],
     }
