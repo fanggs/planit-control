@@ -11,5 +11,5 @@ async function call(name,...args){
   if(typeof api?.[name]!=='function')throw new Error(`Live connection is not configured: ${name}. Sample data was not substituted.`);
   return config.transport==='custom'?api[name](...args,{accessToken:await accessToken()}):api[name](...args);
 }
-export const services=Object.fromEntries(['listSites','readSite','listReports','prepareReportPhoto','submitReport','listBriefings','readBriefing','readPreferences','savePreferences','subscribeEvents'].map(name=>[name,(...args)=>call(name,...args)]));
+export const services=Object.fromEntries(['listSites','readSite','listReports','prepareReportPhoto','submitReport','listBriefings','readBriefing','ask','readPreferences','savePreferences','subscribeEvents'].map(name=>[name,(...args)=>call(name,...args)]));
 export function demoAction(name,...args){if(config.dataMode!=='mock')throw new Error('Demo controls are disabled in live mode.');return mockAPI[name](...args);}

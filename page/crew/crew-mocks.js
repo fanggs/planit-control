@@ -40,6 +40,7 @@ async function site(id){
 }
 export const mockAPI={
   async listSites(){return (await catalog()).map(s=>({...s}));},readSite:site,
+  async ask(){throw new Error('Questions require live data. The sample preview does not call Gemini.');},
   subscribeEvents(siteId,onEvent,onConnection){
     const listener=event=>{if(!siteId||!event.site_id||String(event.site_id)===String(siteId))onEvent(event);};listeners.add(listener);onConnection(true);
     const timer=setInterval(()=>{onConnection(navigator.onLine);onEvent({type:'heartbeat',server_time:now()});},10000);

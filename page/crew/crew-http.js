@@ -7,7 +7,7 @@ export const CONTRACT_ROUTES = Object.freeze({
   sites: '/sites', site: '/sites/{id}', alerts: '/alerts',
   reports: '/reports', photos: '/photos', photo: '/photos/{photo_key}',
   photoSuggestion: '/photos/{photo_key}/suggestion',
-  briefing: '/briefings/{id}'
+  briefing: '/briefings/{id}', ask: '/ask'
 });
 export class CrewAPIError extends Error {
   constructor(message, {status = 0, code = 'request_failed', ambiguousWrite = false} = {}) {
@@ -57,11 +57,11 @@ export function createHTTPAPI(settings, getToken, fetcher = fetch) {
     for (const [key, value] of Object.entries(query)) if (value != null) result.searchParams.set(key, value);
     return result;
   }
-  async function request(route, {params, query, method = 'GET', body, binary = false} = {}) {
+  async function request(route, {params, query, method = 'GET', body, binary = false, readOnly = false, timeoutMs} = {}) {
     const target = url(route, params, query), token = await getToken();
     if (typeof token !== 'string' || !token) throw new Error('A valid access token is required.');
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), settings.timeoutMs || 20000);
+    const timer = setTimeout(() => controller.abort(), timeoutMs || settings.timeoutMs || 20000);
     try {
       const headers = {Accept: binary ? 'image/jpeg,image/png' : 'application/json', Authorization: `Bearer ${token}`};
       if (body && !(body instanceof FormData)) headers['Content-Type'] = 'application/json';
@@ -74,7 +74,7 @@ export function createHTTPAPI(settings, getToken, fetcher = fetch) {
           : response.status === 403 ? 'Your account does not have permission for this action.'
           : `Service request failed (${response.status}).`;
         throw new CrewAPIError(problem?.error?.message || fallback, {
-          status: response.status, code: problem?.error?.code || 'request_failed', ambiguousWrite: method !== 'GET' && response.status >= 500
+          status: response.status, code: problem?.error?.code || 'request_failed', ambiguousWrite: method !== 'GET' && !readOnly && response.status >= 500
         });
       }
       if (binary) {
@@ -86,8 +86,9 @@ export function createHTTPAPI(settings, getToken, fetcher = fetch) {
       return response.status === 204 ? null : await response.json();
     } catch (error) {
       if (error instanceof CrewAPIError) throw error;
-      if (method !== 'GET') throw new CrewAPIError('The request could not be confirmed. Check whether the report was saved before submitting again.', {ambiguousWrite: true});
       if (error.name === 'AbortError') throw new CrewAPIError('The request timed out. Try again.', {code: 'timeout'});
+      if (method !== 'GET' && !readOnly) throw new CrewAPIError('The request could not be confirmed. Check whether the report was saved before submitting again.', {ambiguousWrite: true});
+      if (readOnly) throw new CrewAPIError('Questions are unavailable right now. Try again later.', {code: 'service_unavailable'});
       throw error;
     } finally { clearTimeout(timer); }
   }
@@ -97,6 +98,19 @@ export function createHTTPAPI(settings, getToken, fetcher = fetch) {
   }
   async function listSites() {
     return array(await request('sites'), 'sites').map(mapSiteSummary);
+  }
+  async function ask(question) {
+    if (typeof question !== 'string' || question.trim().length < 3 || question.trim().length > 500) {
+      throw new Error('Enter a question between 3 and 500 characters.');
+    }
+    const answer = await request('ask', {method:'POST', body:{question:question.trim()}, readOnly:true, timeoutMs:30000});
+    if (answer?.answer === null && answer.reason === 'cannot_answer') return answer;
+    if (typeof answer?.answer !== 'string' || !answer.answer.trim() ||
+      typeof answer.sql !== 'string' || !Array.isArray(answer.sources) ||
+      !answer.sources.every(source => typeof source?.label === 'string' && typeof source.url === 'string')) {
+      throw new Error('The question service returned an invalid answer.');
+    }
+    return answer;
   }
   async function readSite(id, {refreshAlerts = false, clearedAlertId} = {}) {
     const site_id = contractSiteId(id), revision = mapper.nextRevision();
@@ -220,6 +234,6 @@ export function createHTTPAPI(settings, getToken, fetcher = fetch) {
       getToken, readSite, listSites, onEvent, onConnection,
       heartbeatMs: settings.heartbeatMs, timers: settings.timers || globalThis, retryBaseMs: settings.retryBaseMs});
   }
-  return {listSites, readSite, listReports, prepareReportPhoto, submitReport, listBriefings, readBriefing,
+  return {listSites, readSite, listReports, prepareReportPhoto, submitReport, listBriefings, readBriefing, ask,
     readPreferences: unsupported, savePreferences: unsupported, subscribeEvents};
 }

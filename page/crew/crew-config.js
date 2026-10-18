@@ -12,13 +12,13 @@ export const config = {
     timeoutMs: 20000,
     heartbeatMs: 45000,
     realtime: {baseURL: 'https://planit-realtime.app.space', appId: 'app_01M557EC8CQY7VDN5253P86ZBN'},
-    photoField: 'file', // Confirm the multipart field name with Aryan; v1.1 does not specify it.
+    photoField: 'file', // Matches the protected FastAPI photo upload route.
     routes: {
       sites: '/sites', site: '/sites/{id}',
       alerts: '/alerts', reports: '/reports',
       photos: '/photos', photo: '/photos/{photo_key}',
       photoSuggestion: '/photos/{photo_key}/suggestion',
-      briefing: '/briefings/{id}'
+      briefing: '/briefings/{id}', ask: '/ask'
     }
   },
   // UI access is convenience only; the API must independently enforce permissions.
