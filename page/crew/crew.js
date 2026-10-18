@@ -1,6 +1,6 @@
 /* Why: Assemble previously tested modules into simple crew navigation and an isolated supervisor handoff, retaining alerts across views. */
 import {config} from './crew-config.js';
-import {userRoles,supervisorNavigationURL} from './crew-routing.js';
+import {userRoles,siteParameter,supervisorNavigationURL} from './crew-routing.js';
 import {HAZARD_LABELS} from './crew-integration.js';
 import {initAuth,session,signIn,signOut,enterDemo,authConfigured} from './crew-auth.js';
 import {services,demoAction} from './crew-services.js';
@@ -10,6 +10,7 @@ import {esc,sourceLink,dateLabel,hazardHTML,refreshHazardAges,scorePanel,floodHT
 import {expireScreening} from './crew-screening.js';
 import {icon,brandMark,contourArt} from './crew-visuals.js';
 import {sessionExpired} from './crew-session.js';
+import {markAuthenticated,hasResumeHint,clearResumeHint} from '../shared/auth-resume.mjs';
 import {mountReports} from './crew-reports.js';
 import {mountBriefing} from './crew-briefing.js';
 import {mountAsk} from './crew-ask.js';
@@ -21,16 +22,20 @@ function cleanupView(){state.viewVersion++;state.viewCleanup?.();state.viewClean
 function loginScreen(error=''){
   cleanupView();
   const loginURL=new URL('login.html',location.href);loginURL.searchParams.set('start','1');
-  const siteId=new URLSearchParams(location.search).get('site');if(siteId)loginURL.searchParams.set('site',siteId);
-  $('#crew-root').innerHTML=`<main class="crew-login" id="crew-main">${brandMark()}<p class="crew-eyebrow">ForeSite / CREW ACCESS</p><h1>A clearer picture.<br>A safer shift.</h1><p>Sign in to see your site, share observations, and plan your next shift.</p>${error?`<p class="crew-error" role="alert">${esc(error)}</p>`:''}<a class="crew-button" href="${esc(loginURL.href)}">Log in with Auth0 ↗</a><a href="index.html">← Back to ForeSite</a>${config.dataMode==='mock'?'<button class="crew-button secondary" data-action="preview">Open sample crew preview</button><small>Sample conditions. No Auth0 sign-in or live alerts.</small>':''}</main>`;
+  const siteId=siteParameter(new URLSearchParams(location.search).get('site'));if(siteId)loginURL.searchParams.set('site',siteId);
+  const signInURL=authConfigured()?loginURL.href:'https://foresite.work/crew/login.html';
+  const guidance=!config.authOriginSupported?'This IDE preview cannot sign in. Open ForeSite at the supported HTTPS address, or use http://127.0.0.1:4174/crew/login.html.':error;
+  $('#crew-root').innerHTML=`<main class="crew-login" id="crew-main">${brandMark()}<p class="crew-eyebrow">ForeSite / CREW ACCESS</p><h1>A clearer picture.<br>A safer shift.</h1><p>Sign in to see your site, share observations, and plan your next shift.</p>${guidance?`<p class="crew-error" role="alert">${esc(guidance)}</p>`:''}<a class="crew-button" href="${esc(signInURL)}">Log in with Auth0 ↗</a><a href="index.html">← Back to ForeSite</a>${config.dataMode==='mock'?'<button class="crew-button secondary" data-action="preview">Open sample crew preview</button><small>Sample conditions. No Auth0 sign-in or live alerts.</small>':''}</main>`;
 }
 function unavailable(error){$('#crew-root').innerHTML=`<main class="crew-login" id="crew-main"><h1>Site data is unavailable.</h1><p>${esc(error.message)}</p><button class="crew-button" data-action="reload">Try again</button><button class="crew-button secondary" data-action="logout">Sign out</button></main>`;}
-async function openWorkspace(){
+async function openWorkspace(callbackSiteId){
   state.user=await session();if(!state.user)return loginScreen();
-  if(!state.user.demo&&!userRoles(state.user,config.authRoleClaim).length)return loginScreen('Your account needs a crew or supervisor role. Ask your administrator for access.');
+  if(!state.user.demo&&!userRoles(state.user,config.authRoleClaim).length){clearResumeHint();return loginScreen('Your account needs a crew or supervisor role. Ask your administrator for access.');}
+  if(!state.user.demo)markAuthenticated();
   $('#crew-root').innerHTML='<main class="crew-login" id="crew-main"><h1>Loading your sites…</h1></main>';
   try{state.sites=await services.listSites();if(!Array.isArray(state.sites)||!state.sites.length)throw new Error('No assigned sites returned. Ask your supervisor to check access.');
-    const requested=new URLSearchParams(location.search).get('site'),preferred=state.sites.find(s=>String(s.id)===(requested||'621'))||state.sites[0];
+    const requested=siteParameter(callbackSiteId)??siteParameter(new URLSearchParams(location.search).get('site'));
+    const preferred=state.sites.find(s=>String(s.id)===(requested||'621'))||state.sites[0];
     await loadSite(String(preferred.id));
   }catch(error){unavailable(error);}
 }
@@ -42,7 +47,9 @@ async function loadSite(id){
     const site=await services.readSite(id);if(version!==state.loadVersion)return;
     if(!acceptSnapshot(null,site,id))throw new Error('Site response must match its ID and include a non-negative integer revision.');
     state.site=site;alignClock(site.server_time);state.alert=acceptAlert(null,site.alert,id);
-    const url=new URL(location.href);url.searchParams.set('site',id);history.replaceState({},'',url);renderWorkspace();
+    const url=new URL(location.pathname,location.href);url.searchParams.set('site',id);
+    if(state.user?.demo)url.searchParams.set('demo','1');
+    history.replaceState({},'',url);renderWorkspace();
     const unsubscribe=await services.subscribeEvents(id,event=>{
       if(version!==state.loadVersion)return;
       if(event.type!=='heartbeat'&&String(event.site_id??event.site?.id)!==String(id))return;
@@ -150,8 +157,18 @@ async function boot(){
   try{
     // The explicitly labeled local demo needs no Auth0 token or remote SDK.
     if(config.dataMode==='mock'&&new URLSearchParams(location.search).get('demo')==='1')enterDemo();
-    else await initAuth();
+    else {
+      const callback=await initAuth();
+      const startRequested=new URLSearchParams(location.search).get('start')==='1';
+      if(startRequested){const clean=new URL(location.href);clean.searchParams.delete('start');history.replaceState({},'',clean);}
+      if(await session()){await openWorkspace(callback.siteId);return;}
+      // A previous verified page can request one top-level SSO handoff. This
+      // is only a hint, never authorization; consume it before redirecting.
+      if(authConfigured()&&(hasResumeHint()||startRequested)){
+        clearResumeHint();await signIn();return;
+      }
+    }
     if(await session())await openWorkspace();else loginScreen();
-  }catch(error){loginScreen(error.message);}
+  }catch(error){clearResumeHint();loginScreen(error.message);}
 }
 boot();

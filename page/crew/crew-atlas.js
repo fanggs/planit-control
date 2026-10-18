@@ -1,11 +1,12 @@
 import {watchAtlasScores} from './crew-atlas-realtime.js';
 import {config} from './crew-config.js';
-import {supervisorNavigationURL} from './crew-routing.js';
+import {siteParameter,supervisorNavigationURL,userRoles} from './crew-routing.js';
 import {validScore} from './crew-domain.js';
 import {esc,dateLabel,scoreBadgeHTML,scoreWindowHTML,topFactorsHTML} from './crew-ui.js';
 import {expireScreening,scoreBadgeText} from './crew-screening.js';
 import {lightningWatch} from './crew-watch.js';
 import {sessionExpired} from './crew-session.js';
+import {markAuthenticated,hasResumeHint,clearResumeHint} from '../shared/auth-resume.mjs';
 import {REGIONS,RISK_BANDS,atlasRisk,atlasRank,atlasRoster,atlasSummaries,atlasFilter,atlasPoint,atlasZoom,atlasEase,atlasPins,layoutAtlasLabels} from './crew-atlas-data.js';
 
 const $=selector=>document.querySelector(selector),canvas=$('#atlas-canvas'),ctx=canvas.getContext('2d');
@@ -14,14 +15,14 @@ const on=(target,type,fn,options={})=>target.addEventListener(type,fn,{...option
 const camera={tilt:0,yaw:0,zoom:1,panX:0,panY:0};
 const state={roster:[],sites:[],visible:[],selected:'621',hover:null,mode:'2d',motion:!reduced.matches,scoreState:'locations'};
 const query=new URLSearchParams(location.search),initialSite=query.get('return_site');
-const returnId=/^[1-9]\d*$/.test(initialSite||'')?initialSite:'621';
+let returnId=siteParameter(initialSite)||'621';
 let d3,geography,projection,ground=[],grid,width=0,height=0,ratio=1,positions=[],hits=[],raf=0,animation,pulse=0,drag,pinch,sourceAPI;
 const touches=new Map();
 let stopScoreUpdates,updatesConnected=false;
 const selected=()=>state.sites.find(s=>s.id===state.selected);
 const point=(x,y,z=0)=>atlasPoint(x,y,z,camera,width,height);
 function announce(text){$('#atlas-announcement').textContent=text;}
-function saveView(){const url=new URL(location.href);url.searchParams.set('site',state.selected);url.searchParams.set('view',state.mode);url.searchParams.set('return_site',returnId);history.replaceState({},'',url);}
+function saveView(){const url=new URL(location.pathname,location.href);url.searchParams.set('site',state.selected);url.searchParams.set('view',state.mode);url.searchParams.set('return_site',returnId);history.replaceState({},'',url);}
 function pose(mode=state.mode){return {tilt:mode==='3d'?.98:0,yaw:mode==='3d'?-.14:0,zoom:1,panX:0,panY:mode==='3d'?height*.055:0};}
 function request(){if(!raf&&!document.hidden)raf=requestAnimationFrame(draw);}
 function move(to){
@@ -192,32 +193,73 @@ function startScoreUpdates(){
     onSites(sites){state.sites=sites;state.scoreState='connected';filter();scoreStatus();},
     onConnection(connected){updatesConnected=connected;scoreStatus();},onError(error){announce(error.message);}});
 }
+async function prepareAtlasSignIn(){
+  const callbackPending=query.has('state')&&(query.has('code')||query.has('error'));
+  if(config.dataMode!=='live'&&!callbackPending)return {};
+  try{
+    const auth=await import('./crew-auth.js');
+    // Consume code/state before saveView or switchMode mutates browser history.
+    const callback=await auth.initAuth(),user=await auth.session();
+    if(user){
+      if(!userRoles(user,config.authRoleClaim).length){clearResumeHint();return {error:'Your account needs a crew or supervisor role to see current scores.'};}
+      markAuthenticated();return {siteId:siteParameter(callback.siteId)};
+    }
+    if(config.dataMode==='live'&&(hasResumeHint()||query.get('start')==='1')){
+      clearResumeHint();await auth.signIn();return {redirecting:true};
+    }
+    return {};
+  }catch(error){
+    clearResumeHint();return {error:error.message||'Sign-in could not be completed.'};
+  }
+}
+async function beginAtlasSignIn(){
+  const button=$('#atlas-data-refresh');button.disabled=true;
+  try{
+    const auth=await import('./crew-auth.js');
+    await auth.initAuth();
+    await auth.signIn();
+  }catch(error){announce(error.message||'Sign-in could not be completed.');button.disabled=false;}
+}
 async function refreshScores(){
   const button=$('#atlas-data-refresh');button.disabled=true;
   if(sessionExpired()){
-    scoreStatus();button.disabled=false;
+    scoreStatus();button.textContent='Sign in for scores ↗';button.dataset.authAction='signin';button.disabled=false;
     announce('Sign in again before requesting current scores. The displayed map may be out of date.');
     return;
   }
   try{
-    if(config.dataMode==='live'&&!sourceAPI){const auth=await import('./crew-auth.js');await auth.initAuth();const user=await auth.session();const {userRoles}=await import('./crew-routing.js');if(!user||!userRoles(user,config.authRoleClaim).length){button.textContent='Sign in for scores ↗';button.onclick=()=>{location.href='login.html?start=1&site='+encodeURIComponent(state.selected);};throw new Error('Sign in to load scores. Location data remains available.');}sourceAPI=(await import('./crew-services.js')).services;}
+    if(config.dataMode==='live'&&!sourceAPI){
+      const auth=await import('./crew-auth.js');await auth.initAuth();const user=await auth.session();
+      if(!user||!userRoles(user,config.authRoleClaim).length){
+        button.textContent='Sign in for scores ↗';button.dataset.authAction='signin';
+        throw new Error(user?'Your account needs a crew or supervisor role to see current scores.':'Sign in to load scores. Location data remains available.');
+      }
+      markAuthenticated();sourceAPI=(await import('./crew-services.js')).services;
+    }
     sourceAPI??=(await import('./crew-services.js')).services;
     state.sites=atlasSummaries(state.roster,await sourceAPI.listSites());state.scoreState='connected';filter();
-    scoreStatus();button.textContent='Refresh scores ↻';
+    scoreStatus();button.textContent='Refresh scores ↻';button.dataset.authAction='refresh';
   }catch(error){
     if(sessionExpired()){
       scoreStatus();announce('Sign in again before requesting current scores. The displayed map may be out of date.');
     }else{
       state.sites=atlasSummaries(state.roster,[]);state.scoreState='unavailable';filter();scoreStatus();announce(error.message);
     }
-  }finally{button.disabled=sessionExpired();}
+  }finally{button.disabled=false;}
 }
-on($('#atlas-data-refresh'),'click',()=>{if(!$('#atlas-data-refresh').onclick)refreshScores();});
+on($('#atlas-data-refresh'),'click',()=>{
+  if($('#atlas-data-refresh').dataset.authAction==='signin')void beginAtlasSignIn();
+  else void refreshScores();
+});
 async function getJSON(path){const response=await fetch(new URL(path,import.meta.url));if(!response.ok)throw new Error('A required map data file could not be loaded.');return response.json();}
 async function boot(){
   try{
+    const authState=await prepareAtlasSignIn();
+    if(authState.redirecting)return;
     state.roster=atlasRoster(await getJSON('./crew-data/monitored-sites.json'));state.sites=state.roster.slice();state.visible=atlasRank(state.sites);
-    state.selected=state.sites.some(s=>s.id===query.get('site'))?query.get('site'):'621';
+    const requestedSite=authState.siteId||siteParameter(query.get('site'));
+    state.selected=state.sites.some(s=>s.id===requestedSite)?requestedSite:'621';
+    if(authState.siteId)returnId=authState.siteId;
     const supervisorLink=$('a[href="crew-supervisor.html"]');if(supervisorLink)supervisorLink.href=supervisorNavigationURL(location.href,config.dataMode).href;
     $('#atlas-sample-note').hidden=config.dataMode!=='mock';
     $('#atlas-region').insertAdjacentHTML('beforeend',Object.entries(REGIONS).map(([key,r])=>`<option value="${key}">${r.label}</option>`).join(''));
@@ -226,6 +268,7 @@ async function boot(){
     const [,states]=await Promise.all([import('./crew-vendor/d3-7.9.0.min.js'),getJSON('./crew-data/atlas-us-states.json')]);d3=globalThis.d3;geography=states;build();$('#atlas-loading').hidden=true;
     if(query.get('view')==='3d')switchMode('3d');saveView();
     $('#atlas-data-refresh').hidden=false;await refreshScores();startScoreUpdates();
+    if(authState.error)announce(authState.error);
   }catch(error){$('#atlas-loading').hidden=false;$('#atlas-loading').textContent=error.message+' The plant list remains available if the roster loaded.';announce(error.message);}
 }
 let expiryTimer;
