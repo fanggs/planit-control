@@ -32,7 +32,7 @@ export function alertView(alert, connected, now = Date.now(), watch = null) {
         : 'Get to shelter and follow your lightning procedure. Each new strike nearby restarts the timer.', tone:'hold', seconds};
   }
   if (!connected || alert.status !== 'cleared' || (watched && watched.status !== 'clear')) return {title:'Can’t confirm lightning status', detail:connected?'The lightning check is out of date. Check with your supervisor before working outside.':'Live updates are off, so this screen can’t confirm it’s safe. Check with your supervisor.', tone:'unknown', seconds:null};
-  return {title:'No lightning stop-work right now', detail:'Check the other conditions below and follow your site procedures.', tone:'clear', seconds:null};
+  return {title:'No lightning nearby', detail:'No strikes within 10 miles in the last 30 minutes. Check the other conditions below.', tone:'clear', seconds:null};
 }
 
 export function contributionLabel(factor) {

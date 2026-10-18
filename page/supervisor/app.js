@@ -346,7 +346,7 @@ function renderAlerts(detail) {
   container.append(watchChip(lightning.text, lightning.status === 'stop_work' ? 'high' : lightning.status === 'clear' ? 'low' : 'unknown',
     'lightning', detail.site_id, 'detail'));
   if (lightning.status === 'unknown') container.append(note(detail.lightning_status?.reason || 'The lightning watch could not confirm current conditions.', true));
-  if (lightning.status === 'clear') container.append(note('No lightning within 10 miles. Keep an eye on the other conditions.'));
+  if (lightning.status === 'clear') container.append(note('No strikes within 10 miles in the last 30 minutes. Check the other conditions too.'));
   container.append(note(`Lightning checked ${siteTime(detail.lightning_status?.checked_at, detail.timezone)}`));
   const lightningSource = sourceLink(detail.lightning_status, 'Lightning source');
   if (lightningSource) container.append(lightningSource);

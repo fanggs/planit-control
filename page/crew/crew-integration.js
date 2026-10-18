@@ -83,7 +83,7 @@ export function displayHazards(raw, activeAlerts, now = Date.now()) {
     reading: lightning.status === 'clear' ? 'No lightning within 10 miles' : lightning.text,
     severity: lightning.status === 'stop_work' ? 'high' : null,
     observed_at: time(raw.lightning_status?.checked_at), time_label: 'Checked',
-    advice: lightning.status === 'clear' ? 'No lightning stop-work. Keep an eye on the other conditions.'
+    advice: lightning.status === 'clear' ? 'No strikes within 10 miles in the last 30 minutes. Check the other conditions too.'
       : lightning.status === 'stop_work' ? 'Stop work until the alert clears.'
       : raw.lightning_status?.reason || 'We can’t confirm lightning right now, so this isn’t an all-clear.'};
   const warnings = warningsWatch(raw.warnings_status, raw.environmental_events, now);

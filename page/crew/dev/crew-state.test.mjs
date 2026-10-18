@@ -14,3 +14,11 @@ test('recorded lightning replay is visibly labeled without presenting it as a cu
   assert.match(view.title,/REPLAY/);assert.match(view.detail,/not real lightning/);
   assert.equal(view.tone,'hold');
 });
+
+test('a confirmed clear reads plainly, without a double negative',()=>{
+  const view=alertView({site_id:'621',version:1,status:'cleared'},true,Date.now(),{status:'clear',checked_at:new Date().toISOString()});
+  assert.equal(view.title,'No lightning nearby');
+  assert.match(view.detail,/No strikes within 10 miles in the last 30 minutes/);
+  assert.doesNotMatch(view.title+view.detail,/stop-work/);
+  assert.equal(view.tone,'clear');
+});
