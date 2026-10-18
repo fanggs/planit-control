@@ -79,3 +79,48 @@ test('request timeout also aborts a JSON body stalled after successful headers',
   await assert.rejects(api.sites(), /request timed out/);
   assert.equal(bodyAborted, true);
 });
+
+test('ask submits one trimmed question with the supervisor bearer token and validates the answer', async () => {
+  let sent;
+  const api = createAPI({base: 'https://example.com/api', token: async () => 'supervisor-token',
+    fetcher: async (url, options) => {
+      sent = {url, options};
+      return new Response(JSON.stringify({answer: 'Two plants matched.', sql: 'SELECT count(*) FROM public.sites',
+        sources: [{label: 'EIA', url: 'https://www.eia.gov/'}]}), {status: 200});
+    }});
+  assert.equal((await api.ask('  How many plants?  ')).answer, 'Two plants matched.');
+  assert.equal(sent.url, 'https://example.com/api/ask');
+  assert.equal(sent.options.method, 'POST');
+  assert.equal(sent.options.headers.Authorization, 'Bearer supervisor-token');
+  assert.deepEqual(JSON.parse(sent.options.body), {question: 'How many plants?'});
+  assert.equal(sent.options.cache, 'no-store');
+  assert.equal(sent.options.credentials, 'omit');
+  assert.equal(sent.options.redirect, 'error');
+  assert.ok(!sent.url.includes('supervisor-token'));
+});
+
+test('ask keeps cannot-answer separate from service failure and rejects malformed responses', async () => {
+  const base = {base: 'https://example.com/api', token: async () => 'token'};
+  const cannot = createAPI({...base, fetcher: async () =>
+    new Response(JSON.stringify({answer: null, reason: 'cannot_answer'}), {status: 200})});
+  assert.deepEqual(await cannot.ask('What is the CEO favorite color?'), {answer: null, reason: 'cannot_answer'});
+  const unavailable = createAPI({...base, fetcher: async () =>
+    new Response(JSON.stringify({error: {code: 'service_unavailable', message: 'Question service unavailable'}}), {status: 503})});
+  await assert.rejects(unavailable.ask('How many plants?'), error =>
+    error.status === 503 && error.code === 'service_unavailable');
+  const malformed = createAPI({...base, fetcher: async () =>
+    new Response(JSON.stringify({answer: '<script>bad</script>', sql: null, sources: []}), {status: 200})});
+  await assert.rejects(malformed.ask('How many plants?'), /invalid answer/);
+});
+
+test('ask validates question length before fetching and has a longer timeout than site reads', async () => {
+  const api = createAPI({base: 'https://example.com/api', token: async () => 'token', timeoutMs: 5,
+    fetcher: async (_url, options) => await new Promise((resolve, reject) => {
+      const timer = setTimeout(() => resolve(new Response(JSON.stringify({answer: 'One plant.',
+        sql: 'SELECT name FROM public.sites LIMIT 1', sources: []}), {status: 200})), 20);
+      options.signal.addEventListener('abort', () => { clearTimeout(timer); reject(new DOMException('Aborted', 'AbortError')); }, {once: true});
+    })});
+  await assert.rejects(api.ask('  '), /between 3 and 500/);
+  await assert.rejects(api.ask('x'.repeat(501)), /between 3 and 500/);
+  assert.equal((await api.ask('Name one plant')).answer, 'One plant.');
+});
