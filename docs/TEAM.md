@@ -36,12 +36,13 @@ own part.
 | Sid | `SidVal123` | Data + ML models | `get_data/`, `model/`, `db/` (except `db/hazard_report.sql`) |
 | Alan | `fanggs` | API, Gemini, real-time alerts, deploy | `api/` (except Aryan's files below), `jobs/`, `page/realtime/`, the DeepSpace bridge (`planit-realtime`) |
 | Aryan | `nimma-aryan` | Hazard-report and photo backend, Auth0 API role checks | `api/schemas/hazard_report.py`, `api/services/hazard_report_service.py`, report and photo routes/services, `db/hazard_report.sql` |
-| Isaiah | `IsaiahCN` | Frontend and demo readiness | `page/` (except Alan's `page/realtime/`), including crew and supervisor screens and shared styles |
+| Isaiah | `IsaiahCN` | Frontend, Auth0 setup, and demo readiness | `page/` (except Alan's `page/realtime/`), including crew and supervisor screens and shared styles; the Auth0 tenant configuration (login methods, test users, roles, application settings) |
 
-Isaiah owns frontend changes throughout `page/`; Alan continues to own the
-real-time bridge in `page/realtime/`. Aryan owns the report/photo API and its
-authorization boundary. File ownership does not change the app's `crew` and
-`supervisor` Auth0 permissions.
+Isaiah owns frontend changes throughout `page/` and the Auth0 tenant setup
+(he is an Admin member of the tenant; Aryan created it and stays an Admin).
+Alan continues to own the real-time bridge in `page/realtime/`. Aryan owns the
+report/photo API and its authorization boundary. File ownership does not change
+the app's `crew` and `supervisor` Auth0 permissions.
 
 What each role delivers:
 
@@ -56,8 +57,10 @@ What each role delivers:
   photo can be saved, retrieved, and resolved through the API, while an
   unauthorized request is rejected.
 - **Isaiah:** the shared design system, supervisor dashboard, and crew screens
-  (login, alerts with countdown, report form, score breakdown, briefing).
-  He owns phone testing, link checks, and the Devpost draft. Done when a
+  (login, alerts with countdown, report form, score breakdown, briefing), plus
+  the Auth0 setup: login methods, test accounts, role assignments, and the
+  application's token settings. He owns phone testing, link checks, and the
+  Devpost draft. Done when a
   stranger can use the crew side without help and a phone-submitted report
   appears on the supervisor map.
 
