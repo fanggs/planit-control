@@ -8,7 +8,7 @@ import {services} from './crew-services.js';
 import {rankSites,validScore,riskLabel} from './crew-domain.js';
 import {alertView} from './crew-state.js';
 import {expireScreening} from './crew-screening.js';
-import {esc,scorePanel,floodHTML,makeMap,dateLabel,safeURL,scoreBadgeHTML,scoreWindowHTML,wildlifeHTML} from './crew-ui.js';
+import {esc,scorePanel,floodHTML,makeMap,dateLabel,safeURL,scoreBadgeHTML,scoreWindowHTML,topFactorsHTML,watchPanel,wildlifeHTML} from './crew-ui.js';
 const root=document.getElementById('crew-supervisor-root');
 const state={sites:[],filtered:[],map:null,layer:null,reportLayer:null,photoURLs:[],selected:null,page:0,version:0,listVersion:0,unsubscribe:null,connected:false,detailVersion:0,lastEvent:0};
 let noticeTimer,filterTimer;
@@ -31,10 +31,10 @@ function renderSelectedPreview(site,reports=[]){
   const score=validScore(site.score)?site.score.toFixed(1):'—';
   const tone=!validScore(site.score)?'unknown':site.score>=7?'high':site.score>=4?'elevated':'lower';
   const reportCount=reports.filter(r=>String(r.site_id)===String(site.id)&&r.status==='open').length;
-  const lightning=alertView(site.alert,state.connected);
+  const lightning=alertView(site.alert,state.connected,Date.now(),site.lightning_status);
   panel.innerHTML=`<p class="crew-eyebrow">SELECTED POWER PLANT</p>
     <div class="preview-selection-heading"><div><h2>${esc(site.name)}</h2><p>${esc(site.state)} · Plant #${esc(site.id)}</p></div><div class="preview-score" data-risk="${tone}"><strong>${score}</strong><span>/ 10</span></div></div>
-    ${scoreBadgeHTML(site)}${scoreWindowHTML(site)}<div class="preview-badges"><span class="crew-pill">${esc(riskLabel(site.score))} risk</span><span class="crew-pill">${reportCount} open reports</span></div>
+    ${scoreBadgeHTML(site)}${scoreWindowHTML(site)}${validScore(site.score)&&site.top_factors?topFactorsHTML(site):''}<div class="preview-badges"><span class="crew-pill">${esc(riskLabel(site.score))} risk</span><span class="crew-pill">${reportCount} open reports</span></div>
     <p class="preview-alert" data-tone="${esc(lightning.tone)}">${site.alert?.is_replay?'Replay · ':''}${site.demo&&site.alert?.status==='unknown'?'Lightning feed unavailable in this sample':esc(lightning.title)}</p>
     <dl class="preview-readings">${[['Weather',site.hazards?.weather],['Heat',site.hazards?.heat],['Flooding',site.hazards?.flood]].map(([name,h])=>`<div><dt>${name}</dt><dd>${esc(h?.reading??'No data')}</dd></div>`).join('')}</dl>
     <small>${site.demo?'Sample conditions · ':''}Score updated ${dateLabel(site.score_updated_at,site.timezone)}</small>
@@ -78,6 +78,18 @@ async function open(){
 function updateStream(){const element=document.getElementById('supervisor-stream');if(!element)return;
   const checked=state.sites.map(s=>expireScreening(s));if(checked.some((s,i)=>s!==state.sites[i])){state.sites=checked;applyFilters();}
   const selected=expireScreening(state.selectedSnapshot);if(selected!==state.selectedSnapshot&&String(selected?.id)===String(state.selected)){state.selectedSnapshot=selected;renderSelectedPreview(selected,state.selectedReports);const panel=document.querySelector('#supervisor-detail .crew-index-card');if(panel)panel.outerHTML=scorePanel(selected);}
+  if(state.selectedSnapshot){
+    const preview=document.querySelector('#preview-selected .preview-alert');
+    if(preview){const lightning=alertView(state.selectedSnapshot.alert,state.connected,Date.now(),state.selectedSnapshot.lightning_status);
+      preview.textContent=state.selectedSnapshot.demo&&state.selectedSnapshot.alert?.status==='unknown'
+        ? 'Lightning feed unavailable in this sample'
+        : (state.selectedSnapshot.alert?.is_replay?'Replay · ':'')+lightning.title;
+      preview.dataset.tone=lightning.tone;}
+    const watch=document.querySelector('#supervisor-detail .crew-watch');
+    if(watch){const html=watchPanel(state.selectedSnapshot);if(watch.outerHTML!==html)watch.outerHTML=html;}
+    const flood=document.querySelector('#supervisor-detail .crew-flood');
+    if(flood){const html=floodHTML(state.selectedSnapshot);if(flood.outerHTML!==html)flood.outerHTML=html;}
+  }
   if(!navigator.onLine||Date.now()-state.lastEvent>config.api.heartbeatMs)state.connected=false;element.textContent=state.connected?(config.dataMode==='mock'?'Sample updates':'Live updates'):'Updates disconnected';}
 async function refresh(incoming,affectedIds){
   const version=state.version,listVersion=++state.listVersion,button=document.getElementById('supervisor-refresh');if(!button)return;button.disabled=true;
@@ -105,7 +117,7 @@ function applyFilters(reset=false){
 }
 function renderRanking(){
   const pages=Math.max(1,Math.ceil(state.filtered.length/30));state.page=Math.max(0,Math.min(state.page,pages-1));
-  document.getElementById('supervisor-ranked-list').innerHTML=state.filtered.slice(state.page*30,state.page*30+30).map((s,i)=>`<button class="crew-ranked-site" data-risk="${validScore(s.score)?(s.score>=7?"high":s.score>=4?"elevated":"lower"):"unknown"}" data-select-site="${esc(s.id)}"><span class="crew-rank">${state.page*30+i+1}</span><span><strong>${esc(s.name)}</strong><small>${esc(s.state)} · ${riskLabel(s.score)} risk</small>${scoreBadgeHTML(s)}${scoreWindowHTML(s)}</span><b>${validScore(s.score)?s.score.toFixed(1):'—'}</b></button>`).join('')||'<p class="crew-empty">No sites match these filters.</p>';
+  document.getElementById('supervisor-ranked-list').innerHTML=state.filtered.slice(state.page*30,state.page*30+30).map((s,i)=>`<button class="crew-ranked-site" data-risk="${validScore(s.score)?(s.score>=7?"high":s.score>=4?"elevated":"lower"):"unknown"}" data-select-site="${esc(s.id)}"><span class="crew-rank">${state.page*30+i+1}</span><span><strong>${esc(s.name)}</strong><small>${esc(s.state)} · ${riskLabel(s.score)} risk</small>${scoreBadgeHTML(s)}${scoreWindowHTML(s)}${validScore(s.score)&&s.top_factors?topFactorsHTML(s):''}</span><b>${validScore(s.score)?s.score.toFixed(1):'—'}</b></button>`).join('')||'<p class="crew-empty">No sites match these filters.</p>';
   syncSelection();
   document.getElementById('supervisor-page').textContent=`${state.page+1} / ${pages}`;document.getElementById('supervisor-previous').disabled=state.page===0;document.getElementById('supervisor-next').disabled=state.page===pages-1;
 }
@@ -135,7 +147,7 @@ async function selectSite(id,focus=true){
       let photo=safeURL(r.photo_url);if(r.photo instanceof Blob){photo=URL.createObjectURL(r.photo);state.photoURLs.push(photo);}if(photo){const image=document.createElement('img');image.src=photo;image.alt='Crew-reported '+r.category;image.style.cssText='width:160px;max-height:140px;object-fit:cover';popup.append(image);}
       L.circleMarker([r.latitude,r.longitude],{radius:10,color:'#a44532',weight:3,fillColor:'#fff',fillOpacity:1}).bindPopup(popup).addTo(state.reportLayer);
     }
-    target.innerHTML=`<div class="crew-section-heading"><div><p class="crew-eyebrow">SELECTED SITE</p><h2>${esc(p.name)} · ${esc(p.state)}</h2><small>Score updated: ${dateLabel(p.score_updated_at,p.timezone)}</small></div><a class="crew-button" href="crew.html?site=${encodeURIComponent(id)}${config.dataMode==='mock'?'&demo=1':''}">Open crew site ↗</a></div>${scorePanel(p)}${floodHTML(p)}${wildlifeHTML(p)}<section class="crew-card"><h2>Crew observations</h2>${reports.length?reports.filter(r=>String(r.site_id)===String(id)).slice(0,10).map(r=>`<article class="crew-factor"><strong>${esc(r.category)}</strong><p>${esc(r.description)}</p><small>${dateLabel(r.created_at)} · ${esc(r.status)} · ${r.demo?'Local sample':'Stored report'}</small></article>`).join(''):'<p>No crew reports have been returned for this site.</p>'}</section>`;
+    target.innerHTML=`<div class="crew-section-heading"><div><p class="crew-eyebrow">SELECTED SITE</p><h2>${esc(p.name)} · ${esc(p.state)}</h2><small>Score updated: ${dateLabel(p.score_updated_at,p.timezone)}</small></div><a class="crew-button" href="crew.html?site=${encodeURIComponent(id)}${config.dataMode==='mock'?'&demo=1':''}">Open crew site ↗</a></div>${watchPanel(p)}${scorePanel(p)}${floodHTML(p)}${wildlifeHTML(p)}<section class="crew-card"><h2>Crew observations</h2>${reports.length?reports.filter(r=>String(r.site_id)===String(id)).slice(0,10).map(r=>`<article class="crew-factor"><strong>${esc(r.category)}</strong><p>${esc(r.description)}</p><small>${dateLabel(r.created_at)} · ${esc(r.status)} · ${r.demo?'Local sample':'Stored report'}</small></article>`).join(''):'<p>No crew reports have been returned for this site.</p>'}</section>`;
   }catch(error){if(version===state.detailVersion&&target.isConnected){preview.setAttribute('aria-busy','false');preview.innerHTML='<h2>Site data unavailable</h2><p>'+esc(error.message)+'</p>';}if(version===state.detailVersion&&target.isConnected)target.innerHTML=`<section class="crew-card"><h2>Selected site unavailable</h2><p>${esc(error.message)}</p><button class="crew-button secondary" data-select-site="${esc(id)}">Try again</button></section>`;}
 }
 document.addEventListener('click',event=>{const site=event.target.closest('[data-select-site]');if(site)selectSite(site.dataset.selectSite);});
