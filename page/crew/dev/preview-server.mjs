@@ -7,7 +7,7 @@ import {fileURLToPath} from 'node:url';
 const crewRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const pageRoot=path.dirname(crewRoot);
 const publicFolders=new Set(['crew','supervisor','shared','realtime']);
-const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.json':'application/json','.svg':'image/svg+xml','.ico':'image/x-icon','.woff':'font/woff','.woff2':'font/woff2','.txt':'text/plain'};
+const types={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.json':'application/json','.svg':'image/svg+xml','.ico':'image/x-icon','.woff':'font/woff','.woff2':'font/woff2','.txt':'text/plain'};
 export function createPreviewServer(){return http.createServer(async(req,res)=>{
   try{
     if(!['GET','HEAD'].includes(req.method)){res.writeHead(405);res.end();return;}

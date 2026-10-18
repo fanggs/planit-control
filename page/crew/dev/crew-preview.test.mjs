@@ -7,8 +7,9 @@ test('one preview origin serves both workspaces and their dependencies without e
   const server=createPreviewServer();server.listen(0,'127.0.0.1');await once(server,'listening');
   const base=`http://127.0.0.1:${server.address().port}`;
   try{
-    for(const route of ['/','/index.html','/crew.html','/crew-atlas.html','/crew/index.html','/crew/crew.html','/supervisor/index.html','/supervisor/app.js','/supervisor/sample-data/sites.json','/shared/planit.css','/realtime/deepspace-source.js']){
+    for(const route of ['/','/index.html','/crew.html','/crew-atlas.html','/crew/index.html','/crew/crew.html','/supervisor/index.html','/supervisor/app.js','/supervisor/sample-data/sites.json','/shared/planit.css','/shared/auth-session.mjs','/shared/environment-readings.mjs','/realtime/deepspace-source.js']){
       const response=await fetch(base+route);assert.equal(response.status,200,route);await response.text();
+      if(route.endsWith('.mjs'))assert.match(response.headers.get('content-type'),/text\/javascript/,route);
     }
     const redirect=await fetch(base+'/supervisor?test=1',{redirect:'manual'});assert.equal(redirect.status,308);assert.equal(redirect.headers.get('location'),'/supervisor/?test=1');
     for(const route of ['/supervisor/','/crew/'])assert.equal((await fetch(base+route)).status,200);
