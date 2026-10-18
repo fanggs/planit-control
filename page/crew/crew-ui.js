@@ -17,9 +17,9 @@ export function scoreHTML(score){
 export function hazardHTML(site){
   return `<div class="crew-hazard-grid">${hazards.map(([key,name,help])=>{
     const h=site.hazards?.[key];
-    const severity=['lower','elevated','high'].includes(h?.severity)?h.severity:'unknown';
-    // Category tints/icons identify the factor; the text badge communicates risk.
-    return `<article class="crew-hazard" data-hazard="${key}" data-severity="${severity}"><div class="crew-hazard-top"><span class="crew-hazard-icon">${icon(key)}</span><span class="crew-pill">${esc(h?.severity||'Unavailable')}</span></div><h3>${name}</h3><strong>${esc(h?.reading??'Reading unavailable')}</strong><p>${esc(h?.advice||help)}</p><small>${sourceLink(h)}<br>Observed: ${dateLabel(h?.observed_at)}</small></article>`;
+    const severity=['lower','elevated','high'].includes(h?.severity)?h.severity:null;
+    // A measurement or missing feed is not itself a severity assessment.
+    return `<article class="crew-hazard" data-hazard="${key}" data-severity="${severity||'unassessed'}"><div class="crew-hazard-top"><span class="crew-hazard-icon">${icon(key)}</span>${h?.is_replay?'<span class="crew-pill">REPLAY</span>':''}${severity?`<span class="crew-pill">${esc(severity)}</span>`:''}</div><h3>${name}</h3><strong>${esc(h?.reading??'Reading unavailable')}</strong><p>${esc(h?.advice||help)}</p><small>${sourceLink(h)}<br>${esc(h?.time_label||'Observed')}: ${dateLabel(h?.observed_at)}</small></article>`;
   }).join('')}</div>`;
 }
 export function scoreBadgeHTML(site){return `<span class="crew-score-badge" data-score-status="${esc(site?.score_status||'no_data')}">${esc(scoreBadgeText(site))}</span>`;}
@@ -30,8 +30,9 @@ export function scoreWindowHTML(site){return `<p class="crew-score-window">Forec
 export function watchPanel(site,now=Date.now()){
   const lightning=lightningWatch(site.lightning_status,site.active_alerts,now);
   const warnings=warningsWatch(site.warnings_status,site.environmental_events,now);
+  const replay=site.active_alerts?.some(alert=>alert.hazard_type==='lightning'&&alert.level==='stop_work'&&alert.trigger?.is_replay===true);
   return `<section class="crew-card crew-watch" aria-label="Live safety watch status"><p class="crew-eyebrow">INDEPENDENT SAFETY WATCHES</p><h2>Checked conditions</h2>
-    <div class="crew-watch-grid"><div data-watch-tone="${lightning.status}"><strong>${esc(lightning.text)}</strong><p>${esc(site.lightning_status?.reason||'A score never clears a lightning hold.')}</p><small>Checked ${dateLabel(site.lightning_status?.checked_at,site.timezone)} · ${sourceLink(site.lightning_status)}</small></div>
+    <div class="crew-watch-grid"><div data-watch-tone="${lightning.status}"><strong>${replay?'REPLAY · ':''}${esc(lightning.text)}</strong><p>${replay?'Recorded storm replay for the demo, not a current lightning observation.':esc(site.lightning_status?.reason||'A score never clears a lightning hold.')}</p><small>Checked ${dateLabel(site.lightning_status?.checked_at,site.timezone)} · ${sourceLink(site.lightning_status)}</small></div>
     <div data-watch-tone="${warnings.status}"><strong>${esc(warnings.text)}</strong><p>${warnings.status==='ok'?'The NWS feed was checked recently. Other hazards may still exist.':'An empty warning list cannot confirm safety while the NWS check is unavailable.'}</p><small>Checked ${dateLabel(site.warnings_status?.checked_at,site.timezone)} · ${sourceLink(site.warnings_status)}</small></div></div></section>`;
 }
 export function scoreWaterfall(site){
@@ -59,7 +60,7 @@ export function scorePanel(input){
     <p class="crew-muted">${esc(site.score_target||site.score_method||'Model details unavailable.')}</p>
     ${modern?'<p class="crew-muted">Prototype screening estimate only. It is not an established probability, an injury prediction, or an all-clear. Red-flag warnings describe fire weather; severe-storm warnings do not confirm measured lightning.</p>':''}
     <details open><summary>What pushed the score?</summary>${scoreWaterfall(site)}${available&&site.factors?.length&&site.score_reconciles!==false?site.factors.map(f=>`<article class="crew-factor"><div class="crew-row"><strong>${esc(f.name)}</strong><b>${esc(contributionLabel(f))}</b></div>${f.reading?`<p>${esc(f.reading)}</p>`:''}<small>${f.feature?'Model explanation':sourceLink(f)} · ${dateLabel(f.scored_at||f.retrieved_at,site.timezone)}</small></article>`).join(''):'<p>Factor contributions are unavailable. Missing values are not zero.</p>'}
-    <p class="crew-muted">${available&&Number.isFinite(site.baseline)?`Baseline: ${esc(site.baseline)}. `:''}Baseline plus signed contributions equals the index. Negative contributions lower the estimate; they never clear safety alerts.</p>
+    <p class="crew-muted">${available&&Number.isFinite(site.baseline)?`Baseline: ${esc(site.baseline.toFixed(2))}. `:''}Baseline plus signed contributions equals the index. Negative contributions lower the estimate; they never clear safety alerts.</p>
     <h3>Model information</h3><p class="crew-muted">${esc(site.model?.name||'Model details unavailable')} · ${site.score_status==='research'?'Research prototype':site.score_status==='validated_prototype'?'Validated prototype':esc(scoreBadgeText(site))}${site.captured_at?'<br>Inputs captured: '+dateLabel(site.captured_at,site.timezone):''}</p></details></section>`;
 }
 export function wildlifeHTML(site){

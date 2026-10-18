@@ -25,7 +25,11 @@ export function alertView(alert, connected, now = Date.now(), watch = null) {
   if (!alert) return {title:'Status unavailable', detail:'Waiting for the alert service. Confirm conditions with your supervisor.', tone:'unknown', seconds:null};
   if (alert.status === 'hold') {
     const seconds = remainingSeconds(alert.all_clear_at, now);
-    return {title:'Stop work · Lightning', detail:seconds === 0 ? 'Timer elapsed. Waiting for server confirmation; do not resume from the timer alone.' : 'Follow your site lightning procedure. Every new nearby strike resets this hold.', tone:'hold', seconds};
+    const replay = alert.is_replay === true;
+    return {title:replay?'REPLAY · Stop work · Lightning':'Stop work · Lightning',
+      detail:replay ? 'Recorded storm replay for the demo, not a current lightning observation. Wait for the server to clear this simulated hold.'
+        : seconds === 0 ? 'Timer elapsed. Waiting for server confirmation; do not resume from the timer alone.'
+        : 'Follow your site lightning procedure. Every new nearby strike resets this hold.', tone:'hold', seconds};
   }
   if (!connected || alert.status !== 'cleared' || (watched && watched.status !== 'clear')) return {title:'Status unavailable', detail:connected?'The lightning watch has not confirmed a fresh clear status. Check with your supervisor.':'Live updates are unavailable. The screen cannot confirm that work may resume.', tone:'unknown', seconds:null};
   return {title:'No active lightning hold reported', detail:'This describes the lightning alert only. Check all hazards and follow site procedures.', tone:'clear', seconds:null};
@@ -33,6 +37,8 @@ export function alertView(alert, connected, now = Date.now(), watch = null) {
 
 export function contributionLabel(factor) {
   if (!Number.isFinite(factor?.contribution)) return 'Unavailable';
-  const signed = `${factor.contribution >= 0 ? '+' : ''}${factor.contribution}`;
+  // Round only the display, never the factor used for score reconciliation.
+  const rounded = factor.contribution.toFixed(2);
+  const signed = `${factor.contribution >= 0 ? '+' : ''}${rounded}`;
   return `${signed} ${factor.unit === 'score_points' ? 'points' : (factor.unit || 'contribution units')}`;
 }
