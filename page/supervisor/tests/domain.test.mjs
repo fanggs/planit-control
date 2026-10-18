@@ -1,45 +1,95 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-import {assessScore, summaryScore, rankSites, freshness, countdown, coordinates, openReportPins,
-  isReplayAlert, siteHasReplayAlert, validNotice, hasSupervisorRole, safeSourceURL} from '../domain.js';
+import {assessScore, featureLabel, summaryScore, summaryScreening, rankSites, freshness, countdown, coordinates, openReportPins,
+  isReplayAlert, lightningDisplay, siteHasReplayAlert, validNotice, hasSupervisorRole, safeSourceURL,
+  warningsDisplay, wildlifeSummary} from '../domain.js';
 const sites = JSON.parse(await fs.readFile(new URL('../sample-data/sites.json', import.meta.url)));
 const details = JSON.parse(await fs.readFile(new URL('../sample-data/site_details.json', import.meta.url)));
+const sampleNow = Date.parse('2026-10-17T18:30:00Z');
 
-test('all shipped sample scores reconcile and retain negative contributions', () => {
+test('all shipped sample prototype screenings reconcile and retain signed feature contributions', () => {
   assert.equal(sites.length, 3);
   for (const detail of Object.values(details)) {
-    const score = assessScore(detail.score, detail.site_id);
+    const score = assessScore(detail.screening, sampleNow);
     assert.equal(score.status, 'ready');
     assert.ok(score.steps.some(step => step.kind === 'decrease'));
-    assert.ok(Math.abs(score.total - detail.score.score) < .05);
+    assert.ok(Math.abs(score.total - detail.screening.score) < 1e-8);
+    assert.equal(detail.screening.clears_stop_work, false);
   }
+  assert.equal(featureLabel('rain_total_24h_in'), '24-hour rain');
+  assert.equal(featureLabel('month_cos'), 'Season (cosine)');
 });
-test('the contract tolerance uses original values, not rounded display values', () => {
-  const model = {site_id: 1, score: 4.05, baseline: 4,
-    factors: [{hazard_type: 'heat', contribution: 0}], scored_at: '2026-10-17T18:00:00Z'};
-  assert.equal(assessScore(model, 1).status, 'ready');
-  assert.equal(assessScore({...model, factors: []}, 1).status, 'invalid');
-  assert.equal(assessScore({...model, score: 4.051}, 1).status, 'mismatch');
-  assert.equal(assessScore({...model, site_id: 2}, 1).status, 'invalid');
+test('screening uses exact feature reconciliation and rejects missing safety metadata', () => {
+  const model = {...details[9001].screening, score: 4.05, baseline: 4,
+    factors: [{feature: 'heat_index_max_f', contribution: .05}]};
+  assert.equal(assessScore(model, sampleNow).status, 'ready');
+  assert.equal(assessScore({...model, factors: []}, sampleNow).status, 'invalid');
+  assert.equal(assessScore({...model, score: 4.051}, sampleNow).status, 'mismatch');
+  assert.equal(assessScore({...model, factors: [{hazard_type: 'heat', contribution: .05}]}, sampleNow).status, 'invalid');
+  assert.equal(assessScore({...model, clears_stop_work: true}, sampleNow).status, 'invalid');
+  assert.equal(assessScore({...model, valid_until: null}, sampleNow).status, 'invalid');
 });
 test('missing or malformed scores stay unknown; a real zero remains zero', () => {
   const good = sites[0];
-  for (const score of [null, undefined, NaN, Infinity, -1, 11, '0']) assert.equal(summaryScore({...good, score}), null);
-  assert.equal(summaryScore({...good, score: 0}), 0);
-  assert.equal(summaryScore({...good, scored_at: null}), null);
-  assert.equal(summaryScore({...good, top_factors: null}), null);
-  assert.equal(summaryScore({...good, top_factors: []}), null);
-  assert.equal(assessScore(null, 1).status, 'no_data');
+  for (const score of [null, undefined, NaN, Infinity, -1, 11, '0']) assert.equal(summaryScore({...good, score}, sampleNow), null);
+  assert.equal(summaryScore({...good, score: 0}, sampleNow), 0);
+  assert.equal(summaryScore({...good, score_status: 'stale'}, sampleNow), null);
+  assert.equal(summaryScore({...good, scored_at: null}, sampleNow), null);
+  assert.equal(summaryScore({...good, top_factors: null}, sampleNow), null);
+  assert.equal(summaryScore({...good, top_factors: []}, sampleNow), null);
+  assert.equal(assessScore(null, sampleNow).status, 'no_data');
+  assert.equal(assessScore({score: null, status: 'stale', reason: 'Old inputs'}, sampleNow).message, 'Old inputs');
+  assert.equal(assessScore({...details[9001].screening, score: 0, baseline: 0,
+    factors: [{feature: 'wind_max_mph', contribution: 0}]}, sampleNow).status, 'ready');
+  assert.equal(assessScore(details[9001].screening, Date.parse('2026-10-18T19:00:00Z')).status, 'stale');
+  assert.equal(summaryScore(good, Date.parse('2026-10-18T19:00:00Z')), null);
+});
+test('a locally expired research summary says stale instead of research under No data', () => {
+  const current = summaryScreening(sites[0], sampleNow);
+  assert.equal(current.status, 'research');
+  assert.equal(current.score, sites[0].score);
+  const expired = summaryScreening(sites[0], sampleNow + 3 * 3600000);
+  assert.deepEqual(expired, {score: null, status: 'stale'});
+  assert.deepEqual(summaryScreening({...sites[0], score_status: 'no_data'}, sampleNow),
+    {score: null, status: 'no_data'});
+  assert.deepEqual(summaryScreening({...sites[0], top_factors: null}, sampleNow),
+    {score: null, status: 'invalid'});
+  assert.deepEqual(summaryScreening({...sites[0], score_status: {unexpected: true}}, sampleNow),
+    {score: null, status: 'invalid'});
 });
 test('rank/search/filter preserve no-data state and do not change site data', () => {
-  const unknown = {...sites[0], site_id: 9999, name: 'Unknown plant', score: null, scored_at: null, top_factors: null};
+  const unknown = {...sites[0], site_id: 9999, name: 'Unknown plant', score: null,
+    score_status: 'no_data', scored_at: null, top_factors: null};
   const rows = [unknown, ...sites];
-  assert.equal(rankSites(rows).at(-1), unknown);
-  assert.equal(rankSites(rows, {search: 'california'}).length, 1);
-  assert.equal(rankSites(rows, {filter: 'no-data'}).length, 1);
-  assert.equal(rankSites(sites, {filter: 'reports'}).length, 1);
+  assert.equal(rankSites(rows, {allowHistorical: true}).at(-1), unknown);
+  assert.equal(rankSites(rows, {search: 'california', allowHistorical: true}).length, 1);
+  assert.equal(rankSites(rows, {filter: 'no-data', allowHistorical: true}).length, 1);
+  assert.equal(rankSites(sites, {filter: 'reports', allowHistorical: true}).length, 1);
   assert.equal(rows[0], unknown);
+});
+test('only fresh explicit lightning clear and NWS ok may produce clear/no-active text', () => {
+  const checked_at = '2026-10-17T18:29:00Z';
+  assert.equal(lightningDisplay(null, sampleNow).status, 'unknown');
+  assert.equal(lightningDisplay({status: 'unknown', checked_at}, sampleNow).status, 'unknown');
+  assert.equal(lightningDisplay({status: 'clear', checked_at}, sampleNow).status, 'clear');
+  assert.equal(lightningDisplay({status: 'clear', checked_at}, sampleNow + 6 * 60000).status, 'unknown');
+  assert.equal(lightningDisplay({status: 'stop_work', checked_at: null}, sampleNow).status, 'stop_work');
+  assert.equal(lightningDisplay({status: 'clear', checked_at}, sampleNow, true).status, 'stop_work');
+  assert.equal(warningsDisplay(null, [], sampleNow).status, 'unknown');
+  assert.equal(warningsDisplay({status: 'unknown', checked_at}, [], sampleNow).status, 'unknown');
+  assert.equal(warningsDisplay({status: 'ok', checked_at}, [], sampleNow).text, 'No active NWS alerts');
+  assert.equal(warningsDisplay({status: 'ok', checked_at}, [], sampleNow + 16 * 60000).status, 'unknown');
+  const active = {event_kind: 'nws_warning', starts_at: '2026-10-17T18:00:00Z', ends_at: '2026-10-17T19:00:00Z'};
+  const upcoming = {...active, starts_at: '2026-10-17T19:00:00Z'};
+  assert.equal(warningsDisplay({status: 'ok', checked_at}, [active], sampleNow).text, '1 active NWS alert');
+  assert.equal(warningsDisplay({status: 'ok', checked_at}, [upcoming], sampleNow).text, 'No active NWS alerts');
+});
+test('wildlife sightings remain evidence with no inferred encounter probability', () => {
+  assert.match(wildlifeSummary(details[9001].wildlife_context), /evidence, not encounter probability/);
+  assert.match(wildlifeSummary(details[9002].wildlife_context), /does not mean wildlife is absent/);
+  assert.match(wildlifeSummary(details[9003].wildlife_context), /unavailable/);
+  assert.equal(details[9001].wildlife_context.numeric_score_contribution, null);
 });
 test('only open reports with coordinates become active map pins', () => {
   const open = {id: 'current', status: 'open', latitude: 25, longitude: -80};
