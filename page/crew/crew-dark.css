@@ -120,6 +120,8 @@
 .planit-crew .crew-login { background: linear-gradient(145deg, #15221c, #0d1310 75%); border-color: #35493b; box-shadow: 0 25px 100px #0005; }
 .planit-crew .crew-login h1 { color: #edf8ef; }
 .planit-crew .crew-login > a { color: #bcebcf; }
+.planit-crew .crew-login .crew-button:not(.secondary),
+.planit-crew .crew-login .crew-button:not(.secondary):hover { color: #000; }
 .planit-crew #crew-message { background: #213b2b; color: #edf9ee; border: 1px solid #56735b; box-shadow: 0 12px 30px #0006; }
 @media (max-width: 480px) {
   .planit-crew .crew-alert > .crew-row { flex-wrap: wrap; }
