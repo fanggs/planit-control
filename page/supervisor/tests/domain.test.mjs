@@ -18,7 +18,7 @@ test('all shipped sample prototype screenings reconcile and retain signed featur
     assert.equal(detail.screening.clears_stop_work, false);
   }
   assert.equal(featureLabel('rain_total_24h_in'), 'Rain over 24 hours');
-  assert.equal(featureLabel('month_cos'), 'Time of year (2)');
+  assert.equal(featureLabel('month_cos'), 'Time of year');
   assert.equal(featureLabel('heat_index_max_f_missing'), 'Heat index not available');
 });
 test('screening uses exact feature reconciliation and rejects missing safety metadata', () => {
@@ -137,4 +137,15 @@ test('reject invalid coordinates, unrecognized notices, forged role strings and 
   assert.equal(safeSourceURL('javascript:alert(1)'), null);
   assert.equal(safeSourceURL('https://user:password@example.com'), null);
   assert.equal(safeSourceURL('https://api.weather.gov/alerts'), 'https://api.weather.gov/alerts');
+});
+
+test('time-of-year and time-of-day pairs show as one row each without changing the total', async () => {
+  const {combineCycles} = await import('../domain.js');
+  const rows = [{feature: 'month_sin', contribution: -0.2}, {feature: 'wind_max_mph', contribution: 0.3},
+    {feature: 'month_cos', contribution: 0.05}, {feature: 'hour_sin', contribution: 0.01}, {feature: 'hour_cos', contribution: -0.02}];
+  const merged = combineCycles(rows);
+  assert.deepEqual(merged.map(r => r.feature), ['season', 'wind_max_mph', 'time_of_day']);
+  const sum = list => list.reduce((s, r) => s + r.contribution, 0);
+  assert.ok(Math.abs(sum(merged) - sum(rows)) < 1e-12);
+  assert.equal(rows[0].contribution, -0.2); // the input list isn't changed
 });

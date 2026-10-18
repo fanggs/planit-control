@@ -37,11 +37,11 @@
       <div class="metric"><span>Sites in network</span><strong id="site-count">—</strong><small id="site-subtitle">Awaiting data</small></div>
       <div class="metric"><span>Active alerts</span><strong id="alert-count">—</strong><small id="alert-status" role="status">Warnings and stop-work alerts</small></div>
       <div class="metric"><span>Open crew reports</span><strong id="report-count">—</strong><small>Crew reports don’t change the score</small></div>
-      <div class="metric"><span>Sites without screening</span><strong id="missing-count">—</strong><small>No score doesn’t mean safe</small></div>
+      <div class="metric"><span>Sites without a score</span><strong id="missing-count">—</strong><small>No score doesn’t mean safe</small></div>
     </div>
     <section id="ask-panel" class="ask-panel panel" aria-labelledby="ask-title" aria-busy="false">
       <div class="ask-heading"><div><div class="planit-eyebrow">Explore the evidence</div><h2 id="ask-title">Ask about site data</h2></div><span class="planit-chip">Gemini · read-only SQL</span></div>
-      <p id="ask-help" class="ask-help">Ask about monitored plants, weather, forecasts, alerts or prototype screening. Answers use available database records; they are not permission to work.</p>
+      <p id="ask-help" class="ask-help">Ask about our plants, weather, forecasts, alerts or hazard scores. Answers use available database records; they are not permission to work.</p>
       <form id="ask-form" novalidate>
         <label for="ask-question">Your question</label>
         <div class="ask-controls"><input id="ask-question" name="question" type="text" minlength="3" maxlength="500" autocomplete="off" aria-describedby="ask-help" placeholder="Which plants have the strongest forecast wind?" disabled required><button id="ask-submit" class="planit-button primary" type="submit" disabled>Ask data</button></div>

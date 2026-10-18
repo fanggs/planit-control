@@ -247,7 +247,7 @@ Errors always look like: `{"error": {"code": "not_found", "message": "Site 123 n
       "status": "stop_work",
       "checked_at": "2026-10-17T18:04:20Z",
       "reason": null,
-      "source_name": "NOAA GOES GLM",
+      "source_name": "NOAA lightning satellite (GOES GLM)",
       "source_url": "https://www.goes-r.gov/spacesegment/glm.html"
     }
   }

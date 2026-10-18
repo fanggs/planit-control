@@ -60,10 +60,10 @@ export function watchPanel(site,now=Date.now()){
 export function scoreWaterfall(site){
   if(!validScore(site?.score)||!Number.isFinite(site.baseline)||site.score_reconciles!==true||!site.factors?.length)return '';
   let running=site.baseline;
-  const steps=[{name:'Baseline',start:0,end:running,value:running}];
+  const steps=[{name:'Starting point',start:0,end:running,value:running}];
   for(const factor of site.factors){const next=running+factor.contribution;
     steps.push({name:factor.name,start:running,end:next,value:factor.contribution});running=next;}
-  steps.push({name:'Final index',start:0,end:site.score,value:site.score});
+  steps.push({name:'Final score',start:0,end:site.score,value:site.score});
   const min=Math.min(0,...steps.flatMap(step=>[step.start,step.end]));
   const max=Math.max(10,...steps.flatMap(step=>[step.start,step.end]));
   const span=max-min||10;

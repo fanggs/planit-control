@@ -21,7 +21,7 @@ LIGHTNING_FRESH = timedelta(minutes=5)   # job polls every 20 s
 WATCHED_BEFORE_CLEAR = timedelta(minutes=30)  # same 30 minutes as the all-clear rule
 NWS_FRESH = timedelta(minutes=15)        # job polls every 5 min
 
-LIGHTNING_SOURCE = {"source_name": "NOAA GOES GLM", "source_url": "https://www.goes-r.gov/spacesegment/glm.html"}
+LIGHTNING_SOURCE = {"source_name": "NOAA lightning satellite (GOES GLM)", "source_url": "https://www.goes-r.gov/spacesegment/glm.html"}
 NWS_SOURCE = {"source_name": "National Weather Service", "source_url": "https://api.weather.gov/alerts/active"}
 
 

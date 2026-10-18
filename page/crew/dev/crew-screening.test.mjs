@@ -88,7 +88,7 @@ test('UI shows Prototype, the target window, signed contributions and a reconcil
   const site=createContractMapper().site(detail(Date.now())),html=scorePanel(site),wildlife=wildlifeHTML(site);
   assert.match(html,/>Prototype</);assert.match(html,/Forecast window:/);assert.doesNotMatch(html,/Forecast window: not supplied/);
   assert.match(html,/Rain over 24 hours/);assert.match(html,/-0.40 points/);assert.match(html,/doesn’t predict injuries/);
-  assert.match(html,/crew-waterfall/);assert.match(html,/Baseline/);assert.match(html,/Final index/);
+  assert.match(html,/crew-waterfall/);assert.match(html,/Starting point/);assert.match(html,/Final score/);
   assert.doesNotMatch(html,/<svg/);assert.match(wildlife,/2025-09-11/);assert.match(wildlife,/GBIF/);assert.match(wildlife,/19.2 km/);
   assert.match(wildlife,/location accurate to about 5 m/);assert.match(wildlife,/not what’s here today/);
   assert.match(wildlifeHTML({}),/aren’t available.*doesn’t mean there are no animals/);

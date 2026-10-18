@@ -84,7 +84,7 @@ function renderAskResult(result) {
   const panel = $('ask-result');
   panel.replaceChildren();
   if (result.answer === null) {
-    panel.append(el('p', 'The available data cannot answer that question. Try asking about monitored plants, weather, forecasts, alerts or prototype screening.', 'ask-unanswered'));
+    panel.append(el('p', 'The available data cannot answer that question. Try asking about our plants, weather, forecasts, alerts or hazard scores.', 'ask-unanswered'));
     $('ask-status').textContent = 'No answer from the available data.';
   } else {
     panel.append(el('h3', 'Answer'), el('p', result.answer, 'ask-answer'));

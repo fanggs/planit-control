@@ -15,7 +15,7 @@ export const config = Object.freeze({
   apiBase: apiBaseForPage(import.meta.url),
   requestTimeoutMs: 20000,
   pollMs: 30000,
-  staleAfterMinutes: 60, // Display advisory; this is not a safety/alert rule.
+  staleAfterMinutes: 120, // hourly readings: an hour old is normal // Display advisory; this is not a safety/alert rule.
   realtime: {
     baseURL: 'https://planit-realtime.app.space',
     appId: 'app_01M557EC8CQY7VDN5253P86ZBN'

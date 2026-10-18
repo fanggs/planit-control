@@ -14,7 +14,7 @@ export const FEATURE_LABELS=Object.freeze({
   antecedent_forecast_rain_72h_in:'Rain in the past 3 days',
   antecedent_forecast_rain_168h_in:'Rain in the past week',
   latitude:'Location (north–south)',longitude:'Location (east–west)',elevation_m:'Elevation',
-  month_sin:'Time of year',month_cos:'Time of year (2)',hour_sin:'Time of day',hour_cos:'Time of day (2)',
+  month_sin:'Time of year',month_cos:'Time of year',hour_sin:'Time of day',hour_cos:'Time of day',season:'Time of year',time_of_day:'Time of day',
   soil_moisture:'Soil moisture'
 });
 export function featureLabel(feature){
@@ -23,10 +23,8 @@ export function featureLabel(feature){
 }
 export function screeningFactors(rows){
   if(!Array.isArray(rows))throw new Error('Screening factors must be a list.');
-  return rows.map(f=>{
-    if(!number(f?.contribution))throw new Error('Invalid screening contribution.');
-    return {feature:f.feature,name:featureLabel(f.feature),contribution:f.contribution,unit:'score_points'};
-  });
+  for(const f of rows)if(!number(f?.contribution))throw new Error('Invalid screening contribution.');
+  return combineCycles(rows).map(f=>({feature:f.feature,name:featureLabel(f.feature),contribution:f.contribution,unit:'score_points'}));
 }
 function unavailable(status,reason){
   return {score:null,baseline:null,factors:[],score_status:status,score_reason:reason,score_reconciles:false,
@@ -84,4 +82,19 @@ export function scoreBadgeText(site){
   if(shownStatuses.has(site?.score_status))return 'Prototype';
   if(site?.score_status==='legacy')return 'Legacy API score';
   return 'No data';
+}
+
+// The model encodes time of year and time of day as two numbers each (a sine
+// and a cosine). Show each pair as one row; the sum, and so the total, is unchanged.
+const CYCLE_PAIRS = [['month_sin', 'month_cos', 'season'], ['hour_sin', 'hour_cos', 'time_of_day']];
+export function combineCycles(factors) {
+  const out = [];
+  for (const factor of factors) {
+    const pair = CYCLE_PAIRS.find(([a, b]) => factor.feature === a || factor.feature === b);
+    if (!pair) { out.push(factor); continue; }
+    const merged = out.find(row => row.feature === pair[2]);
+    if (merged) merged.contribution += factor.contribution;
+    else out.push({...factor, feature: pair[2], contribution: factor.contribution});
+  }
+  return out;
 }

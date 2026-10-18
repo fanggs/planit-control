@@ -18,7 +18,8 @@ const FEATURE_LABELS = Object.freeze({temperature_max_f: 'High temperature',temp
   antecedent_forecast_rain_72h_in: 'Rain in the past 3 days',
   antecedent_forecast_rain_168h_in: 'Rain in the past week',
   latitude: 'Location (north–south)',longitude: 'Location (east–west)',elevation_m: 'Elevation',
-  month_sin: 'Time of year',month_cos: 'Time of year (2)',hour_sin: 'Time of day',hour_cos: 'Time of day (2)',
+  month_sin: 'Time of year',month_cos: 'Time of year',hour_sin: 'Time of day',hour_cos: 'Time of day',
+  season: 'Time of year', time_of_day: 'Time of day',
   soil_moisture: 'Soil moisture'});
 export const featureLabel = feature => Object.hasOwn(FEATURE_LABELS, feature)
   ? FEATURE_LABELS[feature] : String(feature).replaceAll('_', ' ');
@@ -107,8 +108,8 @@ export function assessScore(model, now = Date.now(), allowHistorical = false) {
   if (Math.abs(total - model.score) > 1e-8) return {status: 'mismatch', total,
     message: `Explanation does not reconcile: ${total.toFixed(2)} calculated, ${model.score.toFixed(2)} supplied. Contact the model team.`};
   let running = model.baseline;
-  const steps = [{name: 'Baseline', value: model.baseline, start: 0, end: model.baseline, kind: 'baseline'}];
-  for (const factor of model.factors) {
+  const steps = [{name: 'Starting point', value: model.baseline, start: 0, end: model.baseline, kind: 'baseline'}];
+  for (const factor of combineCycles(model.factors)) {
     steps.push({name: featureLabel(factor.feature), value: factor.contribution, start: running,
       end: running + factor.contribution, kind: factor.contribution < 0 ? 'decrease' : 'increase'});
     running += factor.contribution;
@@ -198,4 +199,19 @@ const SPECIES = {'Sistrurus miliarius': 'Pygmy rattlesnake', 'Agkistrodon pisciv
 export function speciesName(species) {
   if (typeof species !== 'string' || !species.trim()) return 'Animal not identified';
   return SPECIES[species] ? `${SPECIES[species]} (${species})` : species;
+}
+
+// The model encodes time of year and time of day as two numbers each (a sine
+// and a cosine). Show each pair as one row; the sum, and so the total, is unchanged.
+const CYCLE_PAIRS = [['month_sin', 'month_cos', 'season'], ['hour_sin', 'hour_cos', 'time_of_day']];
+export function combineCycles(factors) {
+  const out = [];
+  for (const factor of factors) {
+    const pair = CYCLE_PAIRS.find(([a, b]) => factor.feature === a || factor.feature === b);
+    if (!pair) { out.push(factor); continue; }
+    const merged = out.find(row => row.feature === pair[2]);
+    if (merged) merged.contribution += factor.contribution;
+    else out.push({...factor, feature: pair[2], contribution: factor.contribution});
+  }
+  return out;
 }
