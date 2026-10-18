@@ -1,9 +1,10 @@
 # Hazard reporting: Aryan's backend and supervisor handoff
 
-This follows `api/CONTRACT.md` v1.1. A crew member uploads a private photo (if
+This follows `api/CONTRACT.md` v1.3. A crew member uploads a private photo (if
 there is one), submits a report with its returned `photo_key`, and a supervisor
 can later resolve the report. **DeepSpace carries ID-only real-time notices;
-it does not store photographs.** Reports do not change Sid's model score.
+it does not store photographs.** Reports and warnings do not change the separate
+screening-model score.
 
 ## Which file does what
 

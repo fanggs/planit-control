@@ -1,4 +1,4 @@
-"""Hazard report request and response shapes for PlanIT contract v1.1.
+"""Hazard report request and response shapes for PlanIT contract v1.3.
 
 Authentication and role checks belong to the FastAPI route. The request body
 cannot supply a report ID, reporter, status, or resolution metadata.
@@ -15,7 +15,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
-# Contract v1.1 uses the positive integer EIA plant code as the site key.
+# Contract v1.3 uses the positive integer EIA plant code as the site key.
 SiteId = Annotated[int, Field(strict=True, gt=0, le=9223372036854775807)]
 
 
@@ -133,5 +133,3 @@ class HazardReportRead(HazardReportCreate):
         elif self.resolved_at is None or self.resolved_by is None:
             raise ValueError("resolved reports need resolved_at and resolved_by")
         return self
-
-

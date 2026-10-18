@@ -1,4 +1,4 @@
-"""Report database operations for PlanIT contract v1.1.
+"""Report database operations for PlanIT contract v1.3.
 
 The FastAPI application supplies its existing SQLAlchemy Session and verified
 Auth0 subject. It owns role checks, commit/rollback, and post-commit events.
@@ -64,7 +64,7 @@ _report_id_validator = TypeAdapter(UUID)
 
 AlertId = int | str | UUID
 # Must check private POST /photos metadata and uploader ownership. Upload has
-# no site_id in contract v1.1: the report row associates the photo with its site.
+# no site_id in contract v1.3: the report row associates the photo with its site.
 # Never treat a client key as a filesystem path. The session is available for
 # a future database-backed metadata implementation in the same transaction.
 PhotoVerifier = Callable[[Session, str, str, int], bool]
@@ -133,7 +133,7 @@ def save_report(
     """Insert an open report and, if high severity, its warning alert.
 
     The route first checks Auth0, role, and site existence. Both roles may
-    report at any site under contract v1.1. The reporter ID must come from the
+    report at any site under contract v1.3. The reporter ID must come from the
     validated token's `sub`. A photo key needs server-side verification
     against private upload metadata. The warning
     writer must use `db` so report and alert commit or roll back together.
