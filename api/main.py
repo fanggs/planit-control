@@ -259,7 +259,8 @@ def briefing(site_id: int):
     found = _briefings().get(str(site_id))
     if found is None:
         raise HTTPException(404, f"No briefing for site {site_id}")
-    return found
+    # Stored briefings keep their sources inside inputs (the table has no column for them).
+    return {**found, "sources": found.get("sources") or (found.get("inputs") or {}).get("sources", [])}
 
 
 if site_data.mode() == "database" and _auth0_config is not None:

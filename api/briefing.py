@@ -137,6 +137,26 @@ def nws_for_day(site: dict, events: list[dict], for_date: date) -> str | None:
     return "; ".join(parts) or None
 
 
+SCREENING_SOURCE = {"source_name": "ForeSite screening model (prototype)",
+                    "source_url": "https://github.com/fanggs/planit-control/blob/main/model/README.md"}
+
+
+def briefing_sources(site: dict, rows: list[dict], events: list[dict], facts: dict) -> list[dict]:
+    """Where the briefing's facts came from: the forecast, any NWS alerts named, the index."""
+    out: dict[str, str] = {}
+    for r in rows:
+        if r["site_id"] == site["site_id"] and r.get("source_name") and r.get("source_url"):
+            out.setdefault(r["source_name"], r["source_url"])
+            break
+    if facts.get("nws_alerts"):
+        for e in events:
+            if e["site_id"] == site["site_id"] and e.get("source_url"):
+                out.setdefault("National Weather Service: " + _event_name(e["title"]), e["source_url"])
+    if facts.get("screening_index_0_to_10") is not None:
+        out.setdefault(SCREENING_SOURCE["source_name"], SCREENING_SOURCE["source_url"])
+    return [{"source_name": k, "source_url": v} for k, v in out.items()]
+
+
 def context_facts(site: dict, events: list[dict], for_date: date) -> dict:
     """Tomorrow's NWS alerts and the current screening index, alongside the weather facts."""
     sc = site.get("screening") or {}
@@ -271,12 +291,14 @@ def briefing_for(site: dict, rows: list[dict], alerts: list[dict], now: datetime
     facts |= context_facts(site, events or [], tomorrow)
     result = write_briefing(site, facts, [a for a in alerts if a["site_id"] == site["site_id"]])
     first = min((r["valid_at"] for r in rows if r["site_id"] == site["site_id"]), default=None)
+    sources = briefing_sources(site, rows, events or [], facts)
     return {
         "site_id": site["site_id"],
         "for_date": tomorrow.isoformat(),
         "generated_at": now.isoformat(timespec="seconds").replace("+00:00", "Z"),
         "text": result["text"],
+        "sources": sources,
         "inputs": {"forecast_valid_from": first,
                    "score_scored_at": (site.get("screening") or {}).get("scored_at"),
-                   "method": result["method"], "facts": facts},
+                   "method": result["method"], "facts": facts, "sources": sources},
     }

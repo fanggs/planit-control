@@ -61,7 +61,7 @@ def nws_events() -> list[dict]:
     if not db.configured():
         return []
     return db.query("""
-        SELECT site_id, title, event_kind, starts_at, ends_at FROM public.environmental_events
+        SELECT site_id, title, event_kind, starts_at, ends_at, source_url FROM public.environmental_events
         WHERE event_kind LIKE 'nws_%' AND (ends_at IS NULL OR ends_at > now())
           AND starts_at < now() + interval '2 days'""")
 

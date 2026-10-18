@@ -28,9 +28,15 @@ class BriefingInputs(BaseModel):
     method: str | None = None  # "gemini" or "template" (grounding fallback)
 
 
+class BriefingSource(BaseModel):
+    source_name: str
+    source_url: str
+
+
 class Briefing(BaseModel):
     site_id: SiteId
     for_date: date  # the site's local calendar date
     generated_at: datetime
     text: str
     inputs: BriefingInputs
+    sources: list[BriefingSource] = []  # forecast, NWS alerts named, screening model

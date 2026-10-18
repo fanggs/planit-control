@@ -5,7 +5,7 @@ Run: .venv/bin/python -m unittest tests.test_briefing -v
 import unittest
 from datetime import date
 
-from api.briefing import context_facts, daily_facts, grounded, nws_for_day, template_briefing
+from api.briefing import briefing_sources, context_facts, daily_facts, grounded, nws_for_day, template_briefing
 
 SITE = {"site_id": 621, "name": "Turkey Point", "timezone": "America/New_York"}
 
@@ -115,6 +115,19 @@ class ContextTest(unittest.TestCase):
         self.assertIn("stop-work", text)
         self.assertIn("Prototype screening index 1.9", text)
         self.assertEqual(grounded(text, facts, alerts), [])
+
+    def test_sources_cover_forecast_nws_and_index(self):
+        rows = [dict(r, source_url="https://open-meteo.com/") for r in ROWS]
+        events = [dict(nws("Heat Advisory issued x", "2026-10-18T15:00:00Z", "2026-10-18T23:00:00Z"),
+                       source_url="https://api.weather.gov/alerts/urn:test")]
+        site = dict(SITE, screening={"score": 1.9, "status": "validated_prototype"})
+        facts = daily_facts(SITE, ROWS, DAY) | context_facts(site, events, DAY)
+        names = [s["source_name"] for s in briefing_sources(site, rows, events, facts)]
+        self.assertEqual(names, ["Open-Meteo / ECMWF IFS HRES (modeled)", "National Weather Service: Heat Advisory",
+                                 "ForeSite screening model (prototype)"])
+        quiet = daily_facts(SITE, ROWS, DAY) | context_facts(SITE, [], DAY)
+        self.assertEqual([s["source_name"] for s in briefing_sources(SITE, rows, [], quiet)],
+                         ["Open-Meteo / ECMWF IFS HRES (modeled)"])
 
     def test_made_up_warning_hours_are_caught(self):
         facts = daily_facts(SITE, ROWS, DAY) | context_facts(SITE, [nws("Heat Advisory issued x",

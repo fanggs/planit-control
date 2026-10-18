@@ -303,7 +303,8 @@ wasn't: show "warning status unavailable", not "none".
   "for_date": "2026-10-18",
   "generated_at": "2026-10-17T22:00:00Z",
   "text": "Tomorrow: heat index reaches 112°F by 1 PM. Storms likely after 3 PM...",
-  "inputs": {"forecast_valid_from": "2026-10-18T04:00:00Z", "score_scored_at": "2026-10-17T22:00:00Z"}
+  "inputs": {"forecast_valid_from": "2026-10-18T04:00:00Z", "score_scored_at": "2026-10-17T22:00:00Z"},
+  "sources": [{"source_name": "Open-Meteo / ECMWF IFS HRES (modeled)", "source_url": "https://open-meteo.com/"}]
 }
 ```
 
