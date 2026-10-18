@@ -4,23 +4,45 @@ import {contributionLabel} from './crew-state.js';
 import {icon} from './crew-visuals.js';
 import {expireScreening,scoreBadgeText} from './crew-screening.js';
 import {lightningWatch,warningsWatch} from './crew-watch.js';
+import {displayHazards} from './crew-integration.js';
 export const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function safeURL(value){try{const u=new URL(value);return ['https:','http:'].includes(u.protocol)?u.href:null;}catch{return null;}}
 export function sourceLink(s){const url=safeURL(s?.source_url);return url?`<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(s.source_name||'Source')} ↗</a>`:esc(s?.source_name||'Source unavailable');}
 export function dateLabel(value,zone){if(!Number.isFinite(Date.parse(value)))return 'Unavailable';try{return new Date(value).toLocaleString(undefined,{timeZone:zone||undefined,dateStyle:'medium',timeStyle:'short'});}catch{return 'Timezone unavailable';}}
+export function ageLabel(value,now=Date.now()){
+  const observed=Date.parse(value);
+  if(!Number.isFinite(observed))return 'Age unavailable';
+  const elapsed=now-observed;
+  if(elapsed < -60000)return 'Timestamp is in the future';
+  if(elapsed < 60000)return 'Just now';
+  const minutes=Math.floor(elapsed/60000);
+  if(minutes<60)return `${minutes} min ago`;
+  const hours=Math.floor(minutes/60);
+  return hours<24?`${hours} h ago`:`${Math.floor(hours/24)} d ago`;
+}
 export function scoreHTML(score){
   const valid=validScore(score);
   // The ring depicts the supplied score; it never estimates missing data.
   const color=!valid?'#a0aaa2':score>=7?'#efab87':score>=4?'#e8bf72':'#9bdbac';
   return `<div class="crew-score-ring" style="--score-sweep:${valid?score*36:0}deg;--score-color:${color}"><strong class="crew-score">${valid?score.toFixed(1):'—'}<small>/ 10</small></strong></div>`;
 }
-export function hazardHTML(site){
+export function hazardHTML(site,now=Date.now(),{includeAge=true}={}){
+  // Re-evaluate live watch checks against the clock. A failed refresh must not
+  // leave an old "clear" card visible after its 5/15-minute validity ends.
+  const current=Object.hasOwn(site,'latest_weather')&&Array.isArray(site.active_alerts)
+    ? displayHazards(site,site.active_alerts,now):site.hazards;
   return `<div class="crew-hazard-grid">${hazards.map(([key,name,help])=>{
-    const h=site.hazards?.[key];
+    const h=current?.[key];
     const severity=['lower','elevated','high'].includes(h?.severity)?h.severity:null;
     // A measurement or missing feed is not itself a severity assessment.
-    return `<article class="crew-hazard" data-hazard="${key}" data-severity="${severity||'unassessed'}"><div class="crew-hazard-top"><span class="crew-hazard-icon">${icon(key)}</span>${h?.is_replay?'<span class="crew-pill">REPLAY</span>':''}${severity?`<span class="crew-pill">${esc(severity)}</span>`:''}</div><h3>${name}</h3><strong>${esc(h?.reading??'Reading unavailable')}</strong><p>${esc(h?.advice||help)}</p><small>${sourceLink(h)}<br>${esc(h?.time_label||'Observed')}: ${dateLabel(h?.observed_at)}</small></article>`;
+    return `<article class="crew-hazard" data-hazard="${key}" data-severity="${severity||'unassessed'}"><div class="crew-hazard-top"><span class="crew-hazard-icon">${icon(key)}</span>${h?.is_replay?'<span class="crew-pill">REPLAY</span>':''}${severity?`<span class="crew-pill">${esc(severity)}</span>`:''}</div><h3>${name}</h3><strong>${esc(h?.reading??'Reading unavailable')}</strong><p>${esc(h?.advice||help)}</p><small>${sourceLink(h)}<br>${esc(h?.time_label||'Observed')}: ${dateLabel(h?.observed_at,site.timezone)} · <span data-observed-at="${esc(h?.observed_at||'')}">${includeAge?esc(ageLabel(h?.observed_at,now)):''}</span></small></article>`;
   }).join('')}</div>`;
+}
+export function refreshHazardAges(root,now=Date.now()){
+  for(const element of root.querySelectorAll('[data-observed-at]')){
+    const next=ageLabel(element.getAttribute('data-observed-at'),now);
+    if(element.textContent!==next)element.textContent=next;
+  }
 }
 export function scoreBadgeHTML(site){return `<span class="crew-score-badge" data-score-status="${esc(site?.score_status||'no_data')}">${esc(scoreBadgeText(site))}</span>`;}
 export function topFactorsHTML(site){return Array.isArray(site?.top_factors)&&site.top_factors.length

@@ -99,6 +99,45 @@ test('offline pauses crew retries and online refetches before connected',async()
   stop();assert.equal(listeners.size,0);
 });
 
+test('hidden crew document closes its listener and a visible document refetches once before reconnecting',async()=>{
+  const timers=clock(),listeners=new Map(),document={hidden:false,
+    addEventListener(type,handler){listeners.set(`document:${type}`,handler);},
+    removeEventListener(type){listeners.delete(`document:${type}`);}},
+    browser={document,navigator:{onLine:true},
+    addEventListener(type,handler){listeners.set(type,handler);},removeEventListener(type){listeners.delete(type);}};
+  const callbacks=[],events=[],connections=[];
+  let closes=0,reads=0,tokens=0;
+  const stop=subscribeContractEvents({siteId:'9001',browser,timers,
+    getSource:()=>({subscribe(value){callbacks.push(value);return()=>{closes++;};}}),
+    getToken:async()=>`token-${++tokens}`,
+    readSite:async()=>({id:'9001',revision:++reads}),listSites:async()=>[],
+    onEvent:event=>events.push(event),onConnection:value=>connections.push(value)});
+  try{
+    await flush();assert.equal(callbacks.length,1);
+    callbacks[0].onConnection(true);await flush();
+    assert.equal(reads,1);assert.equal(connections.at(-1),true);
+    document.hidden=true;
+    assert.equal(typeof listeners.get('document:visibilitychange'),'function');
+    listeners.get('document:visibilitychange')();await flush();
+    assert.equal(closes,1);assert.equal(connections.at(-1),false);
+    assert.equal(timers.timeouts.size,0);assert.equal(timers.intervals.size,0);
+    const before=events.length;
+    callbacks[0].onEvent({type:'report.created',site_id:9001,report_id:'old-report'});
+    callbacks[0].onConnection(true);await flush();
+    assert.equal(reads,1);assert.equal(events.length,before);
+    document.hidden=false;listeners.get('document:visibilitychange')();await flush();
+    assert.equal(callbacks.length,2);assert.ok(tokens>=2);
+    callbacks[1].onConnection(true);await flush();
+    assert.equal(reads,2);assert.equal(connections.at(-1),true);
+    listeners.get('document:visibilitychange')();await flush();
+    assert.equal(callbacks.length,2,'a duplicate visible event must not open another listener');
+  }finally{stop();}
+  assert.equal(closes,2);assert.equal(timers.timeouts.size,0);assert.equal(timers.intervals.size,0);
+  assert.equal(listeners.size,0);
+  callbacks[1].onEvent({type:'report.created',site_id:9001,report_id:'after-stop'});await flush();
+  assert.equal(reads,2);
+});
+
 test('score batches update the selected site from the API and ignore unrelated or malformed ID lists',async()=>{
   const h=harness(),stop=h.api.subscribeEvents('9001',e=>h.events.push(e),c=>h.connections.push(c));
   try{

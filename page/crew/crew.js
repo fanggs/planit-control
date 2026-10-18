@@ -6,7 +6,7 @@ import {initAuth,session,signIn,signOut,enterDemo,authConfigured} from './crew-a
 import {services,demoAction} from './crew-services.js';
 import {acceptAlert,alertView} from './crew-state.js';
 import {acceptSnapshot,rankSites} from './crew-domain.js';
-import {esc,sourceLink,dateLabel,hazardHTML,scorePanel,floodHTML,wildlifeHTML,watchPanel} from './crew-ui.js';
+import {esc,sourceLink,dateLabel,hazardHTML,refreshHazardAges,scorePanel,floodHTML,wildlifeHTML,watchPanel} from './crew-ui.js';
 import {expireScreening} from './crew-screening.js';
 import {icon,brandMark,contourArt} from './crew-visuals.js';
 import {sessionExpired} from './crew-session.js';
@@ -14,10 +14,10 @@ import {mountReports} from './crew-reports.js';
 import {mountBriefing} from './crew-briefing.js';
 import {mountAsk} from './crew-ask.js';
 const $=s=>document.querySelector(s);
-const state={user:null,sites:[],site:null,view:'status',alert:null,connected:false,unsubscribe:null,loadVersion:0,clockOffset:0,lastEvent:0,viewCleanup:null,reports:null,viewVersion:0};
+const state={user:null,sites:[],site:null,view:'status',alert:null,connected:false,unsubscribe:null,loadVersion:0,clockOffset:0,lastEvent:0,viewCleanup:null,reports:null,viewVersion:0,conditionMarkup:null};
 let messageTimer,searchTimer;
 function message(text){$('#crew-message').textContent=text;$('#crew-message').classList.add('visible');clearTimeout(messageTimer);messageTimer=setTimeout(()=>$('#crew-message').classList.remove('visible'),7000);}
-function cleanupView(){state.viewVersion++;state.viewCleanup?.();state.viewCleanup=null;state.reports=null;}
+function cleanupView(){state.viewVersion++;state.viewCleanup?.();state.viewCleanup=null;state.reports=null;state.conditionMarkup=null;}
 function loginScreen(error=''){
   cleanupView();
   const loginURL=new URL('login.html',location.href);loginURL.searchParams.set('start','1');
@@ -36,6 +36,8 @@ async function openWorkspace(){
 }
 async function loadSite(id){
   const version=++state.loadVersion;state.unsubscribe?.();state.unsubscribe=null;state.alert=null;state.connected=false;state.site=null;cleanupView();
+  // Never leave the previous plant's alerts visible while the new selection loads.
+  $('#crew-root').innerHTML='<main class="crew-login" id="crew-main"><h1>Loading site conditions…</h1></main>';
   try{
     const site=await services.readSite(id);if(version!==state.loadVersion)return;
     if(!acceptSnapshot(null,site,id))throw new Error('Site response must match its ID and include a non-negative integer revision.');
@@ -94,22 +96,27 @@ function renderView(){
 function renderStatus(){
   if(state.view!=='status'||!$('#crew-view'))return;const p=state.site;
   const open=$('#crew-score-panel details')?.open;
-  $('#crew-view').innerHTML=`<div class="crew-section-heading"><div><p class="crew-eyebrow">ONE RISK PICTURE</p><h2>Conditions around your site</h2><p class="crew-muted">Readings carry their observation time and source. Missing data stays unavailable.</p></div><button class="crew-link" data-action="refresh">Refresh</button></div><div id="crew-watch-panel">${watchPanel(p)}</div>${hazardHTML(p)}<div id="crew-score-panel">${scorePanel(p)}</div><div id="crew-flood-panel">${floodHTML(p)}</div>${wildlifeHTML(p)}
+  const now=Date.now();state.conditionMarkup=hazardHTML(p,now,{includeAge:false});
+  $('#crew-view').innerHTML=`<div class="crew-section-heading"><div><p class="crew-eyebrow">ONE RISK PICTURE</p><h2>Conditions around your site</h2><p class="crew-muted">Readings carry their observation time and source. Missing data stays unavailable.</p></div><button class="crew-link" data-action="refresh">Refresh</button></div><div id="crew-watch-panel">${watchPanel(p)}</div><div id="crew-conditions-grid">${hazardHTML(p,now)}</div><div id="crew-score-panel">${scorePanel(p)}</div><div id="crew-flood-panel">${floodHTML(p)}</div>${wildlifeHTML(p)}
     <div class="crew-quick-actions"><button class="crew-button" data-view="reports">${icon("report")} Report a hazard</button><button class="crew-button secondary" data-view="briefing">${icon("briefing")} Read tomorrow’s briefing</button></div>
     ${config.dataMode==='mock'?`<details class="crew-card crew-demo-controls"><summary>Demo scenarios</summary><p>These controls simulate backend events. They never report actual conditions.</p><label for="crew-strike-distance">Sample strike distance (miles)</label><input id="crew-strike-distance" type="number" min="0" max="100" step="0.1" value="4.2"><div class="crew-quick-actions"><button class="crew-button secondary" data-action="strike">Trigger / reset lightning hold</button><button class="crew-button secondary" data-action="clear">Simulate server clear</button><button class="crew-button secondary" data-action="flood">Trigger flood warning</button><button class="crew-button secondary" data-action="flood-off">Remove sample flood warning</button></div><small>Strikes beyond 10 miles do not trigger a hold. Timer expiry alone never clears it. Try Grand Gulf (plant 6072) for the Mississippi River scenario.</small></details>`:''}`;
   if(open)$('#crew-score-panel details').open=true;updateAlert();
 }
 function updateAlert(){
-  if(!$('#crew-alert'))return;
+  if(!$('#crew-alert')||!state.site)return;
   const fresh=expireScreening(state.site);if(fresh!==state.site){state.site=fresh;if(state.view==='status')renderStatus();}
   if(!navigator.onLine||Date.now()-state.lastEvent>config.api.heartbeatMs)state.connected=false;
   const view=alertView(state.alert,state.connected,Date.now()+state.clockOffset,state.site?.lightning_status);
   $('#crew-alert').dataset.tone=view.tone;if($('#crew-alert-title').textContent!==view.title)$('#crew-alert-title').textContent=view.title;if($('#crew-alert-detail').textContent!==view.detail)$('#crew-alert-detail').textContent=view.detail;
   $('#crew-countdown').textContent=view.seconds===null?'':`${String(Math.floor(view.seconds/60)).padStart(2,'0')}:${String(view.seconds%60).padStart(2,'0')}`;
   $('#crew-stream').textContent=(sessionExpired()?'Sign-in expired · live updates paused':state.connected?(config.dataMode==='mock'?'Sample stream connected':'Notifications connected · check reading timestamps'):'Updates disconnected · confirm with your supervisor')+(state.alert?.last_strike_at?' · Last strike: '+dateLabel(state.alert.last_strike_at):'');
-  const watch=$('#crew-watch-panel'),floodPanel=$('#crew-flood-panel');
+  const watch=$('#crew-watch-panel'),floodPanel=$('#crew-flood-panel'),conditions=$('#crew-conditions-grid');
   if(watch){const html=watchPanel(state.site);if(watch.innerHTML!==html)watch.innerHTML=html;}
   if(floodPanel){const html=floodHTML(state.site);if(floodPanel.innerHTML!==html)floodPanel.innerHTML=html;}
+  if(conditions){const now=Date.now(),signature=hazardHTML(state.site,now,{includeAge:false});
+    if(state.conditionMarkup!==signature){state.conditionMarkup=signature;conditions.innerHTML=hazardHTML(state.site,now);}
+    else refreshHazardAges(conditions,now);
+  }
   const flood=state.site?.flood;
   const banners=[];
   if(flood?.status==='warning')banners.push(`<p class="crew-flood-notice" role="alert"><strong>Flood-risk warning</strong> · ${esc(flood.message)}</p>`);
@@ -140,6 +147,11 @@ window.addEventListener('planit:session-expired',()=>{state.unsubscribe?.();stat
 window.addEventListener('pageshow',event=>{if(event.persisted&&state.user&&state.site)loadSite(String(state.site.id));});
 async function boot(){
   if(config.themeStylesheet){const link=document.createElement('link');link.rel='stylesheet';link.href=config.themeStylesheet;link.onerror=()=>message('Shared theme unavailable. Using crew-scoped fallback styles.');document.head.insertBefore(link,document.head.querySelector('link[href="crew.css"]'));}
-  try{await initAuth();if(config.dataMode==='mock'&&new URLSearchParams(location.search).get('demo')==='1')enterDemo();if(await session())await openWorkspace();else loginScreen();}catch(error){loginScreen(error.message);}
+  try{
+    // The explicitly labeled local demo needs no Auth0 token or remote SDK.
+    if(config.dataMode==='mock'&&new URLSearchParams(location.search).get('demo')==='1')enterDemo();
+    else await initAuth();
+    if(await session())await openWorkspace();else loginScreen();
+  }catch(error){loginScreen(error.message);}
 }
 boot();
