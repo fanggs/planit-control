@@ -9,13 +9,14 @@
     "hazard_region": "florida_gulf",
     "score": 8.2,
     "scored_at": "2026-10-17T18:00:00Z",
+    "score_status": "research",
     "top_factors": [
       {
-        "hazard_type": "heat",
+        "feature": "heat_index_max_f",
         "contribution": 3.1
       },
       {
-        "hazard_type": "lightning",
+        "feature": "rain_max_1h_in",
         "contribution": 1.9
       }
     ],
@@ -24,7 +25,9 @@
       "hazard_type": "lightning",
       "clear_at": "2026-10-17T18:34:00Z"
     },
-    "open_report_count": 1
+    "open_report_count": 1,
+    "lightning_status": {"status": "stop_work", "checked_at": null, "reason": null,
+      "source_name": "NOAA GOES GLM", "source_url": "https://www.goes-r.gov/spacesegment/glm.html"}
   },
   {
     "site_id": 9002,
@@ -36,13 +39,14 @@
     "hazard_region": "mississippi_corridor",
     "score": 6.6,
     "scored_at": "2026-10-17T18:00:00Z",
+    "score_status": "research",
     "top_factors": [
       {
-        "hazard_type": "flooding",
+        "feature": "month_cos",
         "contribution": 2.6
       },
       {
-        "hazard_type": "soil_saturation",
+        "feature": "rain_total_24h_in",
         "contribution": 1.2
       }
     ],
@@ -51,7 +55,9 @@
       "hazard_type": "flooding",
       "clear_at": null
     },
-    "open_report_count": 0
+    "open_report_count": 0,
+    "lightning_status": {"status": "unknown", "checked_at": null, "reason": "Historical sample; no live lightning watch",
+      "source_name": "NOAA GOES GLM", "source_url": "https://www.goes-r.gov/spacesegment/glm.html"}
   },
   {
     "site_id": 9003,
@@ -63,17 +69,20 @@
     "hazard_region": "california_west",
     "score": 5.7,
     "scored_at": "2026-10-17T18:00:00Z",
+    "score_status": "research",
     "top_factors": [
       {
-        "hazard_type": "wildfire",
+        "feature": "wind_max_mph",
         "contribution": 2.9
       },
       {
-        "hazard_type": "heat",
+        "feature": "heat_index_max_f",
         "contribution": 1.6
       }
     ],
     "active_alert": null,
-    "open_report_count": 0
+    "open_report_count": 0,
+    "lightning_status": {"status": "unknown", "checked_at": null, "reason": "Historical sample; no live lightning watch",
+      "source_name": "NOAA GOES GLM", "source_url": "https://www.goes-r.gov/spacesegment/glm.html"}
   }
 ]

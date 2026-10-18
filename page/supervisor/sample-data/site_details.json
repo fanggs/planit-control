@@ -21,36 +21,51 @@
       "source_name": "Open-Meteo",
       "source_url": "https://open-meteo.com/"
     },
-    "score": {
-      "site_id": 9001,
+    "screening": {
       "score": 8.2,
       "baseline": 2.4,
-      "scored_at": "2026-10-17T18:00:00Z",
-      "horizon_hours": 24,
-      "model_version": "sample",
       "factors": [
         {
-          "hazard_type": "heat",
+          "feature": "heat_index_max_f",
           "contribution": 3.1
         },
         {
-          "hazard_type": "lightning",
+          "feature": "rain_max_1h_in",
           "contribution": 1.9
         },
         {
-          "hazard_type": "soil_saturation",
+          "feature": "rain_total_24h_in",
           "contribution": 0.9
         },
         {
-          "hazard_type": "flooding",
+          "feature": "month_cos",
           "contribution": -1.5
         },
         {
-          "hazard_type": "wildlife",
+          "feature": "temperature_max_f",
           "contribution": 1.4
         }
-      ]
+      ],
+      "status": "research",
+      "target": "NWS warning or heat advisory covering the plant within the next 24 hours",
+      "scored_at": "2026-10-17T18:00:00Z",
+      "captured_at": "2026-10-17T17:45:00Z",
+      "valid_from": "2026-10-17T18:00:00Z",
+      "valid_until": "2026-10-18T18:00:00Z",
+      "artifact_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "snapshot_id": "0000000000000000000000000000000000000000000000000000000000000000",
+      "clears_stop_work": false
     },
+    "wildlife_context": {"site_id": 9001, "status": "recorded_sightings", "radius_km": 25,
+      "limitations": "Sample presence-only evidence; no records never means absence.",
+      "encounter_probability": null, "numeric_score_contribution": null,
+      "sightings": [{"occurrence_id": "sample-gbif-1", "species": "American alligator",
+        "observed_at": "2026-10-16T12:00:00Z", "distance_km": 8.4,
+        "source_name": "Sample GBIF-style fixture", "source_url": "https://www.gbif.org/"}]},
+    "lightning_status": {"status": "stop_work", "checked_at": null, "reason": null,
+      "source_name": "NOAA GOES GLM", "source_url": "https://www.goes-r.gov/spacesegment/glm.html"},
+    "warnings_status": {"status": "unknown", "checked_at": null,
+      "source_name": "National Weather Service", "source_url": "https://api.weather.gov/alerts/active"},
     "active_alerts": [
       {
         "id": 101,
@@ -121,36 +136,48 @@
       "source_name": "Open-Meteo",
       "source_url": "https://open-meteo.com/"
     },
-    "score": {
-      "site_id": 9002,
+    "screening": {
       "score": 6.6,
       "baseline": 2.4,
-      "scored_at": "2026-10-17T18:00:00Z",
-      "horizon_hours": 24,
-      "model_version": "sample",
       "factors": [
         {
-          "hazard_type": "flooding",
+          "feature": "month_cos",
           "contribution": 2.6
         },
         {
-          "hazard_type": "soil_saturation",
+          "feature": "rain_total_24h_in",
           "contribution": 1.2
         },
         {
-          "hazard_type": "heat",
+          "feature": "heat_index_max_f",
           "contribution": 0.3
         },
         {
-          "hazard_type": "lightning",
+          "feature": "wind_max_mph",
           "contribution": -0.4
         },
         {
-          "hazard_type": "wildlife",
+          "feature": "temperature_max_f",
           "contribution": 0.5
         }
-      ]
+      ],
+      "status": "research",
+      "target": "NWS warning or heat advisory covering the plant within the next 24 hours",
+      "scored_at": "2026-10-17T18:00:00Z",
+      "captured_at": "2026-10-17T17:45:00Z",
+      "valid_from": "2026-10-17T18:00:00Z",
+      "valid_until": "2026-10-18T18:00:00Z",
+      "artifact_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "snapshot_id": "0000000000000000000000000000000000000000000000000000000000000000",
+      "clears_stop_work": false
     },
+    "wildlife_context": {"site_id": 9002, "status": "no_records_in_sample", "radius_km": 25,
+      "limitations": "Sample presence-only evidence; no records never means absence.",
+      "encounter_probability": null, "numeric_score_contribution": null, "sightings": []},
+    "lightning_status": {"status": "unknown", "checked_at": null, "reason": "Historical sample; no live lightning watch",
+      "source_name": "NOAA GOES GLM", "source_url": "https://www.goes-r.gov/spacesegment/glm.html"},
+    "warnings_status": {"status": "unknown", "checked_at": null,
+      "source_name": "National Weather Service", "source_url": "https://api.weather.gov/alerts/active"},
     "active_alerts": [
       {
         "id": 103,
@@ -203,36 +230,47 @@
       "source_name": "Open-Meteo",
       "source_url": "https://open-meteo.com/"
     },
-    "score": {
-      "site_id": 9003,
+    "screening": {
       "score": 5.7,
       "baseline": 2.4,
-      "scored_at": "2026-10-17T18:00:00Z",
-      "horizon_hours": 24,
-      "model_version": "sample",
       "factors": [
         {
-          "hazard_type": "wildfire",
+          "feature": "wind_max_mph",
           "contribution": 2.9
         },
         {
-          "hazard_type": "heat",
+          "feature": "heat_index_max_f",
           "contribution": 1.6
         },
         {
-          "hazard_type": "soil_saturation",
+          "feature": "rain_total_24h_in",
           "contribution": -0.8
         },
         {
-          "hazard_type": "lightning",
+          "feature": "month_cos",
           "contribution": -0.6
         },
         {
-          "hazard_type": "wildlife",
+          "feature": "temperature_max_f",
           "contribution": 0.2
         }
-      ]
+      ],
+      "status": "research",
+      "target": "NWS warning or heat advisory covering the plant within the next 24 hours",
+      "scored_at": "2026-10-17T18:00:00Z",
+      "captured_at": "2026-10-17T17:45:00Z",
+      "valid_from": "2026-10-17T18:00:00Z",
+      "valid_until": "2026-10-18T18:00:00Z",
+      "artifact_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "snapshot_id": "0000000000000000000000000000000000000000000000000000000000000000",
+      "clears_stop_work": false
     },
+    "wildlife_context": {"site_id": 9003, "status": "unavailable", "encounter_probability": null,
+      "numeric_score_contribution": null, "sightings": []},
+    "lightning_status": {"status": "unknown", "checked_at": null, "reason": "Historical sample; no live lightning watch",
+      "source_name": "NOAA GOES GLM", "source_url": "https://www.goes-r.gov/spacesegment/glm.html"},
+    "warnings_status": {"status": "unknown", "checked_at": null,
+      "source_name": "National Weather Service", "source_url": "https://api.weather.gov/alerts/active"},
     "active_alerts": [],
     "environmental_events": [],
     "recent_reports": []
