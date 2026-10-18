@@ -1,10 +1,12 @@
-# ForeSite (PlanIT Control): Contract v1.2
+# ForeSite (PlanIT Control): Contract v1.3
 
 **Status:** v1.2. v1.1 decided 2026-10-17 from Sid's and Aryan's AI reviews and
 the team's answers. v1.2 (2026-10-17 evening) adopts Sid's ML index correction
 (`model/handoffs/CONTRACT-CHANGE-PROPOSAL.md`): one evaluated screening model
 instead of the 8/2 weather + wildlife split, feature-level explanations, and
-wildlife as a separate evidence layer.
+wildlife as a separate evidence layer. v1.3 (2026-10-17 night) adds
+`lightning_status` and `warnings_status` so screens can show "clear" / "no
+active warnings" only when the watch actually checked, plus live NWS alerts.
 
 > **This is our base, not a frozen spec.** Build from it, but things will come up
 > once real data and code hit it (an API returns different fields, a feature
@@ -98,6 +100,10 @@ Unique on (`site_id`, `observed_at`, `provider`) so reloads don't duplicate.
 **environmental_events** (NWS warnings, wildfire, flood warnings)
 `id`, `site_id`, `hazard_type`, `event_kind` (e.g. `nws_warning`), `title`,
 `severity`, `starts_at`, `ends_at`, `source_name`, `source_url`, `retrieved_at`
+
+Live NWS alerts (`jobs/nws.py`, every 5 minutes) use `event_kind` `nws_` plus the
+NWS type (`nws_warning`, `nws_watch`, `nws_advisory`, `nws_statement`), `id` and
+`source_url` = the NWS alert URL, and `ends_at` set early if NWS drops the alert.
 
 **wildlife_observations** (training data for the wildlife model)
 `occurrence_id` (GBIF ID), `species`, `observed_at`, `latitude`, `longitude`,
@@ -236,17 +242,42 @@ Errors always look like: `{"error": {"code": "not_found", "message": "Site 123 n
       {"feature": "wind_max_mph", "contribution": 1.2}
     ],
     "active_alert": {"level": "stop_work", "hazard_type": "lightning", "clear_at": "2026-10-17T18:30:00Z"},
-    "open_report_count": 1
+    "open_report_count": 1,
+    "lightning_status": {
+      "status": "stop_work",
+      "checked_at": "2026-10-17T18:04:20Z",
+      "reason": null,
+      "source_name": "NOAA GOES GLM",
+      "source_url": "https://www.goes-r.gov/spacesegment/glm.html"
+    }
   }
 ]
 ```
+`lightning_status.status` is `stop_work` (an open lightning stop-work alert),
+`clear` (the lightning watch checked within the last 5 minutes, its feed works
+and has been watched for 30 minutes, and there's no stop-work alert), or
+`unknown` with a `reason`. **No alert is not the same as clear**: screens show
+"clear" only for `status: "clear"`.
 `score`, `scored_at`, `top_factors` are `null` when the screening index is unavailable; `score_status` says why (`no_data`, `stale`, `invalid`, `research_unapproved`) or is `research` / `validated_prototype` when shown. `active_alert` is `null` if none.
 
 ### `GET /sites/{site_id}`: site detail + breakdown panel
 Returns the site fields, plus:
 `latest_weather` (with `observed_at`), `screening` (full section 4 output, or
-the null/status/reason form), `wildlife_context` (section 4), `active_alerts`
-(list), `environmental_events` (active ones), `recent_reports` (list).
+the null/status/reason form), `wildlife_context` (section 4), `lightning_status`
+(as in `/sites`), `warnings_status`, `active_alerts` (list),
+`environmental_events` (active and upcoming NWS ones), `recent_reports` (list).
+
+```json
+"warnings_status": {
+  "status": "ok",
+  "checked_at": "2026-10-18T01:50:00Z",
+  "source_name": "National Weather Service",
+  "source_url": "https://api.weather.gov/alerts/active"
+}
+```
+`ok` means NWS was checked for this site in the last 15 minutes, so an empty
+`environmental_events` list means "no active NWS alerts". `unknown` means it
+wasn't: show "warning status unavailable", not "none".
 
 ### `GET /alerts`: active alerts
 ```json
@@ -355,6 +386,14 @@ score, so the score stays an honest model output.
 with `level = warning` and the report's `hazard_type` at that site (e.g. a
 wildlife warning for a gator). The alert ends when the report is resolved.
 It uses the same `alerts` table and `alert.started` / `alert.cleared` events.
+
+**NWS warnings:** an active Flood, Flash Flood, Coastal Flood, or Lakeshore
+Flood Warning, Red Flag or Fire Warning, or Heat Advisory / Heat, Excessive
+Heat, or Extreme Heat Warning creates an alert with `level = warning`
+(never `stop_work`; only lightning stops work), the matching `hazard_type`,
+the NWS headline as `message`, `clear_at` = NWS end time, and
+`trigger: {"nws_event", "nws_id"}`. NWS updates keep the same alert
+(`alert.updated`); it ends (`alert.cleared`) when NWS no longer lists it.
 
 ## 8. Lightning data (live)
 
