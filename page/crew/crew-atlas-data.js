@@ -1,5 +1,5 @@
 import {validScore} from './crew-domain.js';
-import {screeningSummary,expireScreening} from './crew-screening.js';
+import {screeningSummary,screeningFactors,expireScreening} from './crew-screening.js';
 
 // Match the crew score bands. A missing reading never becomes a safe score.
 export const RISK_BANDS=Object.freeze([
@@ -38,11 +38,12 @@ export function atlasSummaries(roster,rows) {
   return roster.map(site=>{
     const raw=summaries.get(site.id);
     const modern=raw?.score_status&& !['legacy','sample'].includes(raw.score_status);
-    const score=modern?screeningSummary({...raw,scored_at:raw.scored_at??raw.score_updated_at}):{
+    const score=modern?screeningSummary({...raw,scored_at:raw.scored_at??raw.score_updated_at},Date.now(),{requireFactors:true}):{
       score:validScore(raw?.score)?raw.score:null,score_status:raw?.demo?'sample':validScore(raw?.score)?'legacy':'no_data',
       score_updated_at:raw?.score_updated_at??raw?.scored_at??null,valid_from:raw?.valid_from??null,valid_until:raw?.valid_until??null};
-    return expireScreening({...site,...score,demo:raw?.demo===true,sample:raw?.sample===true,timezone:site.timezone,
-      active_alert:raw?.active_alert??null});
+    return expireScreening({...site,...score,top_factors:score.score!==null&&modern?screeningFactors(raw.top_factors):null,
+      demo:raw?.demo===true,sample:raw?.sample===true,timezone:site.timezone,
+      active_alert:raw?.active_alert??null,lightning_status:raw?.lightning_status??null});
   });
 }
 

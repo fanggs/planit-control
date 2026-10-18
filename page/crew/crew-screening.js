@@ -40,11 +40,15 @@ function freshness(value,now,{summary=false}={}){
   }else if(!summary||value.valid_from!=null||value.valid_until!=null)return 'invalid';
   return null;
 }
-export function screeningSummary(raw,now=Date.now()){
+export function screeningSummary(raw,now=Date.now(),{requireFactors=false}={}){
   const status=raw.score_status;
   if(unavailableStatuses.has(status))return unavailable(status,raw.reason||raw.score_reason||'Screening index unavailable.');
   if(!shownStatuses.has(status))return unavailable('invalid','Screening status was not recognized.');
   if(!number(raw.score)||raw.score<0||raw.score>10)return unavailable('invalid','Screening score is invalid.');
+  if(requireFactors){
+    try{if(!screeningFactors(raw.top_factors).length)return unavailable('invalid','Screening explanation is unavailable.');}
+    catch{return unavailable('invalid','Screening explanation is invalid.');}
+  }
   const problem=freshness(raw,now,{summary:true});
   if(problem)return unavailable(problem,problem==='stale'?'Screening inputs or forecast window are out of date.':'Screening timestamps are incomplete or invalid.');
   return {score:raw.score,score_status:status,score_reason:null,score_updated_at:stamp(raw.scored_at??raw.score_updated_at),
