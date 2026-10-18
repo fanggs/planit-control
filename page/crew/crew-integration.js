@@ -2,6 +2,9 @@
    Revisions below order client requests; they are not backend data or timestamps. */
 import {screeningDetail,screeningSummary,screeningFactors} from './crew-screening.js';
 import {lightningWatch,warningsWatch} from './crew-watch.js';
+import {isSessionExpired} from '../shared/auth-session.mjs';
+import {reportSessionExpired} from './crew-session.js';
+import {heatIndexDisplay} from '../shared/environment-readings.mjs';
 export const HAZARD_LABELS = Object.freeze({
   heat: 'Extreme heat', lightning: 'Lightning', flooding: 'Flooding',
   wildfire: 'Wildfire', soil_saturation: 'Soil saturation', wildlife: 'Wildlife', other: 'Other'
@@ -58,18 +61,51 @@ function displayHazards(raw, activeAlerts, now) {
   const weather = raw.latest_weather;
   const observed_at = time(weather?.observed_at);
   const hazards = Object.fromEntries(['weather', 'heat', 'lightning', 'flood', 'wildfire', 'soil', 'wildlife'].map(key => [key, {
-    reading: 'No data', severity: 'unknown', observed_at: null, source_name: undefined, source_url: null
+    reading: 'Reading unavailable', severity: null, observed_at: null, source_name: undefined, source_url: null,
+    advice: 'No assessment was supplied. Missing data is not a safe condition.'
   }]));
   if (weather) {
     const common = {...source(weather), observed_at};
-    hazards.weather = {...hazards.weather, ...common, reading: `Temperature ${format(weather.temperature_f, '°F')} · wind ${format(weather.wind_mph, 'mph')} · rain ${format(weather.precip_24h_in, 'in / 24 h')}`};
-    hazards.heat = {...hazards.heat, ...common, reading: `Heat index ${format(weather.heat_index_f, '°F')}`};
-    hazards.soil = {...hazards.soil, ...common, reading: `Soil moisture ${format(weather.soil_moisture, 'm³/m³')}`};
+    hazards.weather = {...hazards.weather, ...common,
+      reading: `Temperature ${format(weather.temperature_f, '°F')} · wind ${format(weather.wind_mph, 'mph')} · rain ${format(weather.precip_24h_in, 'in / 24 h')}`,
+      advice: 'These are measurements, not an overall weather safety assessment.'};
+    const air = weather.temperature_f;
+    hazards.heat = {...hazards.heat, ...common, reading: heatIndexDisplay(weather),
+      advice: finite(weather.heat_index_f) ? 'Measured inputs produced this hot-weather index; no work clearance is implied.'
+        : finite(air) && air < 80 ? 'Not applicable to this hot-weather formula; other heat and site hazards still matter.'
+        : finite(air) && air > 112 ? 'Outside the supported calculation range. Heat exposure may still be severe.'
+        : 'The calculation or its inputs are unavailable. Do not infer that heat is safe.'};
+    hazards.soil = {...hazards.soil, ...common, reading: `Soil moisture ${format(weather.soil_moisture, 'm³/m³')}`,
+      advice: 'Measurement only. No ground-bearing or saturation assessment was supplied.'};
   }
+  const lightning = lightningWatch(raw.lightning_status, activeAlerts, now);
+  hazards.lightning = {...hazards.lightning, ...source(raw.lightning_status),
+    reading: lightning.status === 'clear' ? 'No current lightning stop-work hold' : lightning.text,
+    severity: lightning.status === 'stop_work' ? 'high' : null,
+    observed_at: time(raw.lightning_status?.checked_at), time_label: 'Checked',
+    advice: lightning.status === 'clear' ? 'The lightning watch checked recently. This does not clear other hazards.'
+      : raw.lightning_status?.reason || 'A missing or stale watch is not an all-clear.'};
+  const warnings = warningsWatch(raw.warnings_status, raw.environmental_events, now);
+  for (const [key, label] of [['flood', 'flood'], ['wildfire', 'fire-weather']]) {
+    hazards[key] = {...hazards[key], ...source(raw.warnings_status),
+      reading: warnings.status === 'ok' ? `No active NWS ${label} warning returned` : 'NWS warning status unavailable',
+      observed_at: time(raw.warnings_status?.checked_at), time_label: 'Checked',
+      advice: warnings.status === 'ok' ? 'This is a warning-feed check, not an assessment that the site is safe.'
+        : 'The NWS check is missing or stale; an empty warning list cannot confirm safety.'};
+  }
+  const wildlife = raw.wildlife_context;
+  const sightings = Array.isArray(wildlife?.sightings) ? wildlife.sightings : [];
+  hazards.wildlife = {...hazards.wildlife,
+    reading: wildlife?.status === 'recorded_sightings' ? `${sightings.length} recorded sighting${sightings.length === 1 ? '' : 's'} nearby · details below`
+      : wildlife?.status === 'no_records_in_sample' ? 'No sightings in this limited sample · details below'
+      : 'Wildlife evidence unavailable · details below',
+    advice: 'Historical sightings are not a live encounter assessment; crew observations appear separately.'};
   for (const event of raw.environmental_events || []) {
     if (!activeEvent(event, now)) continue;
     const key = displayKeys[event.hazard_type];
-    if (key) hazards[key] = {...hazards[key], ...source(event), reading: event.title || 'Environmental warning', severity: eventSeverity(event.severity), observed_at: null};
+    if (key) hazards[key] = {...hazards[key], ...source(event), reading: event.title || 'Environmental warning',
+      severity: eventSeverity(event.severity), observed_at: time(event.starts_at), time_label: 'Started',
+      advice: 'Review the attributed event and follow your supervisor’s site instructions.'};
   }
   for (const alert of activeAlerts) {
     const key = displayKeys[alert.hazard_type];
@@ -77,7 +113,12 @@ function displayHazards(raw, activeAlerts, now) {
     const report = (raw.recent_reports || []).find(r => String(r.id) === String(alert.trigger?.report_id));
     hazards[key] = {...hazards[key], reading: alert.message,
       severity: alert.level === 'stop_work' || report?.severity === 'high' ? 'high' : 'elevated',
-      observed_at: time(alert.last_trigger_at || alert.started_at), source_name: report ? 'Crew report' : 'Site alert'};
+      observed_at: time(alert.last_trigger_at || alert.started_at), time_label: 'Updated',
+      source_name: report ? 'Crew report' : 'Site alert',
+      is_replay: alert.trigger?.is_replay === true,
+      advice: alert.trigger?.is_replay === true
+        ? 'Recorded storm replay for the demo, not a current lightning observation.'
+        : 'An active site alert takes precedence over an empty or unavailable feed.'};
   }
   return hazards;
 }
@@ -100,6 +141,7 @@ export function createContractMapper({now = () => Date.now()} = {}) {
     const clear = watched ? watched.status === 'clear' : confirmedClear || previous?.alert?.status === 'cleared';
     const alert = {site_id: id, version: revision, status: hold ? 'hold' : clear ? 'cleared' : 'unknown',
       contract_id: hold?.id ?? previous?.alert?.contract_id ?? null,
+      is_replay: hold?.trigger?.is_replay === true,
       all_clear_at: hold?.clear_at ?? null, last_strike_at: hold?.last_trigger_at ?? null,
       distance_miles: finite(hold?.trigger?.distance_mi) ? hold.trigger.distance_mi : null};
     // A stale same-alert response must not shorten a hold that already incorporated a newer strike.
@@ -160,7 +202,7 @@ function mapWildlife(raw,id){
 /* Alan supplies the DeepSpace SDK connection through this small frontend boundary.
    Events are invalidation notices: fetch authorized API data before updating screens. */
 export function subscribeContractEvents({siteId, getSource, getToken, readSite, listSites,
-  onEvent, onConnection, heartbeatMs = 45000, timers = globalThis, retryBaseMs = 1000}) {
+  onEvent, onConnection, heartbeatMs = 45000, timers = globalThis, browser = globalThis, retryBaseMs = 1000}) {
   const types = new Set(['alert.started', 'alert.updated', 'alert.cleared', 'report.created', 'report.resolved', 'scores.updated']);
   let stopped = false, generation = 0, cleanup, retry, heartbeat, opening;
   let connected = false, confirming = false, attempt = 0, queue = Promise.resolve(), pendingScores;
@@ -172,8 +214,18 @@ export function subscribeContractEvents({siteId, getSource, getToken, readSite, 
     const close = cleanup; cleanup = undefined;
     try { close?.(); } catch { /* The SDK connection is already lost. */ }
     onConnection(false);
+    if(browser.navigator?.onLine===false)return;
     retry = timers.setTimeout(connect, Math.min(30000, retryBaseMs * 2 ** Math.min(attempt++, 5)));
     retry?.unref?.();
+  }
+  function fail(gen,error){
+    if(!current(gen))return;
+    if(!isSessionExpired(error)){reconnect(gen);return;}
+    stopped=true;generation++;connected=false;confirming=false;pendingScores=undefined;
+    timers.clearTimeout(retry);clearTimers();
+    const close=cleanup;cleanup=undefined;
+    try{close?.();}catch{/* The subscription is already closed. */}
+    onConnection(false);reportSessionExpired(error);
   }
   async function refresh(gen, notice) {
     if (!current(gen)) return;
@@ -191,12 +243,13 @@ export function subscribeContractEvents({siteId, getSource, getToken, readSite, 
   }
 
   function enqueue(gen, task) {
-    queue = queue.then(() => current(gen) ? task() : undefined).catch(() => reconnect(gen));
+    queue = queue.then(() => current(gen) ? task() : undefined).catch(error => fail(gen,error));
   }
   async function connect() {
     if (stopped) return;
     const gen = ++generation; queue = Promise.resolve(); confirming = false; pendingScores = undefined;
     onConnection(false);
+    if(browser.navigator?.onLine===false)return;
     opening = timers.setTimeout(() => reconnect(gen), heartbeatMs);
     opening?.unref?.();
     try {
@@ -242,12 +295,27 @@ export function subscribeContractEvents({siteId, getSource, getToken, readSite, 
       if (!current(gen)) { if (typeof unsubscribe === 'function') unsubscribe(); return; }
       if (typeof unsubscribe !== 'function') throw new Error('The real-time source must supply an unsubscribe function.');
       cleanup = unsubscribe;
-    } catch { reconnect(gen); }
+    } catch(error) { fail(gen,error); }
   }
+  const offline=()=>{
+    if(stopped)return;
+    generation++;connected=false;confirming=false;pendingScores=undefined;
+    timers.clearTimeout(retry);clearTimers();
+    const close=cleanup;cleanup=undefined;
+    try{close?.();}catch{/* The subscription is already closed. */}
+    onConnection(false);
+  };
+  const online=()=>{
+    if(stopped)return;
+    offline();void connect();
+  };
+  browser.addEventListener?.('offline',offline);
+  browser.addEventListener?.('online',online);
   connect();
   return () => {
     stopped = true; generation++; connected = false;
     timers.clearTimeout(retry); clearTimers();
+    browser.removeEventListener?.('offline',offline);browser.removeEventListener?.('online',online);
     const close = cleanup; cleanup = undefined;
     try { close?.(); } catch { /* Closing an already-disconnected SDK is harmless. */ }
   };

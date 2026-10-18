@@ -23,7 +23,7 @@ test('hazard cards preserve API units, zero readings and missing data without in
   assert.equal(site.flood.river_distance_miles,null);assert.equal(site.flood.rainfall_reading,'3.4 in');
   raw.latest_weather.precip_24h_in=0;raw.latest_weather.heat_index_f=null;raw.score=null;
   const missing=mapper.site(raw);
-  assert.match(missing.hazards.weather.reading,/0 in/);assert.match(missing.hazards.heat.reading,/No data/);
+  assert.match(missing.hazards.weather.reading,/0 in/);assert.match(missing.hazards.heat.reading,/Unavailable/);
   assert.equal(missing.score,null);assert.deepEqual(missing.factors,[]);assert.equal(missing.baseline,null);
 });
 test('only actual lightning stop-work alerts create holds, not report or flood warnings',()=>{

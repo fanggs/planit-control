@@ -71,6 +71,34 @@ test('API failures keep notifications disconnected and an unconfigured provider 
   close();assert.equal(timers.timeouts.size,0);
 });
 
+test('expired authentication stops the crew reconnect loop',async()=>{
+  const timers=clock(),connections=[];
+  const stop=subscribeContractEvents({siteId:'621',timers,
+    getSource:()=>({subscribe(){assert.fail('No socket after expired auth');}}),
+    getToken:async()=>{throw Object.assign(new Error('Login needed'),{error:'missing_refresh_token'});},
+    readSite:async()=>({}),listSites:async()=>[],onEvent(){},onConnection:value=>connections.push(value)});
+  await flush();
+  assert.equal(timers.timeouts.size,0);
+  assert.equal(connections.at(-1),false);
+  stop();
+});
+
+test('offline pauses crew retries and online refetches before connected',async()=>{
+  const timers=clock(),listeners=new Map(),browser={navigator:{onLine:false},
+    addEventListener(type,handler){listeners.set(type,handler);},removeEventListener(type){listeners.delete(type);}};
+  let callbacks,reads=0;const connections=[];
+  const stop=subscribeContractEvents({siteId:null,timers,browser,
+    getSource:()=>({subscribe(value){callbacks=value;return()=>{};}}),getToken:async()=>'token',
+    readSite:async()=>({}),listSites:async()=>{reads++;return[];},onEvent(){},onConnection:value=>connections.push(value)});
+  await flush();assert.equal(callbacks,undefined);assert.equal(timers.timeouts.size,0);
+  browser.navigator.onLine=true;listeners.get('online')();await flush();
+  callbacks.onConnection(true);await flush();assert.equal(reads,1);assert.equal(connections.at(-1),true);
+  browser.navigator.onLine=false;listeners.get('offline')();assert.equal(connections.at(-1),false);
+  browser.navigator.onLine=true;listeners.get('online')();await flush();callbacks.onConnection(true);await flush();
+  assert.equal(reads,2);assert.equal(connections.at(-1),true);
+  stop();assert.equal(listeners.size,0);
+});
+
 test('score batches update the selected site from the API and ignore unrelated or malformed ID lists',async()=>{
   const h=harness(),stop=h.api.subscribeEvents('9001',e=>h.events.push(e),c=>h.connections.push(c));
   try{

@@ -39,6 +39,21 @@ test('a missing realtime provider reports unavailable and schedules retry, not c
   await settle(); assert.ok(statuses.every(value => value === false)); assert.equal(retries, 1); stop();
 });
 
+test('expired authentication stops retrying and asks the page for sign-in', async () => {
+  let retries = 0, expiries = 0;
+  const statuses = [];
+  const stop = connectRealtime({getSource: () => ({subscribe() { assert.fail('No socket after expired auth'); }}),
+    getToken: async () => { throw Object.assign(new Error('Login needed'), {error: 'missing_refresh_token'}); },
+    onInvalidate: async () => {}, onStatus: value => statuses.push(value),
+    onSessionExpired: () => { expiries++; },
+    timers: {setTimeout: () => ++retries, clearTimeout: () => {}}});
+  await settle();
+  assert.equal(expiries, 1);
+  assert.equal(retries, 0);
+  assert.equal(statuses.at(-1), false);
+  stop();
+});
+
 test('a burst during an in-flight refresh is coalesced into one follow-up', async () => {
   let callbacks, calls = 0;
   const finishes = [], statuses = [];
@@ -65,7 +80,7 @@ test('a failed refresh disconnects and a reconnect refreshes before claiming liv
   const statuses = [];
   const stop = connectRealtime({getToken: async () => 'token', getSource: () => ({subscribe(args) {
     callbacks = args; return () => cleanup++;
-  }}), timers: {setTimeout(callback, delay) { if (delay === 10000) retry = callback; return 1; }, clearTimeout() {}},
+  }}), timers: {setTimeout(callback, delay) { if (delay === 1000) retry = callback; return 1; }, clearTimeout() {}},
     onStatus: value => statuses.push(value), onInvalidate: async () => {
       if (++calls === 1) throw new Error('API offline');
     }});
@@ -80,6 +95,26 @@ test('a failed refresh disconnects and a reconnect refreshes before claiming liv
   callbacks.onConnection(true); await settle();
   assert.equal(calls, 2); assert.equal(statuses.at(-1), true);
   stop();
+});
+
+test('offline pauses retries and online reconnects with a fresh API snapshot', async () => {
+  const listeners = new Map(), browser = {navigator: {onLine: false},
+    addEventListener(type, callback) { listeners.set(type, callback); },
+    removeEventListener(type) { listeners.delete(type); }};
+  let subscriptions = 0, snapshots = 0, retries = 0, callbacks;
+  const stop = connectRealtime({browser, getToken: async () => 'token',
+    getSource: () => ({subscribe(value) { subscriptions++; callbacks = value; return () => {}; }}),
+    onInvalidate: async () => { snapshots++; }, onStatus() {},
+    timers: {setTimeout: () => ++retries, clearTimeout: () => {}}});
+  await settle(); assert.equal(subscriptions, 0); assert.equal(retries, 0);
+  browser.navigator.onLine = true; listeners.get('online')(); await settle();
+  assert.equal(subscriptions, 1); callbacks.onConnection(true); await settle();
+  assert.equal(snapshots, 1);
+  browser.navigator.onLine = false; listeners.get('offline')(); await settle();
+  assert.equal(retries, 1); // Only the prior opening watchdog was allocated.
+  browser.navigator.onLine = true; listeners.get('online')(); await settle();
+  callbacks.onConnection(true); await settle(); assert.equal(snapshots, 2);
+  stop(); assert.equal(listeners.size, 0);
 });
 
 test('the configured DeepSpace bridge delivers ID notices and refreshes authorized dashboard data', async () => {

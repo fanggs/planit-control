@@ -8,6 +8,7 @@ import {services} from './crew-services.js';
 import {rankSites,validScore,riskLabel} from './crew-domain.js';
 import {alertView} from './crew-state.js';
 import {expireScreening} from './crew-screening.js';
+import {sessionExpired} from './crew-session.js';
 import {esc,scorePanel,floodHTML,makeMap,dateLabel,safeURL,scoreBadgeHTML,scoreWindowHTML,topFactorsHTML,watchPanel,wildlifeHTML} from './crew-ui.js';
 const root=document.getElementById('crew-supervisor-root');
 const state={sites:[],filtered:[],map:null,layer:null,reportLayer:null,photoURLs:[],selected:null,page:0,version:0,listVersion:0,unsubscribe:null,connected:false,detailVersion:0,lastEvent:0};
@@ -90,8 +91,9 @@ function updateStream(){const element=document.getElementById('supervisor-stream
     const flood=document.querySelector('#supervisor-detail .crew-flood');
     if(flood){const html=floodHTML(state.selectedSnapshot);if(flood.outerHTML!==html)flood.outerHTML=html;}
   }
-  if(!navigator.onLine||Date.now()-state.lastEvent>config.api.heartbeatMs)state.connected=false;element.textContent=state.connected?(config.dataMode==='mock'?'Sample updates':'Live updates'):'Updates disconnected';}
+  if(!navigator.onLine||Date.now()-state.lastEvent>config.api.heartbeatMs)state.connected=false;element.textContent=sessionExpired()?'Sign-in expired · live updates paused':state.connected?(config.dataMode==='mock'?'Sample updates':'Live updates'):'Updates disconnected';}
 async function refresh(incoming,affectedIds){
+  if(sessionExpired())return;
   const version=state.version,listVersion=++state.listVersion,button=document.getElementById('supervisor-refresh');if(!button)return;button.disabled=true;
   try{const sites=Array.isArray(incoming)?incoming:await services.listSites();if(version!==state.version||listVersion!==state.listVersion)return;if(!Array.isArray(sites))throw new Error('Invalid site list.');state.sites=sites;applyFilters();if(state.selected&&(!Array.isArray(affectedIds)||affectedIds.includes(state.selected)))await selectSite(state.selected,false);}catch(error){message(error.message);}finally{if(button.isConnected&&listVersion===state.listVersion)button.disabled=false;}
 }
@@ -153,6 +155,7 @@ async function selectSite(id,focus=true){
 document.addEventListener('click',event=>{const site=event.target.closest('[data-select-site]');if(site)selectSite(site.dataset.selectSite);});
 setInterval(updateStream,1000);setInterval(()=>{if(document.getElementById('supervisor-map')&&!document.hidden)refresh();},30000);
 window.addEventListener('offline',()=>{state.connected=false;updateStream();});window.addEventListener('online',refresh);window.addEventListener('pagehide',()=>{state.unsubscribe?.();state.map?.remove();});
+window.addEventListener('planit:session-expired',()=>{state.unsubscribe?.();state.unsubscribe=null;state.connected=false;updateStream();});
 window.addEventListener('pageshow',event=>{if(event.persisted)open();});
 async function boot(){
   if(config.themeStylesheet){const link=document.createElement('link');link.rel='stylesheet';link.href=config.themeStylesheet;document.head.insertBefore(link,document.head.querySelector('link[href="crew.css"]'));}

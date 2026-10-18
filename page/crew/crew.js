@@ -9,6 +9,7 @@ import {acceptSnapshot,rankSites} from './crew-domain.js';
 import {esc,sourceLink,dateLabel,hazardHTML,scorePanel,floodHTML,wildlifeHTML,watchPanel} from './crew-ui.js';
 import {expireScreening} from './crew-screening.js';
 import {icon,brandMark,contourArt} from './crew-visuals.js';
+import {sessionExpired} from './crew-session.js';
 import {mountReports} from './crew-reports.js';
 import {mountBriefing} from './crew-briefing.js';
 import {mountAsk} from './crew-ask.js';
@@ -55,6 +56,7 @@ async function loadSite(id){
 }
 function alignClock(time){if(Number.isFinite(Date.parse(time)))state.clockOffset=Date.parse(time)-Date.now();}
 async function refreshSite(version=state.loadVersion,incoming){
+  if(sessionExpired())return;
   const id=state.site?.id;if(!id)return;
   try{
     const next=incoming||await services.readSite(id);if(version!==state.loadVersion)return;
@@ -104,7 +106,7 @@ function updateAlert(){
   const view=alertView(state.alert,state.connected,Date.now()+state.clockOffset,state.site?.lightning_status);
   $('#crew-alert').dataset.tone=view.tone;if($('#crew-alert-title').textContent!==view.title)$('#crew-alert-title').textContent=view.title;if($('#crew-alert-detail').textContent!==view.detail)$('#crew-alert-detail').textContent=view.detail;
   $('#crew-countdown').textContent=view.seconds===null?'':`${String(Math.floor(view.seconds/60)).padStart(2,'0')}:${String(view.seconds%60).padStart(2,'0')}`;
-  $('#crew-stream').textContent=(state.connected?(config.dataMode==='mock'?'Sample stream connected':'Notifications connected · check reading timestamps'):'Updates disconnected · confirm with your supervisor')+(state.alert?.last_strike_at?' · Last strike: '+dateLabel(state.alert.last_strike_at):'');
+  $('#crew-stream').textContent=(sessionExpired()?'Sign-in expired · live updates paused':state.connected?(config.dataMode==='mock'?'Sample stream connected':'Notifications connected · check reading timestamps'):'Updates disconnected · confirm with your supervisor')+(state.alert?.last_strike_at?' · Last strike: '+dateLabel(state.alert.last_strike_at):'');
   const watch=$('#crew-watch-panel'),floodPanel=$('#crew-flood-panel');
   if(watch){const html=watchPanel(state.site);if(watch.innerHTML!==html)watch.innerHTML=html;}
   if(floodPanel){const html=floodHTML(state.site);if(floodPanel.innerHTML!==html)floodPanel.innerHTML=html;}
@@ -134,6 +136,7 @@ setInterval(updateAlert,1000);document.addEventListener('visibilitychange',()=>{
 setInterval(()=>{if(state.site&&state.user&&!document.hidden)refreshSite();},30000);
 window.addEventListener('offline',()=>{state.connected=false;updateAlert();});window.addEventListener('online',()=>{if(state.user&&state.site)loadSite(String(state.site.id));});
 window.addEventListener('pagehide',()=>{state.unsubscribe?.();cleanupView();});
+window.addEventListener('planit:session-expired',()=>{state.unsubscribe?.();state.unsubscribe=null;state.connected=false;updateAlert();});
 window.addEventListener('pageshow',event=>{if(event.persisted&&state.user&&state.site)loadSite(String(state.site.id));});
 async function boot(){
   if(config.themeStylesheet){const link=document.createElement('link');link.rel='stylesheet';link.href=config.themeStylesheet;link.onerror=()=>message('Shared theme unavailable. Using crew-scoped fallback styles.');document.head.insertBefore(link,document.head.querySelector('link[href="crew.css"]'));}

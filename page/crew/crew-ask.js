@@ -7,6 +7,9 @@ const EXAMPLES = [
   'Are there any active lightning alerts?'
 ];
 
+export const shouldSubmitAskOnKey = event => event.key === 'Enter' && !event.shiftKey
+  && !event.isComposing && !event.repeat;
+
 // Mounts inside the existing authenticated crew workspace. No question, SQL,
 // or answer is treated as HTML; the API is the only source of live answers.
 export function mountAsk(root, ask, {sample = false} = {}) {
@@ -15,6 +18,7 @@ export function mountAsk(root, ask, {sample = false} = {}) {
     <p class="crew-muted">Questions use the monitored-site database. Answers are not safety clearance; verify site alerts and source times before field decisions.</p>
     <form id="crew-ask-form"><label for="crew-ask-question">Your question</label>
       <textarea id="crew-ask-question" rows="3" minlength="3" maxlength="500" placeholder="Which sites have active lightning alerts?"></textarea>
+      <small>Press Enter to ask; Shift+Enter adds a new line.</small>
       <button class="crew-button" type="submit">Ask data</button></form>
     <p id="crew-ask-status" role="status" aria-live="polite"></p>
     <div id="crew-ask-examples" class="crew-ask-examples"><strong>Try a question</strong></div>
@@ -32,6 +36,11 @@ export function mountAsk(root, ask, {sample = false} = {}) {
   setBusy(false);
   if(sample){status.textContent='Questions require live data. Sample mode does not call Gemini.';return ()=>{alive=false;};}
   status.textContent='Ready for a question about monitored plants, forecasts, alerts, or prototype screening.';
+  question.addEventListener('keydown',event=>{
+    if(shouldSubmitAskOnKey(event)){
+      event.preventDefault();form.requestSubmit();
+    }
+  });
   form.addEventListener('submit',async event=>{
     event.preventDefault();if(!alive||busy)return;
     const value=question.value.trim();result.replaceChildren();

@@ -8,6 +8,8 @@ import {createRefreshQueue} from './refresh.js';
 import {createPhotoCache} from './photo-cache.js';
 import {bindPageLifecycle, changeSelectedSite, markDetailStale} from './lifecycle.js';
 import {detailScreeningStatus, screeningAvailability, screeningAvailabilityChanged, updateWatchChips} from './status-clock.js';
+import {isSessionExpired} from '../shared/auth-session.mjs';
+import {heatIndexDisplay} from '../shared/environment-readings.mjs';
 import {assessScore, coordinates, countdown, featureLabel, finite, freshness, hasSupervisorRole, label,
   lightningDisplay, points, isReplayAlert, openReportPins, rankSites, riskTone, safeSourceURL,
   siteHasReplayAlert, siteTime, summaryScreening, validFactors, warningsDisplay, wildlifeSummary} from './domain.js';
@@ -18,6 +20,7 @@ const state = {sites: [], alerts: null, selected: null, detail: null, detailStal
   reports: [], search: '', filter: 'all'};
 let api, auth, map, siteLayer, reportLayer, detailGeneration = 0, photoGeneration = 0;
 let stopRealtime, poll, countdownTimer, user, resolving = false;
+let sessionExpired = false;
 let renderedScreening = new Map();
 const photos = createPhotoCache();
 const siteMarkers = new Map();
@@ -39,8 +42,26 @@ function watchChip(text, tone, kind, siteId, scope = 'summary') {
   return node;
 }
 function note(text, warning = false) { return el('p', text, `note${warning ? ' warning-note' : ''}`); }
-function showError(error) { $('error').textContent = error.message || String(error); $('error').hidden = false; }
-function clearError() { $('error').hidden = true; $('error').textContent = ''; }
+function expireSession() {
+  if (sessionExpired) return;
+  sessionExpired = true;
+  stopRealtime?.(); stopRealtime = null;
+  clearInterval(poll); poll = null;
+  setAskControls(false);
+  $('refresh').disabled = true;
+  $('connection').dataset.connected = 'false';
+  $('connection').textContent = 'Sign-in expired · live updates paused';
+  $('auth-action').textContent = 'Sign in again';
+  $('error').textContent = 'Your sign-in expired. Sign in again to see live alerts and current site data. The last displayed data may be out of date.';
+  $('error').hidden = false;
+  if (state.detail) { state.detailStale = true; renderDetail(); }
+}
+function showError(error) {
+  if (isSessionExpired(error)) { expireSession(); return; }
+  if (sessionExpired) return;
+  $('error').textContent = error.message || String(error); $('error').hidden = false;
+}
+function clearError() { if (sessionExpired) return; $('error').hidden = true; $('error').textContent = ''; }
 function setAskControls(enabled) {
   $('ask-question').disabled = !enabled;
   $('ask-submit').disabled = !enabled;
@@ -101,10 +122,11 @@ async function submitAsk() {
   try {
     renderAskResult(await api.ask(question));
   } catch (error) {
+    if (isSessionExpired(error)) { showError(error); return; }
     $('ask-error').textContent = askFailureText(error);
     $('ask-error').hidden = false;
     $('ask-status').textContent = 'No answer was returned.';
-  } finally { setAskControls(true); }
+  } finally { setAskControls(!sessionExpired); }
 }
 function bindAsk() {
   $('ask-form').addEventListener('submit', event => { event.preventDefault(); void submitAsk(); });
@@ -361,7 +383,9 @@ function renderWeather(detail) {
     ['Rain · 24 h', 'precip_24h_in', 'in'], ['Rain · 1 h', 'precip_1h_in', 'in'], ['Soil moisture', 'soil_moisture', 'm³/m³']];
   for (const [name, key, unit] of fields) {
     const reading = el('div', null, 'weather-reading');
-    reading.append(el('span', name), el('strong', finite(weather?.[key]) ? `${weather[key]} ${unit}` : 'No data')); grid.append(reading);
+    const value = key === 'heat_index_f' ? heatIndexDisplay(weather)
+      : finite(weather?.[key]) ? `${weather[key]} ${unit}` : 'No data';
+    reading.append(el('span', name), el('strong', value)); grid.append(reading);
   }
   container.append(grid, note(`Observed ${siteTime(weather?.observed_at, detail.timezone)} · ${ageText(weather?.observed_at)}`));
   const source = safeSourceURL(weather?.source_url);
@@ -470,7 +494,8 @@ async function selectSite(id, pan = true) {
 async function fetchData() {
   $('refresh').disabled = true;
   try {
-    const {sites, alerts} = await loadDashboardFeeds(api);
+    const {sites, alerts, alertError} = await loadDashboardFeeds(api);
+    if (isSessionExpired(alertError)) throw alertError;
     state.sites = sites; state.alerts = alerts;
     if (!sites.some(site => site.site_id === state.selected)) updateSelection(rankSites(sites, {allowHistorical: sample})[0]?.site_id ?? null);
     renderMetrics(); renderList();
@@ -479,7 +504,7 @@ async function fetchData() {
     $('updated').textContent = `Fetched ${new Date().toLocaleTimeString([], {hour: 'numeric', minute: '2-digit', second: '2-digit'})}`;
     if (alerts === null) showError(new Error('Alert feed unavailable. The site map is still available, but do not infer safety from missing alerts.'));
     else clearError();
-  } finally { $('refresh').disabled = false; }
+  } finally { $('refresh').disabled = sessionExpired; }
 }
 const refresh = createRefreshQueue(fetchData);
 async function resolveReport(id, button) {
@@ -498,7 +523,7 @@ async function resolveReport(id, button) {
     }
     await refresh();
   } catch (error) {
-    showError(saved ? new Error('Report resolved, but the dashboard could not refresh. Verify current alerts and use Refresh before relying on counts.') : error);
+    showError(saved && !isSessionExpired(error) ? new Error('Report resolved, but the dashboard could not refresh. Verify current alerts and use Refresh before relying on counts.') : error);
   }
   finally {
     resolving = false;
@@ -547,7 +572,7 @@ async function start() {
       return;
     }
     $('identity').textContent = user.name || 'Signed-in user';
-    action.textContent = 'Sign out'; action.addEventListener('click', () => void auth.logout().catch(showError));
+    action.textContent = 'Sign out'; action.addEventListener('click', () => void (sessionExpired ? auth.login() : auth.logout()).catch(showError));
     if (!hasSupervisorRole(user, config.auth.rolesClaim)) throw new Error('A supervisor role is required for this workspace. Ask the Auth0 administrator to configure the agreed role claim.');
     api = createAPI({base: config.apiBase, token: auth.token, timeoutMs: config.requestTimeoutMs});
     setAskControls(true);
@@ -558,7 +583,8 @@ async function start() {
   countdownTimer = setInterval(refreshClock, 1000);
   if (!sample) {
     stopRealtime = connectRealtime({getSource: () => createDeepSpaceSource(config.realtime), getToken: auth.token,
-      onInvalidate: refresh, onStatus(connected) {
+      onInvalidate: refresh, onSessionExpired: showError, onStatus(connected) {
+        if (sessionExpired) return;
         $('connection').dataset.connected = String(connected);
         $('connection').textContent = connected ? 'Live events connected' : 'Polling · live events unavailable';
       }});

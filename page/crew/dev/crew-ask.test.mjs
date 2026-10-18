@@ -1,9 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHTTPAPI} from '../crew-http.js';
+import {shouldSubmitAskOnKey} from '../crew-ask.js';
 
 const settings={baseURL:'https://foresite.work/api'};
 const json=(value,status=200)=>new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json'}});
+
+test('Enter submits a question; Shift+Enter and IME composition retain multiline editing',()=>{
+  assert.equal(shouldSubmitAskOnKey({key:'Enter'}),true);
+  assert.equal(shouldSubmitAskOnKey({key:'Enter',shiftKey:true}),false);
+  assert.equal(shouldSubmitAskOnKey({key:'Enter',isComposing:true}),false);
+  assert.equal(shouldSubmitAskOnKey({key:'Enter',repeat:true}),false);
+});
 
 test('a crew question uses the protected read-only /ask endpoint',async()=>{
   const calls=[];

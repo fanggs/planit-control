@@ -5,6 +5,7 @@ import {validScore} from './crew-domain.js';
 import {esc,dateLabel,scoreBadgeHTML,scoreWindowHTML,topFactorsHTML} from './crew-ui.js';
 import {expireScreening,scoreBadgeText} from './crew-screening.js';
 import {lightningWatch} from './crew-watch.js';
+import {sessionExpired} from './crew-session.js';
 import {REGIONS,RISK_BANDS,atlasRisk,atlasRank,atlasRoster,atlasSummaries,atlasFilter,atlasPoint,atlasZoom,atlasEase,atlasPins,layoutAtlasLabels} from './crew-atlas-data.js';
 
 const $=selector=>document.querySelector(selector),canvas=$('#atlas-canvas'),ctx=canvas.getContext('2d');
@@ -179,26 +180,37 @@ on(canvas,'keydown',e=>{
 on(document,'visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(raf);raf=0;if(animation)Object.assign(camera,animation.to);animation=null;pulse=0;}else request();});
 const resize=new ResizeObserver(build);resize.observe(canvas);
 on(window,'pagehide',()=>{stopScoreUpdates?.();stopScoreUpdates=undefined;updatesConnected=false;cancelAnimationFrame(raf);raf=0;});on(window,'pageshow',e=>{if(e.persisted){build();if(config.dataMode==='live')void refreshScores().then(startScoreUpdates);}});
+on(window,'planit:session-expired',()=>{stopScoreUpdates?.();stopScoreUpdates=undefined;updatesConnected=false;scoreStatus();});
 function scoreStatus(){
   const scored=state.sites.filter(s=>validScore(s.score)).length;
   const prototypes=state.sites.filter(s=>['research','validated_prototype'].includes(s.score_status)&&validScore(s.score)).length;
-  $('#atlas-data-status').textContent=state.scoreState==='unavailable'?'VERIFIED LOCATIONS / SCORE FEED UNAVAILABLE':config.dataMode==='mock'?`SAMPLE SCORES · ${scored} REAL PLANT LOCATIONS`:`${scored} OF 60 SCORES · ${prototypes} PROTOTYPE · ${updatesConnected?'LIVE UPDATES':'UPDATES DISCONNECTED'}`;
+  $('#atlas-data-status').textContent=sessionExpired()?'SIGN-IN EXPIRED / LIVE UPDATES PAUSED':state.scoreState==='unavailable'?'VERIFIED LOCATIONS / SCORE FEED UNAVAILABLE':config.dataMode==='mock'?`SAMPLE SCORES · ${scored} REAL PLANT LOCATIONS`:`${scored} OF 60 SCORES · ${prototypes} PROTOTYPE · ${updatesConnected?'LIVE UPDATES':'UPDATES DISCONNECTED'}`;
 }
 function startScoreUpdates(){
-  if(config.dataMode!=='live'||!sourceAPI||stopScoreUpdates)return;
+  if(config.dataMode!=='live'||!sourceAPI||stopScoreUpdates||sessionExpired())return;
   stopScoreUpdates=watchAtlasScores({api:sourceAPI,roster:state.roster,
     onSites(sites){state.sites=sites;state.scoreState='connected';filter();scoreStatus();},
     onConnection(connected){updatesConnected=connected;scoreStatus();},onError(error){announce(error.message);}});
 }
 async function refreshScores(){
   const button=$('#atlas-data-refresh');button.disabled=true;
+  if(sessionExpired()){
+    scoreStatus();button.disabled=false;
+    announce('Sign in again before requesting current scores. The displayed map may be out of date.');
+    return;
+  }
   try{
     if(config.dataMode==='live'&&!sourceAPI){const auth=await import('./crew-auth.js');await auth.initAuth();const user=await auth.session();const {userRoles}=await import('./crew-routing.js');if(!user||!userRoles(user,config.authRoleClaim).length){button.textContent='Sign in for scores ↗';button.onclick=()=>{location.href='login.html?start=1&site='+encodeURIComponent(state.selected);};throw new Error('Sign in to load scores. Location data remains available.');}sourceAPI=(await import('./crew-services.js')).services;}
     sourceAPI??=(await import('./crew-services.js')).services;
     state.sites=atlasSummaries(state.roster,await sourceAPI.listSites());state.scoreState='connected';filter();
     scoreStatus();button.textContent='Refresh scores ↻';
-  }catch(error){state.sites=atlasSummaries(state.roster,[]);state.scoreState='unavailable';filter();$('#atlas-data-status').textContent='VERIFIED LOCATIONS / SCORE FEED UNAVAILABLE';announce(error.message);}
-  finally{button.disabled=false;}
+  }catch(error){
+    if(sessionExpired()){
+      scoreStatus();announce('Sign in again before requesting current scores. The displayed map may be out of date.');
+    }else{
+      state.sites=atlasSummaries(state.roster,[]);state.scoreState='unavailable';filter();scoreStatus();announce(error.message);
+    }
+  }finally{button.disabled=sessionExpired();}
 }
 on($('#atlas-data-refresh'),'click',()=>{if(!$('#atlas-data-refresh').onclick)refreshScores();});
 async function getJSON(path){const response=await fetch(new URL(path,import.meta.url));if(!response.ok)throw new Error('A required map data file could not be loaded.');return response.json();}
