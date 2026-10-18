@@ -1,34 +1,70 @@
-"""Site, score, and weather shapes for GET /sites and GET /sites/{site_id}.
+"""Site, screening, and weather shapes for GET /sites and GET /sites/{site_id}.
 
-Field names follow api/CONTRACT.md sections 3 to 5. Anything that can be
+Field names follow api/CONTRACT.md sections 3 to 5 (v1.2). Anything that can be
 missing is nullable, because missing data must show as "no data", never zero.
 """
 
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal
+from typing import Annotated, Literal, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 
 from api.schemas.hazard_report import HazardType, SiteId
 
 
-class Factor(BaseModel):
-    hazard_type: HazardType
+ShownStatus = Literal["research", "validated_prototype"]
+UnavailableStatus = Literal["no_data", "stale", "invalid", "research_unapproved"]
+
+
+class FeatureFactor(BaseModel):
+    """One model feature's push on the score (a feature, not a hazard)."""
+
+    feature: str
     contribution: float  # can be negative
 
 
-class HazardScore(BaseModel):
-    """Model output. baseline + sum(contributions) == score, within 0.05."""
+class Screening(BaseModel):
+    """Screening index (contract section 4). baseline + sum(contributions) == score."""
 
-    site_id: SiteId
     score: float
     baseline: float
+    factors: list[FeatureFactor]
+    status: ShownStatus  # "research" must be shown with a Prototype label
+    target: str
     scored_at: datetime
-    horizon_hours: int
-    model_version: str
-    factors: list[Factor]
+    captured_at: datetime
+    valid_from: datetime
+    valid_until: datetime
+    artifact_sha256: str
+    snapshot_id: str
+    clears_stop_work: Literal[False]
+
+
+class ScreeningUnavailable(BaseModel):
+    """Missing, stale, invalid, or unapproved: null score, never zero."""
+
+    score: None
+    baseline: None
+    factors: list[FeatureFactor]
+    status: UnavailableStatus
+    reason: str
+
+
+ScreeningResult = Annotated[Union[Screening, ScreeningUnavailable], Field(discriminator="status")]
+
+
+class WildlifeContext(BaseModel):
+    """Dated GBIF sightings near the site. Evidence only: no score or probability."""
+
+    model_config = ConfigDict(extra="allow")  # radius, limitations, provenance hashes
+
+    site_id: SiteId
+    status: str
+    sightings: list[dict]
+    encounter_probability: None
+    numeric_score_contribution: None = None
 
 
 class ActiveAlertSummary(BaseModel):
@@ -49,7 +85,8 @@ class SiteSummary(BaseModel):
     hazard_region: str
     score: float | None
     scored_at: datetime | None
-    top_factors: list[Factor] | None
+    score_status: ShownStatus | UnavailableStatus
+    top_factors: list[FeatureFactor] | None
     active_alert: ActiveAlertSummary | None
     open_report_count: int
 
@@ -92,7 +129,8 @@ class SiteDetail(BaseModel):
     plant_type: str
     hazard_region: str
     latest_weather: LatestWeather | None
-    score: HazardScore | None
+    screening: ScreeningResult
+    wildlife_context: WildlifeContext
     active_alerts: list[dict]
     environmental_events: list[EnvironmentalEvent]
     recent_reports: list[dict]

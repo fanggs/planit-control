@@ -20,11 +20,14 @@ from urllib.parse import urlsplit
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import OperationalError
 
 from api import db, site_data
 from api.auth.hazard_auth import Auth0Config, Principal, create_auth_dependency, require_roles
 from api.schemas.alerts import Alert, Briefing
 from api.schemas.sites import SiteDetail, SiteSummary
+from db.screening_read import unavailable
+from get_data.site_context import for_site
 
 LIVE_ALERTS = site_data.ROOT / "data" / "live" / "alerts.json"
 LEVEL_RANK = {"stop_work": 2, "warning": 1}
@@ -121,9 +124,14 @@ def _reports() -> list[dict]:
     return site_data.sample("reports") if site_data.mode() == "sample" else []
 
 
+def _screening(site: dict) -> dict:
+    return site.get("screening") or unavailable("no_data", "No stored screening prediction")
+
+
 def _summary(site: dict, alerts: list[dict], reports: list[dict]) -> dict:
     top = _site_alerts(site["site_id"], alerts)
-    score = site.get("score")  # full model output when one exists
+    screening = _screening(site)
+    shown = screening["score"] is not None  # a real 0 is still a score
     return {
         "site_id": site["site_id"],
         "name": site["name"],
@@ -132,9 +140,11 @@ def _summary(site: dict, alerts: list[dict], reports: list[dict]) -> dict:
         "longitude": site["longitude"],
         "timezone": site["timezone"],
         "hazard_region": site["hazard_region"],
-        "score": score["score"] if score else None,
-        "scored_at": score["scored_at"] if score else None,
-        "top_factors": sorted(score["factors"], key=lambda f: -f["contribution"])[:2] if score else None,
+        "score": screening["score"],
+        "scored_at": screening["scored_at"] if shown else None,
+        "score_status": screening["status"],
+        # The two features that moved the score most, up or down.
+        "top_factors": sorted(screening["factors"], key=lambda f: -abs(f["contribution"]))[:2] if shown else None,
         "active_alert": (
             {"level": top[0]["level"], "hazard_type": top[0]["hazard_type"], "clear_at": top[0]["clear_at"]}
             if top else None
@@ -169,6 +179,15 @@ async def _error_shape(request: Request, exc: HTTPException):
     )
 
 
+# Database down: say so (503) instead of returning empty or sample data.
+@app.exception_handler(OperationalError)
+async def _database_down(request: Request, exc: OperationalError):
+    return JSONResponse(
+        status_code=503,
+        content={"error": {"code": "service_unavailable", "message": "Database unavailable"}},
+    )
+
+
 # ---------------------------------------------------------------- endpoints
 
 @app.get("/health")
@@ -190,7 +209,8 @@ def site_detail(site_id: int):
     return {
         **site,
         "latest_weather": site.get("latest_weather"),
-        "score": site.get("score"),
+        "screening": _screening(site),
+        "wildlife_context": for_site(site_id),
         "active_alerts": _site_alerts(site_id, _alerts()),
         "environmental_events": site_data.active_events(site_id) or site.get("environmental_events", []),
         "recent_reports": [r for r in _reports() if r["site_id"] == site_id],

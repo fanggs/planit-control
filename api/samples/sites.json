@@ -9,13 +9,14 @@
     "hazard_region": "florida_gulf",
     "score": 8.2,
     "scored_at": "2026-10-17T18:00:00Z",
+    "score_status": "research",
     "top_factors": [
       {
-        "hazard_type": "heat",
+        "feature": "heat_index_max_f",
         "contribution": 3.1
       },
       {
-        "hazard_type": "lightning",
+        "feature": "rain_max_1h_in",
         "contribution": 1.9
       }
     ],
@@ -36,13 +37,14 @@
     "hazard_region": "mississippi_corridor",
     "score": 6.6,
     "scored_at": "2026-10-17T18:00:00Z",
+    "score_status": "research",
     "top_factors": [
       {
-        "hazard_type": "flooding",
+        "feature": "month_cos",
         "contribution": 2.6
       },
       {
-        "hazard_type": "soil_saturation",
+        "feature": "rain_total_24h_in",
         "contribution": 1.2
       }
     ],
@@ -63,13 +65,14 @@
     "hazard_region": "california_west",
     "score": 5.7,
     "scored_at": "2026-10-17T18:00:00Z",
+    "score_status": "research",
     "top_factors": [
       {
-        "hazard_type": "wildfire",
+        "feature": "wind_max_mph",
         "contribution": 2.9
       },
       {
-        "hazard_type": "heat",
+        "feature": "heat_index_max_f",
         "contribution": 1.6
       }
     ],
