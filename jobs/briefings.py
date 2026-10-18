@@ -45,10 +45,25 @@ def save(briefings: dict) -> None:
 
 
 def current_alerts() -> list[dict]:
-    try:
+    """Every open alert: lightning stop-work, report warnings, and NWS warnings."""
+    if db.configured():
+        return db.query("""
+            SELECT site_id, hazard_type, level, message, started_at, clear_at, trigger
+            FROM public.alerts WHERE ended_at IS NULL""")
+    try:  # offline: the lightning job's file
         return json.loads((ROOT / "data" / "live" / "alerts.json").read_text())["lightning"]
     except (FileNotFoundError, json.JSONDecodeError, KeyError):
         return []
+
+
+def nws_events() -> list[dict]:
+    """Live NWS alerts still in effect or starting within 2 days (jobs/nws.py)."""
+    if not db.configured():
+        return []
+    return db.query("""
+        SELECT site_id, title, event_kind, starts_at, ends_at FROM public.environmental_events
+        WHERE event_kind LIKE 'nws_%' AND (ends_at IS NULL OR ends_at > now())
+          AND starts_at < now() + interval '2 days'""")
 
 
 def due(site: dict, saved: dict, now: datetime) -> bool:
@@ -76,11 +91,11 @@ def run_once(force: bool = False) -> int:
     if not rows:
         log.warning("no forecasts available; no briefings written")
         return 0
-    written = 0
+    written, alerts, events = 0, current_alerts(), nws_events()
     for site in load_sites():
         if not (force or due(site, saved, now)):
             continue
-        b = briefing_for(site, rows, current_alerts(), now=now)
+        b = briefing_for(site, rows, alerts, now=now, events=events)
         if b is None:
             log.warning("no forecast for %s tomorrow", site["name"])
             continue

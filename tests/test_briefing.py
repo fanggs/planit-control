@@ -5,7 +5,7 @@ Run: .venv/bin/python -m unittest tests.test_briefing -v
 import unittest
 from datetime import date
 
-from api.briefing import daily_facts, grounded, template_briefing
+from api.briefing import context_facts, daily_facts, grounded, nws_for_day, template_briefing
 
 SITE = {"site_id": 621, "name": "Turkey Point", "timezone": "America/New_York"}
 
@@ -63,6 +63,64 @@ class GroundingTest(unittest.TestCase):
     def test_template_is_always_grounded(self):
         text = template_briefing(self.facts, [])
         self.assertEqual(grounded(text, self.facts, []), [])
+
+
+DAY = date(2026, 10, 18)
+
+
+def nws(title, starts, ends, site_id=621):
+    return {"site_id": site_id, "title": title, "event_kind": "nws_warning", "starts_at": starts, "ends_at": ends}
+
+
+class ContextTest(unittest.TestCase):
+    def test_nws_hours_in_site_local_time(self):
+        events = [nws("Heat Advisory issued October 17 at 1:37PM EDT by NWS Miami FL",
+                      "2026-10-18T15:00:00Z", "2026-10-18T23:00:00Z")]  # 11 AM to 7 PM EDT
+        self.assertEqual(nws_for_day(SITE, events, DAY), "Heat Advisory, 11 AM to 7 PM")
+
+    def test_partial_and_all_day_alerts(self):
+        events = [nws("Freeze Warning issued x", "2026-10-18T02:00:00Z", "2026-10-18T13:00:00Z"),   # until 9 AM
+                  nws("Rip Current Statement issued x", "2026-10-17T10:00:00Z", "2026-10-23T00:00:00Z"),
+                  nws("Flood Watch issued x", "2026-10-18T22:00:00Z", None)]                           # from 6 PM
+        self.assertEqual(nws_for_day(SITE, events, DAY),
+                         "Rip Current Statement, all day; Freeze Warning, until 9 AM; Flood Watch, from 6 PM")
+
+    def test_other_days_and_sites_are_skipped(self):
+        events = [nws("Heat Advisory issued x", "2026-10-19T15:00:00Z", "2026-10-19T23:00:00Z"),
+                  nws("Heat Advisory issued x", "2026-10-18T15:00:00Z", "2026-10-18T23:00:00Z", site_id=9)]
+        self.assertIsNone(nws_for_day(SITE, events, DAY))
+
+    def test_nws_update_listed_once(self):
+        e = nws("Flood Warning issued x", "2026-10-18T15:00:00Z", "2026-10-18T23:00:00Z")
+        self.assertEqual(nws_for_day(SITE, [e, dict(e, title="Flood Warning issued y")], DAY),
+                         "Flood Warning, 11 AM to 7 PM")
+
+    def test_screening_shown_or_not_available(self):
+        site = dict(SITE, screening={"score": 1.876, "status": "validated_prototype"})
+        f = context_facts(site, [], DAY)
+        self.assertEqual((f["screening_index_0_to_10"], f["screening_status"]), (1.9, "validated prototype"))
+        f = context_facts(dict(SITE, screening={"score": None, "status": "stale"}), [], DAY)
+        self.assertEqual((f["screening_index_0_to_10"], f["screening_status"]), (None, "not available"))
+        self.assertEqual(context_facts(dict(SITE, screening={"score": 0.0, "status": "research"}), [], DAY)
+                         ["screening_index_0_to_10"], 0.0)  # a real zero is kept
+
+    def test_template_with_alerts_and_screening_is_grounded(self):
+        events = [nws("Heat Advisory issued x", "2026-10-18T15:00:00Z", "2026-10-18T23:00:00Z")]
+        facts = daily_facts(SITE, ROWS, DAY) | context_facts(dict(SITE, screening={"score": 1.876, "status": "research"}), events, DAY)
+        alerts = [{"hazard_type": "heat", "level": "warning", "message": "Heat Advisory until 7 PM EDT"},
+                  {"hazard_type": "lightning", "level": "stop_work", "message": "Lightning 6.2 mi away. Stop work.",
+                   "trigger": {"distance_mi": 6.2}}]
+        text = template_briefing(facts, alerts)
+        self.assertIn("Heat Advisory, 11 AM to 7 PM", text)
+        self.assertIn("stop-work", text)
+        self.assertIn("Prototype screening index 1.9", text)
+        self.assertEqual(grounded(text, facts, alerts), [])
+
+    def test_made_up_warning_hours_are_caught(self):
+        facts = daily_facts(SITE, ROWS, DAY) | context_facts(SITE, [nws("Heat Advisory issued x",
+                    "2026-10-18T15:00:00Z", "2026-10-18T23:00:00Z")], DAY)
+        self.assertEqual(grounded("A Heat Advisory runs 11 AM to 7 PM.", facts, []), [])
+        self.assertEqual(grounded("A Heat Advisory runs 11 AM to 9 PM.", facts, []), ["9"])
 
 
 if __name__ == "__main__":

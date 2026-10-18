@@ -2,6 +2,7 @@
 Next-day safety briefing for one site (Sperry brief, requirement 3).
 
     forecast rows ──> daily_facts()   code computes every number
+    NWS alerts, score ──> context_facts()   tomorrow's warnings and the screening index
                  ──> Gemini           writes the words around those numbers
                  ──> grounded()       every number in the text must be a fact
                  ──> retry once, else template_briefing() (no AI wording)
@@ -104,6 +105,50 @@ def daily_facts(site: dict, rows: list[dict], for_date: date) -> dict | None:
     }
 
 
+def _event_name(title: str) -> str:
+    """NWS headlines read "Freeze Warning issued October 17 at ..."; keep the event."""
+    return title.split(" issued ")[0].strip()
+
+
+def nws_for_day(site: dict, events: list[dict], for_date: date) -> str | None:
+    """NWS alerts in effect during the site's local day, as plain text with local hours."""
+    tz = ZoneInfo(site["timezone"])
+    day_start = datetime.combine(for_date, datetime.min.time(), tz)
+    day_end = day_start + timedelta(days=1)
+    parts = []
+    for e in sorted(events, key=lambda e: e["starts_at"]):
+        if e["site_id"] != site["site_id"]:
+            continue
+        start = datetime.fromisoformat(e["starts_at"].replace("Z", "+00:00")).astimezone(tz)
+        end = datetime.fromisoformat(e["ends_at"].replace("Z", "+00:00")).astimezone(tz) if e.get("ends_at") else None
+        if start >= day_end or (end is not None and end <= day_start):
+            continue
+        if start <= day_start and (end is None or end >= day_end):
+            when = "all day"
+        elif start <= day_start:
+            when = f"until {_hour(end)}"
+        elif end is None or end >= day_end:
+            when = f"from {_hour(start)}"
+        else:
+            when = f"{_hour(start)} to {_hour(end)}"
+        text = f"{_event_name(e['title'])}, {when}"
+        if text not in parts:  # NWS lists an update and its original separately
+            parts.append(text)
+    return "; ".join(parts) or None
+
+
+def context_facts(site: dict, events: list[dict], for_date: date) -> dict:
+    """Tomorrow's NWS alerts and the current screening index, alongside the weather facts."""
+    sc = site.get("screening") or {}
+    shown = sc.get("score") is not None
+    return {
+        "nws_alerts": nws_for_day(site, events, for_date),
+        "screening_index_0_to_10": round(sc["score"], 1) if shown else None,
+        "screening_status": {"validated_prototype": "validated prototype", "research": "research prototype"}.get(
+            sc.get("status"), "not available"),
+    }
+
+
 # ---------------------------------------------------------------- grounding
 
 _NUM = re.compile(r"(?<![\w.])\d+(?:\.\d+)?")
@@ -127,7 +172,8 @@ def allowed_numbers(facts: dict, alerts: list[dict]) -> set[str]:
     for v in facts.values():
         allowed |= _forms(v)
     for a in alerts:
-        allowed |= _forms(a.get("trigger", {}).get("distance_mi"))
+        allowed |= _forms((a.get("trigger") or {}).get("distance_mi"))
+        allowed |= _forms(a.get("message"))
     return {n.lstrip("0") or "0" for n in allowed} | allowed
 
 
@@ -151,6 +197,11 @@ Rules:
 - If a fact is null, say that data is not available. Never estimate or round differently.
 - Do not invent times, temperatures, distances, or chances of rain.
 - 3 to 5 short sentences, plain language, no headings or bullet points.
+- If nws_alerts is not null, name each National Weather Service alert and its hours first.
+- screening_index_0_to_10 is a prototype index of how likely an NWS warning or heat advisory
+  covers the plant in the next 24 hours. If it is not null, mention it once as the
+  "prototype screening index"; never call it injury risk, a probability of harm, or an all-clear.
+- An active alert (below) is in effect now; a lightning stop_work alert means work stops.
 - End with one practical recommendation (start time, hydration, shelter, equipment).
 
 Facts (JSON):
@@ -175,14 +226,23 @@ def template_briefing(facts: dict, alerts: list[dict]) -> str:
         parts.append(f"Rain totaling {facts['total_rain_in']} in, starting around {facts['first_rain_at']}.")
     elif facts["total_rain_in"] is not None:
         parts.append("No rain in the forecast.")
-    if any(a["hazard_type"] == "lightning" for a in alerts):
+    if facts.get("nws_alerts"):
+        parts.append(f"National Weather Service alerts: {facts['nws_alerts']}.")
+    if any(a["hazard_type"] == "lightning" and a["level"] == "stop_work" for a in alerts):
         parts.append("A lightning stop-work alert is active now.")
+    for a in alerts:
+        if a["level"] == "warning":
+            parts.append(f"Active warning: {a['message'].rstrip('.')}.")
+    if facts.get("screening_index_0_to_10") is not None:
+        parts.append(f"Prototype screening index {facts['screening_index_0_to_10']} out of 10 "
+                     f"({facts['screening_status']}); it does not clear any alert.")
     return " ".join(parts)
 
 
 def write_briefing(site: dict, facts: dict, alerts: list[dict]) -> dict:
     """Gemini briefing if it passes the grounding check (2 tries), else the template."""
-    prompt = PROMPT.format(site=site["name"], facts=json.dumps(facts, indent=1), alerts=json.dumps(alerts))
+    shown = [{k: a.get(k) for k in ("hazard_type", "level", "message")} for a in alerts]
+    prompt = PROMPT.format(site=site["name"], facts=json.dumps(facts, indent=1), alerts=json.dumps(shown))
     problems: list[str] = []
     for attempt in (1, 2):
         try:
@@ -197,13 +257,18 @@ def write_briefing(site: dict, facts: dict, alerts: list[dict]) -> dict:
             "attempts": 2 if problems else 0, "ungrounded": problems}
 
 
-def briefing_for(site: dict, rows: list[dict], alerts: list[dict], now: datetime | None = None) -> dict | None:
-    """Contract-shaped briefing for the site's next local day, or None without forecasts."""
+def briefing_for(site: dict, rows: list[dict], alerts: list[dict], now: datetime | None = None,
+                 events: list[dict] | None = None) -> dict | None:
+    """Contract-shaped briefing for the site's next local day, or None without forecasts.
+
+    events: live NWS rows from environmental_events (event_kind nws_*), any site.
+    """
     now = now or datetime.now(timezone.utc)
     tomorrow = now.astimezone(ZoneInfo(site["timezone"])).date() + timedelta(days=1)
     facts = daily_facts(site, rows, tomorrow)
     if facts is None:
         return None
+    facts |= context_facts(site, events or [], tomorrow)
     result = write_briefing(site, facts, [a for a in alerts if a["site_id"] == site["site_id"]])
     first = min((r["valid_at"] for r in rows if r["site_id"] == site["site_id"]), default=None)
     return {
@@ -211,6 +276,7 @@ def briefing_for(site: dict, rows: list[dict], alerts: list[dict], now: datetime
         "for_date": tomorrow.isoformat(),
         "generated_at": now.isoformat(timespec="seconds").replace("+00:00", "Z"),
         "text": result["text"],
-        "inputs": {"forecast_valid_from": first, "score_scored_at": None,
+        "inputs": {"forecast_valid_from": first,
+                   "score_scored_at": (site.get("screening") or {}).get("scored_at"),
                    "method": result["method"], "facts": facts},
     }

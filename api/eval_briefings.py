@@ -20,7 +20,8 @@ from collections import Counter, defaultdict
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
-from api.briefing import daily_facts, grounded, latest_forecasts, write_briefing
+from api.briefing import context_facts, daily_facts, grounded, latest_forecasts, write_briefing
+from jobs.briefings import current_alerts, nws_events
 from api.site_data import ROOT, load_sites
 
 
@@ -34,10 +35,14 @@ def main() -> None:
             os.environ.setdefault(k.strip(), v.strip())
 
     rows, as_of = latest_forecasts()
+    all_sites, alerts, events = load_sites(), current_alerts(), nws_events()
     by_region = defaultdict(list)
-    for s in load_sites():
+    for s in all_sites:
         by_region[s["hazard_region"]].append(s)
     sites = [s for region in sorted(by_region) for s in by_region[region][: args.per_region]]
+    # Plus every site with an NWS alert or open alert, so that wording is tested too.
+    flagged = {e["site_id"] for e in events} | {a["site_id"] for a in alerts}
+    sites += [s for s in all_sites if s["site_id"] in flagged and s not in sites]
 
     now = datetime.now(timezone.utc)
     outcomes, failures, times = Counter(), [], []
@@ -47,14 +52,16 @@ def main() -> None:
         if facts is None:
             outcomes["no forecast"] += 1
             continue
+        facts |= context_facts(site, events, tomorrow)
+        site_alerts = [a for a in alerts if a["site_id"] == site["site_id"]]
         t = time.time()
-        result = write_briefing(site, facts, [])
+        result = write_briefing(site, facts, site_alerts)
         times.append(time.time() - t)
         key = "template fallback" if result["method"] == "template" else f"gemini, try {result['attempts']}"
         outcomes[key] += 1
         if result["ungrounded"]:
             failures.append({"site": site["name"], "ungrounded": result["ungrounded"]})
-        assert not grounded(result["text"], facts, []), "a delivered briefing must be grounded"
+        assert not grounded(result["text"], facts, site_alerts), "a delivered briefing must be grounded"
         print(f"  {site['hazard_region']:20} {site['name'][:28]:28} -> {key}", flush=True)
 
     total = sum(v for k, v in outcomes.items() if k != "no forecast")
