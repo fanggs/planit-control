@@ -17,6 +17,14 @@ export function siteParameter(value) {
     ? String(Number(text)) : null;
 }
 
+// Only exact, registered Auth0 callbacks can receive a redirect. Never turn
+// arbitrary location paths (or query parameters) into a redirect URI.
+export function crewCallbackPath(pathname) {
+  if (pathname === '/crew/crew.html' || pathname === '/crew.html') return '/crew/crew.html';
+  if (pathname === '/crew/crew-atlas.html' || pathname === '/crew-atlas.html') return '/crew/crew-atlas.html';
+  return '/crew/login.html';
+}
+
 // Fixed destinations work with both /crew/ hosting and the local root aliases.
 // No role, arbitrary return URL, token or authorization code goes in this URL.
 export function workspaceURL(workspace,baseURL){

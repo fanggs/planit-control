@@ -3,8 +3,9 @@ import {config} from './crew-config.js';
 import {siteParameter} from './crew-routing.js';
 import {expiredSessionError, isSessionExpired} from '../shared/auth-session.mjs';
 import {reportSessionExpired, sessionExpired} from './crew-session.js';
+import {clearResumeHint} from '../shared/auth-resume.mjs';
 let client, demo = false, initializing;
-export const authConfigured = () => Boolean(config.auth.domain && config.auth.clientId);
+export const authConfigured = () => Boolean(config.authOriginSupported && config.auth.domain && config.auth.clientId);
 
 export async function initAuth() {
   if (!authConfigured()) return {};
@@ -42,13 +43,14 @@ export async function initAuth() {
     return {};
   })();
   try { return await initializing; }
-  catch (error) { initializing = undefined; client = undefined; throw error; }
+  catch (error) { clearResumeHint(); initializing = undefined; client = undefined; throw error; }
 }
 export async function session() {
   if (demo) return {name: 'Sample preview', demo: true};
   return client && await client.isAuthenticated() ? await client.getUser() : null;
 }
 export async function signIn() {
+  if (!authConfigured()) throw new Error('Sign-in requires https://foresite.work or the 127.0.0.1:4174 preview, not an IDE browser preview.');
   if (!client) throw new Error('Sign-in is not connected yet. Please try again later.');
   const siteId = siteParameter(new URLSearchParams(location.search).get('site'));
   await client.loginWithRedirect({appState: {siteId}});
@@ -67,6 +69,7 @@ export async function accessToken() {
   }
 }
 export async function signOut() {
+  clearResumeHint();
   if (demo) { demo = false; location.assign(config.auth.logoutReturnTo); return; }
   if (client) await client.logout({logoutParams: {returnTo: config.auth.logoutReturnTo}});
 }

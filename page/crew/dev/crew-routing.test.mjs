@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {workspaceForUser, userRoles, siteParameter, workspaceURL, supervisorDashboardURL, supervisorNavigationURL, isLiveDeploymentURL} from '../crew-routing.js';
+import {workspaceForUser, userRoles, siteParameter, crewCallbackPath, workspaceURL, supervisorDashboardURL, supervisorNavigationURL, isLiveDeploymentURL} from '../crew-routing.js';
 const claim = 'https://planit-control/roles';
 
 test('verified role claims choose the workspace; unknown roles fail closed', () => {
@@ -18,6 +18,15 @@ test('login preserves only a valid plant ID, never an arbitrary redirect', () =>
   for (const value of ['https://example.com', '../crew-supervisor.html', '-1', '1.5', '1e3', '', null, '9007199254740992']) {
     assert.equal(siteParameter(value), null);
   }
+});
+
+test('Auth0 callbacks use only exact registered crew routes',()=>{
+  assert.equal(crewCallbackPath('/crew/crew.html'),'/crew/crew.html');
+  assert.equal(crewCallbackPath('/crew/crew-atlas.html'),'/crew/crew-atlas.html');
+  assert.equal(crewCallbackPath('/crew.html'),'/crew/crew.html');
+  assert.equal(crewCallbackPath('/crew-atlas.html'),'/crew/crew-atlas.html');
+  for(const path of ['/crew/login.html','/crew/crew-supervisor.html','/crew/crew.html/evil','/evil/crew.html'])
+    assert.equal(crewCallbackPath(path),'/crew/login.html');
 });
 
 test('fixed workspace destinations stay separate in root and nested crew deployments',()=>{

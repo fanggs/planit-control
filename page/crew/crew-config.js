@@ -1,5 +1,6 @@
 /* Why: Keep authentication and configurable network contracts separate from the UI; a failed live request must never become a synthetic success. */
-import {isLiveDeploymentURL} from './crew-routing.js';
+import {isLiveDeploymentURL, crewCallbackPath} from './crew-routing.js';
+import {supportedAuthOrigin} from '../shared/auth-origin.mjs';
 
 const liveDeployment=isLiveDeploymentURL(import.meta.url);
 // Aryan-owned frontend settings. Public identifiers only. Never put a client secret here.
@@ -23,13 +24,14 @@ export const config = {
   },
   // UI access is convenience only; the API must independently enforce permissions.
   authRoleClaim: 'https://planit-control/roles',
+  authOriginSupported: supportedAuthOrigin(location.href),
   themeStylesheet: '../shared/planit.css', // Shared tokens; crew components remain scoped.
   auth: {
     domain: 'dev-qtlneoet2ty1xxbc.us.auth0.com',
     clientId: 'HsFNjn2AmnjYmXW8XcTXVWrhJDvxrjQd',
     audience: 'https://planit-control.aasi/api', // Alan/Aryan's API identifier, required for API access tokens.
     // Register this exact callback and the home logout URL in the Auth0 application.
-    redirectUri: new URL('login.html', location.href).href,
-    logoutReturnTo: new URL('index.html', location.href).href
+    redirectUri: new URL(crewCallbackPath(location.pathname), location.href).href,
+    logoutReturnTo: new URL('/crew/index.html', location.href).href
   }
 };
