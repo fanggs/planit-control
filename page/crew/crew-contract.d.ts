@@ -1,4 +1,4 @@
-/* API DTOs follow api/CONTRACT.md v1.2. UI types below intentionally retain
+/* API DTOs follow api/CONTRACT.md v1.3. UI types below intentionally retain
    display aliases so contract changes do not leak into the screen components. */
 export type HazardType = 'heat'|'lightning'|'flooding'|'wildfire'|'soil_saturation'|'wildlife'|'other';
 type Source = {source_name?:string; source_url?:string|null; retrieved_at?:string|null};
@@ -11,13 +11,16 @@ type ScreeningMetadata = {score_status?:ScreeningStatus|'legacy'|'sample'; score
 export type APIWildlifeSighting = Source & {occurrence_id?:number|string; species?:string; observed_at?:string; observed_calendar_date?:string; event_date_raw?:string; distance_km?:number; coordinate_uncertainty_m?:number|null};
 export type APIWildlifeContext = {site_id?:number|string; status:string; radius_km?:number; radius_meaning?:string; sample_match_count?:number; sightings:APIWildlifeSighting[]; limitations?:string; context_built_at?:string; encounter_probability:null; numeric_score_contribution:null};
 export type APIAlert = {id:number; site_id:number; hazard_type:HazardType; level:'warning'|'stop_work'; message:string; started_at:string; last_trigger_at:string|null; clear_at:string|null; trigger:{strike_id?:string; distance_mi?:number; report_id?:string; event_id?:number}};
-export type APISiteSummary = {site_id:number; name:string; state:string; latitude:number; longitude:number; timezone:string; hazard_region:string; score:number|null; score_status:ScreeningStatus; scored_at:string|null; top_factors:APIFactor[]|null; valid_from?:string; valid_until?:string; active_alert:Pick<APIAlert,'level'|'hazard_type'|'clear_at'>|null; open_report_count:number};
+export type APILightningStatus = Source & {status:'clear'|'stop_work'|'unknown'; checked_at:string|null; reason:string|null};
+export type APIWarningsStatus = Source & {status:'ok'|'unknown'; checked_at:string|null};
+export type APISiteSummary = {site_id:number; name:string; state:string; latitude:number; longitude:number; timezone:string; hazard_region:string; score:number|null; score_status:ScreeningStatus; scored_at:string|null; top_factors:APIFactor[]|null; valid_from?:string; valid_until?:string; active_alert:Pick<APIAlert,'level'|'hazard_type'|'clear_at'>|null; open_report_count:number; lightning_status:APILightningStatus};
 export type APIWeather = Source & {observed_at:string; temperature_f:number|null; heat_index_f:number|null; wind_mph:number|null; precip_1h_in:number|null; precip_24h_in:number|null; soil_moisture:number|null};
 export type APIEnvironmentalEvent = Source & {id:number; hazard_type:HazardType; event_kind:string; title:string; severity:string|null; starts_at:string; ends_at:string|null};
 export type APIReportCreate = {site_id:number; hazard_type:HazardType; severity:'low'|'medium'|'high'; description:string; latitude?:number|null; longitude?:number|null; photo_key?:string|null};
 export type APIReport = APIReportCreate & {id:string; reporter_id:string; status:'open'|'resolved'; created_at:string; resolved_at:string|null; resolved_by:string|null};
-export type APISiteDetail = {site_id:number; name:string; utility:string; state:string; county:string; latitude:number; longitude:number; timezone:string; plant_type:string; hazard_region:string; latest_weather:APIWeather|null; screening:APIScreening|null; wildlife_context:APIWildlifeContext|null; active_alerts:APIAlert[]; environmental_events:APIEnvironmentalEvent[]; recent_reports:APIReport[]};
+export type APISiteDetail = {site_id:number; name:string; utility:string; state:string; county:string; latitude:number; longitude:number; timezone:string; plant_type:string; hazard_region:string; latest_weather:APIWeather|null; screening:APIScreening|null; wildlife_context:APIWildlifeContext|null; lightning_status:APILightningStatus; warnings_status:APIWarningsStatus; active_alerts:APIAlert[]; environmental_events:APIEnvironmentalEvent[]; recent_reports:APIReport[]};
 export type APIBriefing = {site_id:number; for_date:string; generated_at:string; text:string; inputs:{forecast_valid_from:string; score_scored_at:string}};
+export type APIAskResult = {answer:string; sql:string; sources:{label:string; url:string}[]} | {answer:null; reason:'cannot_answer'};
 export type APIError = {error:{code:string; message:string}};
 export type ContractNotice = (
   | {type:'alert.started'|'alert.cleared'; alert_id:number; site_id:number}
@@ -32,7 +35,7 @@ type HazardKey = 'weather'|'heat'|'lightning'|'flood'|'wildfire'|'soil'|'wildlif
 type Hazard = Source & {reading:string|null; severity:'lower'|'elevated'|'high'|'unknown'; advice?:string; observed_at:string|null};
 type Factor = Source & {name:string; feature?:string; hazard_type?:HazardType; contribution:number|null; unit:string; reading?:string; scored_at?:string|null};
 type SiteSummary = ScreeningMetadata & {id:string; name:string; state:string; latitude:number; longitude:number; score:number|null; score_updated_at?:string|null; operator?:string; provenance?:Source; demo?:boolean};
-type Site = SiteSummary & {wildlife_context?:APIWildlifeContext|null; revision:number; server_time:string|null; timezone:string|null; sample?:boolean; hazards:Partial<Record<HazardKey,Hazard>>; alert:LightningAlert; active_alerts?:APIAlert[]; warnings?:APIAlert[]; score_method?:string; baseline?:number|null; score_reconciles?:boolean; horizon_hours?:number|null; factors:Factor[]; model?:{name?:string; version?:string; training_period?:string; trained_at?:string|null; evaluation?:string}; flood?:Source & {status:'normal'|'warning'|'unknown'; message?:string; river_name?:string|null; river_distance_miles?:number|null; overnight_rain_mm?:number|null; rainfall_label?:string; rainfall_reading?:string; window_label?:string; observed_at?:string|null; rule_description?:string}};
+type Site = SiteSummary & {wildlife_context?:APIWildlifeContext|null; revision:number; server_time:string|null; timezone:string|null; sample?:boolean; hazards:Partial<Record<HazardKey,Hazard>>; alert:LightningAlert; lightning_status?:APILightningStatus|null; warnings_status?:APIWarningsStatus|null; environmental_events?:APIEnvironmentalEvent[]; active_alerts?:APIAlert[]; warnings?:APIAlert[]; score_method?:string; baseline?:number|null; score_reconciles?:boolean; horizon_hours?:number|null; factors:Factor[]; model?:{name?:string; version?:string; training_period?:string; trained_at?:string|null; evaluation?:string}; flood?:Source & {status:'normal'|'warning'|'unknown'; message?:string; river_name?:string|null; river_distance_miles?:number|null; overnight_rain_mm?:number|null; rainfall_label?:string; rainfall_reading?:string; window_label?:string; observed_at?:string|null; rule_description?:string}};
 type ReportInput = {site_id:string; request_id:string; category:string; severity:'low'|'medium'|'high'; description:string; latitude?:number|null; longitude?:number|null; photo?:File|null};
 type Report = {id:string; site_id:string; category:string; hazard_type?:HazardType; severity?:'low'|'medium'|'high'; description:string; latitude:number|null; longitude:number|null; created_at:string; status:'open'|'resolved'; photo_key?:string|null; photo?:Blob; photo_error?:string; photo_url?:string; shared?:boolean; demo?:boolean};
 type BriefingSummary = {id:string; site_id:string; title:string; valid_date:string; generated_at:string; delivery_status:string|null};
@@ -48,6 +51,7 @@ interface PlanITCrewAPI {
   submitReport(report:ReportInput,options?:AuthOptions):Promise<Report>;
   listBriefings(id:string,options?:AuthOptions):Promise<BriefingSummary[]>;
   readBriefing(id:string,briefingId:string,options?:AuthOptions):Promise<Briefing>;
+  ask(question:string,options?:AuthOptions):Promise<APIAskResult>;
   readPreferences(id:string,options?:AuthOptions):Promise<Preferences>;
   savePreferences(id:string,value:Pick<Preferences,'enabled'|'local_time'|'timezone'|'channels'|'email'>,options?:AuthOptions):Promise<Preferences>;
   subscribeEvents(siteId:string|null,onEvent:(event:StreamEvent)=>void,onConnection:(connected:boolean)=>void,options?:AuthOptions):Promise<()=>void>|(()=>void);
