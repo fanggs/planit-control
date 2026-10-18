@@ -21,7 +21,7 @@ test('rainfall period and attribution exist without an active flood warning, inc
   assert.match(html,/Rainfall period/);assert.match(html,/0 in/);assert.match(html,/Test River · approx. 1.2 mi/);
   assert.ok(html.includes(dateLabel(raw.latest_weather.observed_at,raw.timezone)));
   assert.match(html,/Warning feed:.*NWS/);assert.match(html,/River mapping:.*USGS/);
-  assert.match(html,/No active NWS flood warning/);
+  assert.match(html,/No flood warning right now/);
   raw.latest_weather.precip_24h_in=null;
   const missing=createContractMapper({now:()=>now}).site(raw);
   assert.equal(missing.flood.rainfall_period_start,null);assert.equal(missing.flood.rainfall_period_end,null);
@@ -38,13 +38,13 @@ test('rainfall period stays distinct from a warning period and stale checks cann
   const clear=rawSite();clear.active_alerts=[];clear.environmental_events=[];
   clear.warnings_status={status:'ok',checked_at:'2026-10-17T18:04:00Z'};
   const mapped=createContractMapper({now:()=>now}).site(clear);
-  assert.match(floodHTML(mapped,now+3600000),/Flood status unavailable/);
+  assert.match(floodHTML(mapped,now+3600000),/Can’t check flood warnings right now/);
 });
 
 test('heat-index reasons distinguish cool, missing inputs, high out-of-range and real zero', () => {
-  assert.match(heatIndexDisplay({temperature_f: 63, heat_index_f: null}), /Not calculated below 80/);
+  assert.match(heatIndexDisplay({temperature_f: 63, heat_index_f: null}), /only applies above 80/);
   assert.match(heatIndexDisplay({temperature_f: 90, heat_index_f: null}), /Unavailable/);
-  assert.match(heatIndexDisplay({temperature_f: 115, heat_index_f: null}), /Outside supported range/);
+  assert.match(heatIndexDisplay({temperature_f: 115, heat_index_f: null}), /Too hot for the heat index formula/);
   assert.match(heatIndexDisplay({temperature_f: null, heat_index_f: null}), /Unavailable/);
   assert.match(heatIndexDisplay({temperature_f: 80, heat_index_f: 0}), /Heat index 0/);
 });
@@ -61,11 +61,11 @@ test('unassessed readings have no severity chip, but active alerts do', () => {
   raw.lightning_status = {status: 'clear', checked_at: '2026-10-17T18:04:00Z'};
   raw.warnings_status = {status: 'ok', checked_at: '2026-10-17T18:04:00Z'};
   const site = createContractMapper({now: () => now}).site(raw);
-  assert.match(site.hazards.heat.reading, /Not calculated below 80/);
+  assert.match(site.hazards.heat.reading, /only applies above 80/);
   assert.match(site.hazards.weather.reading, /0 in \/ 24 h/);
-  assert.match(site.hazards.lightning.reading, /No current lightning stop-work hold/);
-  assert.match(site.hazards.flood.reading, /No active NWS flood warning/);
-  assert.match(site.hazards.wildfire.reading, /No active NWS fire-weather warning/);
+  assert.match(site.hazards.lightning.reading, /No lightning within 10 miles/);
+  assert.match(site.hazards.flood.reading, /No flood warning right now/);
+  assert.match(site.hazards.wildfire.reading, /No fire-weather warning right now/);
   assert.match(site.hazards.wildlife.reading, /limited sample/);
   const html = hazardHTML(site);
   assert.doesNotMatch(html, /<span class="crew-pill">Unknown<\/span>/i);
@@ -83,8 +83,8 @@ test('a stale warning check cannot produce no-warning text', () => {
   raw.active_alerts = []; raw.environmental_events = [];
   raw.warnings_status = {status: 'ok', checked_at: '2026-10-17T18:00:00Z'};
   const site = createContractMapper({now: () => now}).site(raw);
-  assert.match(site.hazards.flood.reading, /unavailable/);
-  assert.match(site.hazards.wildfire.reading, /unavailable/);
+  assert.match(site.hazards.flood.reading, /Can’t check weather warnings/);
+  assert.match(site.hazards.wildfire.reading, /Can’t check weather warnings/);
 });
 
 test('condition cards expire independently when a previously successful watch goes stale', () => {
@@ -94,14 +94,14 @@ test('condition cards expire independently when a previously successful watch go
   raw.warnings_status = {status: 'ok', checked_at: '2026-10-17T18:04:00Z'};
   const site = createContractMapper({now: () => now}).site(raw);
 
-  assert.match(hazardHTML(site, now), /No current lightning stop-work hold/);
-  assert.match(hazardHTML(site, now), /No active NWS flood warning/);
+  assert.match(hazardHTML(site, now), /No lightning within 10 miles/);
+  assert.match(hazardHTML(site, now), /No flood warning right now/);
   const lightningExpired = hazardHTML(site, now + 5 * 60000);
-  assert.match(lightningExpired, /Lightning status unavailable/);
-  assert.doesNotMatch(lightningExpired, /No current lightning stop-work hold/);
-  assert.match(lightningExpired, /No active NWS flood warning/);
+  assert.match(lightningExpired, /Can’t confirm lightning right now/);
+  assert.doesNotMatch(lightningExpired, /No lightning within 10 miles/);
+  assert.match(lightningExpired, /No flood warning right now/);
   const bothExpired = hazardHTML(site, now + 15 * 60000);
-  assert.match(bothExpired, /NWS warning status unavailable/);
+  assert.match(bothExpired, /Can’t check weather warnings right now/);
   assert.doesNotMatch(bothExpired, /No active NWS (?:flood|fire-weather) warning/);
 });
 
@@ -159,6 +159,6 @@ test('a replay hold is labeled in the main alert, watch, and hazard card', () =>
     clear_at: '2026-10-17T18:34:00Z', trigger: {is_replay: true}}];
   const site = createContractMapper({now: () => now}).site(raw);
   assert.equal(site.alert.is_replay, true);
-  assert.match(site.hazards.lightning.advice, /Recorded storm replay/);
+  assert.match(site.hazards.lightning.advice, /recorded storm played back/);
   assert.match(hazardHTML(site), /<span class="crew-pill">REPLAY<\/span>/);
 });

@@ -68,7 +68,7 @@ export function displayHazards(raw, activeAlerts, now = Date.now()) {
     const common = {...source(weather), observed_at};
     hazards.weather = {...hazards.weather, ...common,
       reading: `Temperature ${format(weather.temperature_f, '°F')} · wind ${format(weather.wind_mph, 'mph')} · rain ${format(weather.precip_24h_in, 'in / 24 h')}`,
-      advice: 'These are measurements, not an overall weather safety assessment.'};
+      advice: 'Current readings at the site.'};
     const air = weather.temperature_f;
     hazards.heat = {...hazards.heat, ...common, reading: heatIndexDisplay(weather),
       advice: finite(weather.heat_index_f) ? 'Measured inputs produced this hot-weather index; no work clearance is implied.'
@@ -76,23 +76,23 @@ export function displayHazards(raw, activeAlerts, now = Date.now()) {
         : finite(air) && air > 112 ? 'Outside the supported calculation range. Heat exposure may still be severe.'
         : 'The calculation or its inputs are unavailable. Do not infer that heat is safe.'};
     hazards.soil = {...hazards.soil, ...common, reading: `Soil moisture ${format(weather.soil_moisture, 'm³/m³')}`,
-      advice: 'Measurement only. No ground-bearing or saturation assessment was supplied.'};
+      advice: 'How wet the ground is, from 0 (dry) to about 0.5 (soaked). Watch for soft ground.'};
   }
   const lightning = lightningWatch(raw.lightning_status, activeAlerts, now);
   hazards.lightning = {...hazards.lightning, ...source(raw.lightning_status),
-    reading: lightning.status === 'clear' ? 'No current lightning stop-work hold' : lightning.text,
+    reading: lightning.status === 'clear' ? 'No lightning within 10 miles' : lightning.text,
     severity: lightning.status === 'stop_work' ? 'high' : null,
     observed_at: time(raw.lightning_status?.checked_at), time_label: 'Checked',
-    advice: lightning.status === 'clear' ? 'The lightning watch checked recently. This does not clear other hazards.'
-      : lightning.status === 'stop_work' ? 'STOP WORK remains in force until the site alert is cleared by the server.'
-      : raw.lightning_status?.reason || 'A missing or stale watch is not an all-clear.'};
+    advice: lightning.status === 'clear' ? 'No lightning stop-work. Keep an eye on the other conditions.'
+      : lightning.status === 'stop_work' ? 'Stop work until the alert clears.'
+      : raw.lightning_status?.reason || 'We can’t confirm lightning right now, so this isn’t an all-clear.'};
   const warnings = warningsWatch(raw.warnings_status, raw.environmental_events, now);
   for (const [key, label] of [['flood', 'flood'], ['wildfire', 'fire-weather']]) {
     hazards[key] = {...hazards[key], ...source(raw.warnings_status),
-      reading: warnings.status === 'ok' ? `No active NWS ${label} warning returned` : 'NWS warning status unavailable',
+      reading: warnings.status === 'ok' ? `No ${label} warning right now` : 'Can’t check weather warnings right now',
       observed_at: time(raw.warnings_status?.checked_at), time_label: 'Checked',
-      advice: warnings.status === 'ok' ? 'This is a warning-feed check, not an assessment that the site is safe.'
-        : 'The NWS check is missing or stale; an empty warning list cannot confirm safety.'};
+      advice: warnings.status === 'ok' ? 'Checked with the National Weather Service. Still use your judgment on site.'
+        : 'We couldn’t reach the National Weather Service, so we can’t confirm there are no warnings.'};
   }
   const wildlife = raw.wildlife_context;
   const sightings = Array.isArray(wildlife?.sightings) ? wildlife.sightings : [];
@@ -103,7 +103,7 @@ export function displayHazards(raw, activeAlerts, now = Date.now()) {
     reading: wildlife?.status === 'recorded_sightings' ? `${sightings.length} recorded sighting${sightings.length === 1 ? '' : 's'} nearby · details below`
       : wildlife?.status === 'no_records_in_sample' ? 'No sightings in this limited sample · details below'
       : 'Wildlife evidence unavailable · details below',
-    advice: 'Historical sightings are not a live encounter assessment; crew observations appear separately.',
+    advice: 'Past sightings show what lives nearby. Details below.',
     // Cite the evidence itself: GBIF, dated by the newest recorded sighting.
     ...(sightings.length ? {source_name: 'GBIF recorded sightings',
       source_url: sightings.find(row => typeof row?.source_url === 'string')?.source_url ?? 'https://www.gbif.org/',
@@ -130,7 +130,7 @@ export function displayHazards(raw, activeAlerts, now = Date.now()) {
       retrieved_at: report ? null : event?.retrieved_at || null,
       is_replay: alert.trigger?.is_replay === true,
       advice: alert.trigger?.is_replay === true
-        ? 'Recorded storm replay for the demo, not a current lightning observation.'
+        ? 'A recorded storm played back for the demo, not real lightning.'
         : alert.level === 'stop_work' ? 'STOP WORK remains in force until the site alert is cleared by the server.'
         : 'An active site alert takes precedence over an empty or unavailable feed.'};
   }
@@ -194,7 +194,7 @@ export function createContractMapper({now = () => Date.now()} = {}) {
       flood: {...source(floodEvent), status: floodAlert || floodEvent ? 'warning' : warningWatch.status === 'ok' ? 'normal' : 'unknown',
         message: floodAlert?.message || floodEvent?.title || (warningWatch.status === 'ok'
           ? 'No active NWS flood warning was returned. This is not a hydrologic all-clear.'
-          : 'Flood warning status unavailable. No hydrologic assessment was supplied.'),
+          : 'Flood warning status isn’t available right now.'),
         river_name: river?.status === 'mapped' ? river.river_name : null,
         river_distance_miles: river?.status === 'mapped' && finite(river.distance_miles) && river.distance_miles >= 0 ? river.distance_miles : null,
         river_status: river?.status ?? 'unavailable', river_search_radius_km: river?.search_radius_km,

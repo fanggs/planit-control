@@ -91,7 +91,7 @@ function updateStream(){const element=document.getElementById('supervisor-stream
     const flood=document.querySelector('#supervisor-detail .crew-flood');
     if(flood){const html=floodHTML(state.selectedSnapshot);if(flood.outerHTML!==html)flood.outerHTML=html;}
   }
-  if(!navigator.onLine||Date.now()-state.lastEvent>config.api.heartbeatMs)state.connected=false;element.textContent=sessionExpired()?'Sign-in expired · live updates paused':state.connected?(config.dataMode==='mock'?'Sample updates':'Live updates'):'Updates disconnected';}
+  if(!navigator.onLine||Date.now()-state.lastEvent>config.api.heartbeatMs)state.connected=false;element.textContent=sessionExpired()?'Signed out · sign in again for live updates':state.connected?(config.dataMode==='mock'?'Sample updates':'Live updates'):'Live updates paused';}
 async function refresh(incoming,affectedIds){
   if(sessionExpired())return;
   const version=state.version,listVersion=++state.listVersion,button=document.getElementById('supervisor-refresh');if(!button)return;button.disabled=true;

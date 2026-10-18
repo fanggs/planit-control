@@ -53,9 +53,9 @@ export function watchPanel(site,now=Date.now()){
   const lightning=lightningWatch(site.lightning_status,site.active_alerts,now);
   const warnings=warningsWatch(site.warnings_status,site.environmental_events,now);
   const replay=site.active_alerts?.some(alert=>alert.hazard_type==='lightning'&&alert.level==='stop_work'&&alert.trigger?.is_replay===true);
-  return `<section class="crew-card crew-watch" aria-label="Live safety watch status"><p class="crew-eyebrow">INDEPENDENT SAFETY WATCHES</p><h2>Checked conditions</h2>
-    <div class="crew-watch-grid"><div data-watch-tone="${lightning.status}"><strong>${replay?'REPLAY · ':''}${esc(lightning.text)}</strong><p>${replay?'Recorded storm replay for the demo, not a current lightning observation.':esc(site.lightning_status?.reason||'A score never clears a lightning hold.')}</p><small>Checked ${dateLabel(site.lightning_status?.checked_at,site.timezone)} · ${sourceLink(site.lightning_status)}</small></div>
-    <div data-watch-tone="${warnings.status}"><strong>${esc(warnings.text)}</strong><p>${warnings.status==='ok'?'The NWS feed was checked recently. Other hazards may still exist.':'An empty warning list cannot confirm safety while the NWS check is unavailable.'}</p><small>Checked ${dateLabel(site.warnings_status?.checked_at,site.timezone)} · ${sourceLink(site.warnings_status)}</small></div></div></section>`;
+  return `<section class="crew-card crew-watch" aria-label="Live safety watch status"><p class="crew-eyebrow">LIVE SAFETY CHECKS</p><h2>What we’re watching right now</h2>
+    <div class="crew-watch-grid"><div data-watch-tone="${lightning.status}"><strong>${replay?'REPLAY · ':''}${esc(lightning.text)}</strong><p>${replay?'A recorded storm played back for the demo, not real lightning.':esc(site.lightning_status?.reason||'Watching for lightning within 10 miles of the site.')}</p><small>Checked ${dateLabel(site.lightning_status?.checked_at,site.timezone)} · ${sourceLink(site.lightning_status)}</small></div>
+    <div data-watch-tone="${warnings.status}"><strong>${esc(warnings.text)}</strong><p>${warnings.status==='ok'?'Checked with the National Weather Service for this site.':'We couldn’t reach the National Weather Service, so we can’t confirm there are no warnings.'}</p><small>Checked ${dateLabel(site.warnings_status?.checked_at,site.timezone)} · ${sourceLink(site.warnings_status)}</small></div></div></section>`;
 }
 export function scoreWaterfall(site){
   if(!validScore(site?.score)||!Number.isFinite(site.baseline)||site.score_reconciles!==true||!site.factors?.length)return '';
@@ -76,22 +76,28 @@ export function scoreWaterfall(site){
 }
 export function scorePanel(input){
   const site=expireScreening(input),modern=['research','validated_prototype'].includes(site.score_status),available=validScore(site.score);
-  return `<section class="crew-card crew-index-card"><div class="crew-row"><div><p class="crew-eyebrow">HAZARD SCREENING INDEX · ${riskLabel(site.score)}</p><h2>Understand your site’s score</h2>${scoreBadgeHTML(site)}</div>${scoreHTML(site.score)}</div>
-    ${!available?`<p class="crew-muted"><strong>No data</strong> · ${esc(site.score_reason||'No screening prediction was supplied.')} (${esc(site.score_status||'no_data')})</p>`:''}
-    ${scoreWindowHTML(site)}<p class="crew-muted">Score calculated: ${dateLabel(site.score_updated_at,site.timezone)}</p>
-    <p class="crew-muted">${esc(site.score_target||site.score_method||'Model details unavailable.')}</p>
-    ${modern?'<p class="crew-muted">Prototype screening estimate only. It is not an established probability, an injury prediction, or an all-clear. Red-flag warnings describe fire weather; severe-storm warnings do not confirm measured lightning.</p>':''}
-    <details open><summary>What pushed the score?</summary>${scoreWaterfall(site)}${available&&site.factors?.length&&site.score_reconciles!==false?site.factors.map(f=>`<article class="crew-factor"><div class="crew-row"><strong>${esc(f.name)}</strong><b>${esc(contributionLabel(f))}</b></div>${f.reading?`<p>${esc(f.reading)}</p>`:''}<small>${f.feature?'Model explanation':sourceLink(f)} · ${dateLabel(f.scored_at||f.retrieved_at,site.timezone)}</small></article>`).join(''):'<p>Factor contributions are unavailable. Missing values are not zero.</p>'}
-    <p class="crew-muted">${available&&Number.isFinite(site.baseline)?`Baseline: ${esc(site.baseline.toFixed(2))}. `:''}Baseline plus signed contributions equals the index. Negative contributions lower the estimate; they never clear safety alerts.</p>
-    <h3>Model information</h3><p class="crew-muted">${esc(site.model?.name||'Model details unavailable')} · ${site.score_status==='research'?'Research prototype':site.score_status==='validated_prototype'?'Validated prototype':esc(scoreBadgeText(site))}${site.captured_at?'<br>Inputs captured: '+dateLabel(site.captured_at,site.timezone):''}</p></details></section>`;
+  return `<section class="crew-card crew-index-card"><div class="crew-row"><div><p class="crew-eyebrow">HAZARD SCORE · ${riskLabel(site.score)}</p><h2>Understand your site’s score</h2>${scoreBadgeHTML(site)}</div>${scoreHTML(site.score)}</div>
+    ${!available?`<p class="crew-muted"><strong>No data</strong> · ${esc(site.score_reason||'No score is available for this site right now.')}</p>`:''}
+    ${scoreWindowHTML(site)}<p class="crew-muted">Updated: ${dateLabel(site.score_updated_at,site.timezone)}</p>
+    <p class="crew-muted"><strong>What this score means:</strong> how likely the National Weather Service is to issue a warning or heat advisory for this site in the next 24 hours, from 0 (very unlikely) to 10 (very likely). It doesn’t predict injuries.</p>
+    ${modern?'<p class="crew-muted"><strong>Early-stage estimate.</strong> A low score doesn’t mean it’s safe. Always follow active alerts.</p>':''}
+    <details open><summary>What pushed the score?</summary>${scoreWaterfall(site)}${available&&site.factors?.length&&site.score_reconciles!==false?site.factors.map(f=>`<article class="crew-factor"><div class="crew-row"><strong>${esc(f.name)}</strong><b>${esc(contributionLabel(f))}</b></div>${f.reading?`<p>${esc(f.reading)}</p>`:''}<small>${f.feature?'Model explanation':sourceLink(f)} · ${dateLabel(f.scored_at||f.retrieved_at,site.timezone)}</small></article>`).join(''):'<p>We can’t show what pushed the score right now.</p>'}
+    <p class="crew-muted">${available&&Number.isFinite(site.baseline)?`It starts from a typical score of ${esc(site.baseline.toFixed(2))}, and each factor adds or takes away points. `:''}A lower score never cancels a safety alert.</p>
+    <h3>Model information</h3><p class="crew-muted">${esc(site.model?.name||'Model details unavailable')} · ${site.score_status==='research'?'Research prototype':site.score_status==='validated_prototype'?'Validated prototype':esc(scoreBadgeText(site))}${site.captured_at?'<br>Weather data from: '+dateLabel(site.captured_at,site.timezone):''}</p></details></section>`;
+}
+// Common names first; the scientific name stays for anyone looking it up.
+const SPECIES={'Sistrurus miliarius':'Pygmy rattlesnake','Agkistrodon piscivorus':'Cottonmouth (water moccasin)',
+  'Agkistrodon conanti':'Florida cottonmouth','Alligator mississippiensis':'American alligator','Agkistrodon contortrix':'Copperhead'};
+export function speciesName(species){
+  if(typeof species!=='string'||!species.trim())return 'Animal not identified';
+  return SPECIES[species]?`${SPECIES[species]} (${species})`:species;
 }
 export function wildlifeHTML(site){
   const context=site.wildlife_context,rows=Array.isArray(context?.sightings)?context.sightings:[];
-  return `<section class="crew-card crew-wildlife-evidence"><p class="crew-eyebrow">WILDLIFE EVIDENCE · SEPARATE FROM THE SCORE</p><h2>Recorded wildlife sightings</h2>
-    <p class="crew-muted">Historical sightings provide context. They do not measure current presence, encounter probability, or contribute points to the index. Crew wildlife reports stay alongside this evidence.</p>
-    ${context?`<p class="crew-muted">${Number.isFinite(context.radius_km)?'Search radius: '+esc(context.radius_km)+' km. ':''}${esc(context.radius_meaning||'Radius is not a safety boundary.')} · ${esc(({recorded_sightings:'Recorded sightings',no_records_in_sample:'No records in the sample',sample_no_evidence:'Sample · no historical feed'})[context.status]||'Evidence unavailable')}</p>`:''}
-    ${rows.length?rows.slice(0,20).map(row=>`<article class="crew-factor"><strong>${esc(row.species||'Species unavailable')}</strong><p>Observed: ${esc(row.observed_calendar_date||row.event_date_raw||dateLabel(row.observed_at,'UTC'))}${Number.isFinite(row.distance_km)?' · '+esc(row.distance_km.toFixed(1))+' km from the site':''}</p><small>${sourceLink(row)}${Number.isFinite(row.coordinate_uncertainty_m)?' · Coordinate uncertainty: '+esc(row.coordinate_uncertainty_m)+' m':' · Coordinate uncertainty unavailable'}</small></article>`).join(''):`<p>${context?.status==='no_records_in_sample'?'No sightings in the supplied sample. This does not mean wildlife is absent.':'Wildlife evidence is unavailable. This does not mean wildlife is absent.'}</p>`}
-    <p class="crew-muted">${esc(context?.limitations||'Sighting coverage is incomplete and depends on where people report observations.')}${context?.context_built_at?' Context prepared: '+dateLabel(context.context_built_at,site.timezone):''}</p></section>`;
+  return `<section class="crew-card crew-wildlife-evidence"><p class="crew-eyebrow">WILDLIFE NEAR THIS SITE</p><h2>Dangerous animals seen nearby</h2>
+    <p class="crew-muted">Past sightings reported${Number.isFinite(context?.radius_km)?` within ${esc(context.radius_km)} km (${esc(Math.round(context.radius_km*0.621))} mi)`:' near the site'}. They show what lives in the area, not what’s here today. If you see one, report it.</p>
+        ${rows.length?rows.slice(0,20).map(row=>`<article class="crew-factor"><strong>${esc(speciesName(row.species))}</strong><p>Seen ${esc(row.observed_calendar_date||row.event_date_raw||dateLabel(row.observed_at,'UTC'))}${Number.isFinite(row.distance_km)?' · '+esc(row.distance_km.toFixed(1))+' km ('+esc((row.distance_km*0.621).toFixed(1))+' mi) away':''}</p><small>${sourceLink({...row,source_name:'GBIF sighting record'})}${Number.isFinite(row.coordinate_uncertainty_m)?' · location accurate to about '+esc(row.coordinate_uncertainty_m>=1000?(row.coordinate_uncertainty_m/1000).toFixed(1)+' km':Math.round(row.coordinate_uncertainty_m)+' m'):''}</small></article>`).join(''):`<p>${context?.status==='no_records_in_sample'?'No past sightings recorded nearby. That doesn’t mean there are no animals.':'Sighting records aren’t available right now. That doesn’t mean there are no animals.'}</p>`}
+    <p class="crew-muted">Not seeing an animal listed doesn’t mean there are none; records depend on where people report.${context?.context_built_at?' Updated '+dateLabel(context.context_built_at,site.timezone)+'.':''}</p></section>`;
 }
 export function floodHTML(site,now=Date.now()){
   const f=site.flood, zone=site.timezone;
@@ -100,14 +106,14 @@ export function floodHTML(site,now=Date.now()){
   const distance=f?.river_distance_miles;
   const river=f?.river_status==='no_mapped_river'
     ? `No mapped river/stream within ${f.river_search_radius_km} km`
-    : `${f?.river_name||'Unavailable'}${Number.isFinite(distance)?' · approx. '+(distance<.1?'<0.1':distance.toFixed(1))+' mi':''}`;
+    : `${f?.river_name==='Unnamed river/stream'?'A small unnamed stream':f?.river_name||'Unavailable'}${Number.isFinite(distance)?' · approx. '+(distance<.1?'<0.1':distance.toFixed(1))+' mi':''}`;
   const period=f?.rainfall_period_start&&f?.rainfall_period_end
     ? `${dateLabel(f.rainfall_period_start,zone)} – ${dateLabel(f.rainfall_period_end,zone)} · ${zone||'Local time'}`
     : f?.window_label||'Unavailable';
   return `<section class="crew-card crew-flood" data-active="${status==='warning'}">
     <p class="crew-eyebrow">${icon("flood")} FLOOD WATCH</p>
-    <h2>${esc(status==='warning'?'Flood-risk warning':status==='normal'?'No active NWS flood warning':'Flood status unavailable')}</h2>
-    <p>${esc(status==='unknown'&&f?.status==='normal'?'The NWS check is no longer fresh. Warning status is unavailable.':f?.message||'Waiting for flood and rainfall data.')}</p>
+    <h2>${esc(status==='warning'?'Flood-risk warning':status==='normal'?'No flood warning right now':'Can’t check flood warnings right now')}</h2>
+    <p>${esc(status==='unknown'&&f?.status==='normal'?'The National Weather Service check is out of date, so we can’t confirm there’s no flood warning.':f?.message||'Waiting for flood and rainfall data.')}</p>
     <div class="crew-metrics"><span>River / stream proximity<strong>${esc(river)}</strong></span>
     <span>${esc(f?.rainfall_label||'Overnight rain')}<strong>${esc(f?.rainfall_reading??(Number.isFinite(f?.overnight_rain_mm)?`${f.overnight_rain_mm} mm`:'Unavailable'))}</strong></span>
     <span>Rainfall period<strong>${esc(period)}</strong></span></div>

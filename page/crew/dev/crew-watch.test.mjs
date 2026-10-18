@@ -18,10 +18,10 @@ test('lightning is clear only while its explicit check is fresh; stop-work wins'
 });
 
 test('NWS absence is meaningful only after a recent successful check',()=>{
-  assert.equal(warningsWatch({status:'ok',checked_at:iso(-60000)},[],now).text,'No active NWS alerts');
+  assert.equal(warningsWatch({status:'ok',checked_at:iso(-60000)},[],now).text,'No weather warnings right now');
   assert.equal(warningsWatch({status:'ok',checked_at:iso(-60000)},[event],now).count,1);
   assert.match(warningsWatch({status:'ok',checked_at:iso(-60000)},[{...event,title:'Flood Warning issued October 18 at 1:00AM EDT'}],now).text,
-    /^1 active NWS alert: Flood Warning$/);
+    /^1 weather alert: Flood Warning$/);
   assert.equal(warningsWatch({status:'ok',checked_at:iso(-900001)},[],now).status,'unknown');
   assert.equal(warningsWatch({status:'unknown',checked_at:iso(-60000)},[],now).status,'unknown');
   assert.equal(warningsWatch({status:'ok',checked_at:iso(-60000)},[{...event,starts_at:'broken'}],now).status,'unknown');
@@ -36,11 +36,11 @@ test('a stale watch cannot turn a cleared alert into an all-clear',()=>{
 
 test('crew cards distinguish a checked empty NWS feed from an unavailable one',()=>{
   const site={lightning_status:{status:'clear',checked_at:iso(-60000)},warnings_status:{status:'ok',checked_at:iso(-60000)},environmental_events:[],active_alerts:[],timezone:'UTC',flood:{status:'normal',message:'No active NWS flood warning was returned.'}};
-  assert.match(watchPanel(site,now),/Lightning watch clear/);
-  assert.match(watchPanel(site,now),/No active NWS alerts/);
-  assert.match(floodHTML(site,now),/No active NWS flood warning/);
-  assert.match(watchPanel(site,now+16*60000),/NWS warning status unavailable/);
-  assert.match(floodHTML(site,now+16*60000),/Flood status unavailable/);
+  assert.match(watchPanel(site,now),/No lightning within 10 miles/);
+  assert.match(watchPanel(site,now),/No weather warnings right now/);
+  assert.match(floodHTML(site,now),/No flood warning right now/);
+  assert.match(watchPanel(site,now+16*60000),/Can’t check weather warnings right now/);
+  assert.match(floodHTML(site,now+16*60000),/Can’t check flood warnings right now/);
 });
 
 test('the v1.3 detail mapper preserves watch evidence and never infers clear from no alert',()=>{

@@ -13,7 +13,7 @@ import {clearResumeHint, hasResumeHint, markAuthenticated} from '../shared/auth-
 import {heatIndexDisplay} from '../shared/environment-readings.mjs';
 import {assessScore, coordinates, countdown, featureLabel, finite, freshness, hasSupervisorRole, label,
   lightningDisplay, points, isReplayAlert, openReportPins, rankSites, riskTone, safeSourceURL,
-  siteHasReplayAlert, siteTime, summaryScreening, validFactors, warningsDisplay, wildlifeSummary} from './domain.js';
+  siteHasReplayAlert, siteTime, speciesName, summaryScreening, validFactors, warningsDisplay, wildlifeSummary} from './domain.js';
 
 const $ = id => document.getElementById(id);
 const sample = config.mode === 'sample';
@@ -148,7 +148,7 @@ function summaryLightning(site) {
   const stopWork = site.active_alert?.hazard_type === 'lightning' && site.active_alert.level === 'stop_work';
   return lightningDisplay(site.lightning_status, Date.now(), stopWork);
 }
-const SCREENING_TARGET = 'Model target: an NWS warning or heat advisory covering this plant over a 24-hour window';
+const SCREENING_TARGET = 'How likely a National Weather Service warning or heat advisory is here in the next 24 hours';
 function sourceLink(record, fallback) {
   const source = safeSourceURL(record?.source_url);
   if (!source) return null;
@@ -186,7 +186,7 @@ function sitePopup(site) {
   node.append(el('strong', site.name));
   const score = shownSummaryScore(site);
   node.append(el('p', score === null ? 'Screening index unavailable' : `Prototype · ${score.toFixed(1)} / 10`));
-  node.append(el('p', score === null ? 'Missing data never means safe.' : `${SCREENING_TARGET}. Open details for the exact target window.`));
+  node.append(el('p', score === null ? 'No score right now. That doesn’t mean it’s safe.' : `${SCREENING_TARGET}. Open the site for details.`));
   if (score !== null) node.append(el('p', factorSummary(site.top_factors)));
   const lightning = summaryLightning(site);
   node.append(watchChip(lightning.text, lightning.status === 'stop_work' ? 'high' : lightning.status === 'clear' ? 'low' : 'unknown',
@@ -249,7 +249,7 @@ function renderList() {
     score.setAttribute('aria-label', value === null ? 'No screening index data' : `Prototype screening index ${value.toFixed(1)} out of 10`);
     heading.append(copy, score);
     button.append(heading, el('p', value === null ? 'Screening unavailable · missing data never means safe'
-      : `${SCREENING_TARGET}. Open details for the exact target window.`, 'site-factors'));
+      : `${SCREENING_TARGET}. Open the site for details.`, 'site-factors'));
     if (value !== null) button.append(el('p', factorSummary(site.top_factors), 'site-factors'));
     const meta = el('div', null, 'site-meta');
     if (value !== null) meta.append(chip('Prototype', 'medium'));
@@ -274,7 +274,7 @@ function renderList() {
 }
 function renderMetrics() {
   $('site-count').textContent = String(state.sites.length);
-  $('site-subtitle').textContent = sample ? `${state.sites.length} sample sites · not production data` : 'Returned by the authenticated API';
+  $('site-subtitle').textContent = sample ? `${state.sites.length} sample sites · not production data` : 'Plants we monitor';
   const alertDisplay = alertFeedDisplay(state.alerts);
   $('alert-count').textContent = alertDisplay.count;
   $('alert-status').textContent = alertDisplay.status;
@@ -283,7 +283,7 @@ function renderMetrics() {
   $('missing-count').textContent = String(state.sites.filter(site => shownSummaryScore(site) === null).length);
 }
 function renderScore(detail) {
-  const container = section('Prototype hazard screening index');
+  const container = section('Hazard score (early-stage estimate)');
   const model = detail.screening, analysis = assessScore(model, Date.now(), sample);
   container.dataset.screeningStatus = analysis.status;
   if (analysis.status !== 'ready') {
@@ -292,12 +292,12 @@ function renderScore(detail) {
   }
   const head = el('div', null, 'score-header'), total = el('div', model.score.toFixed(1), 'score-total');
   total.append(el('small', '/ 10'));
-  head.append(total, el('div', 'Prototype · 24-hour NWS warning / heat advisory screening\nBaseline + signed feature contributions', 'score-label'));
+  head.append(total, el('div', 'Chance of a weather warning or heat advisory in the next 24 hours', 'score-label'));
   container.append(head, chip('Prototype', 'medium'),
-    note(model.status === 'research' ? 'Research model: it has not passed every probability-error check. This is not an established probability, an injury forecast, or permission to work.'
-      : 'Validated prototype, not an injury forecast or permission to work.', true),
-    note(`Target: ${model.target}`),
-    note(`Exact target window: ${siteTime(model.valid_from, detail.timezone)} to ${siteTime(model.valid_until, detail.timezone)}`));
+    note(model.status === 'research' ? 'Early-stage model that hasn’t passed all its accuracy checks yet. A low score doesn’t mean it’s safe. Always follow active alerts.'
+      : 'Early-stage model that passed its accuracy checks. It doesn’t predict injuries, and a low score doesn’t mean it’s safe.', true),
+    note('What this score means: how likely the National Weather Service is to issue a warning or heat advisory for this plant, from 0 (very unlikely) to 10 (very likely).'),
+    note(`Covers ${siteTime(model.valid_from, detail.timezone)} to ${siteTime(model.valid_until, detail.timezone)}`));
   const graph = el('div', null, 'waterfall'); graph.setAttribute('aria-label', 'Prototype screening feature-contribution waterfall');
   for (const step of analysis.steps) {
     const row = el('div', null, 'water-row'), track = el('div', null, 'water-track');
@@ -312,31 +312,31 @@ function renderScore(detail) {
   const axis = el('div', null, 'water-axis');
   axis.append(el('span', analysis.min.toFixed(0)), el('span', ((analysis.min + analysis.max) / 2).toFixed(0)), el('span', analysis.max.toFixed(0)));
   graph.append(axis);
-  container.append(graph, el('p', 'Peach raises the index · Mint lowers it · Features are not one-to-one hazard categories', 'water-legend'),
+  container.append(graph, el('p', 'Orange pushed the score up, green pulled it down.', 'water-legend'),
     note(`Scored ${siteTime(model.scored_at, detail.timezone)} · ${ageText(model.scored_at)}`),
-    note(`Inputs captured ${siteTime(model.captured_at, detail.timezone)}`),
+    note(`Weather data from ${siteTime(model.captured_at, detail.timezone)}`),
     note(sample ? 'SAMPLE screening result — demonstration data only.'
-      : `Model artifact: ${typeof model.artifact_sha256 === 'string' ? `${model.artifact_sha256.slice(0, 12)}…` : 'Not supplied'}`),
-    note('Crew reports appear separately and do not change this score. Live lightning stop-work rules apply independently.'));
+      : `Model version: ${typeof model.artifact_sha256 === 'string' ? `${model.artifact_sha256.slice(0, 12)}…` : 'Not supplied'}`),
+    note('Crew reports don’t change this score, and a low score never cancels a lightning stop-work.'));
   return container;
 }
 function renderWildlife(detail) {
-  const container = section('Nearby wildlife evidence · separate from the score');
+  const container = section('Dangerous animals seen nearby');
   const context = detail.wildlife_context;
   container.append(note(wildlifeSummary(context)));
   if (!context || !Array.isArray(context.sightings) || context.status === 'unavailable') return container;
-  if (finite(context.radius_km)) container.append(note(`Search radius: ${context.radius_km} km · map context only, not a safety boundary.`));
-  if (context.limitations) container.append(note(context.limitations, true));
+  if (finite(context.radius_km)) container.append(note(`Past sightings within ${context.radius_km} km (${Math.round(context.radius_km * 0.621)} mi). They show what lives in the area, not what’s here today.`));
+  if (context.limitations) container.append(note('Not seeing an animal listed doesn’t mean there are none; records depend on where people report.', true));
   for (const sighting of context.sightings.slice(0, 5)) {
     const card = el('article', null, 'wildlife-card');
-    card.append(el('strong', sighting.species || 'Species not supplied'),
-      note(`Observed ${siteTime(sighting.observed_at, detail.timezone)}${finite(sighting.distance_km) ? ` · ${sighting.distance_km.toFixed(1)} km from site` : ''}`));
-    const source = sourceLink(sighting, 'GBIF sighting source');
+    card.append(el('strong', speciesName(sighting.species)),
+      note(`Seen ${siteTime(sighting.observed_at, detail.timezone)}${finite(sighting.distance_km) ? ` · ${sighting.distance_km.toFixed(1)} km (${(sighting.distance_km * 0.621).toFixed(1)} mi) away` : ''}`));
+    const source = sourceLink({...sighting, source_name: 'GBIF sighting record'}, 'GBIF sighting record');
     if (source) card.append(source);
     container.append(card);
   }
-  if (context.sightings.length > 5) container.append(note(`Showing 5 of ${context.sightings.length} returned sightings.`));
-  container.append(note('A recorded sighting is not an encounter probability and adds no numeric points to the screening index.'));
+  if (context.sightings.length > 5) container.append(note(`Showing 5 of ${context.sightings.length} sightings.`));
+  container.append(note('Sightings don’t change the hazard score. Crew reports of animals seen today appear below.'));
   return container;
 }
 function renderAlerts(detail) {
@@ -346,7 +346,7 @@ function renderAlerts(detail) {
   container.append(watchChip(lightning.text, lightning.status === 'stop_work' ? 'high' : lightning.status === 'clear' ? 'low' : 'unknown',
     'lightning', detail.site_id, 'detail'));
   if (lightning.status === 'unknown') container.append(note(detail.lightning_status?.reason || 'The lightning watch could not confirm current conditions.', true));
-  if (lightning.status === 'clear') container.append(note('The lightning watch was checked recently. This is not a general all-clear.'));
+  if (lightning.status === 'clear') container.append(note('No lightning within 10 miles. Keep an eye on the other conditions.'));
   container.append(note(`Lightning checked ${siteTime(detail.lightning_status?.checked_at, detail.timezone)}`));
   const lightningSource = sourceLink(detail.lightning_status, 'Lightning source');
   if (lightningSource) container.append(lightningSource);
@@ -364,7 +364,7 @@ function renderAlerts(detail) {
     card.append(note(`Started ${siteTime(alert.started_at, detail.timezone)}`));
     container.append(card);
   }
-  if (!detail.active_alerts.length) container.append(note('No active site alerts returned. This is not confirmation that conditions are safe.'));
+  if (!detail.active_alerts.length) container.append(note('No alerts at this site right now. Still check conditions before work.'));
   const warnings = warningsDisplay(detail.warnings_status, detail.environmental_events);
   container.append(watchChip(warnings.text, warnings.status === 'ok' ? 'low' : 'unknown',
     'warnings', detail.site_id, 'detail'));
@@ -375,7 +375,7 @@ function renderAlerts(detail) {
   for (const event of detail.environmental_events || []) {
     const upcoming = Date.parse(event.starts_at) > Date.now();
     const row = el('div', null, 'event-row');
-    row.append(note(`${upcoming ? 'Upcoming' : 'Active'} ${label(event.hazard_type)}: ${event.title} · ${siteTime(event.starts_at, detail.timezone)}`));
+    row.append(note(`${upcoming ? 'Starting ' + siteTime(event.starts_at, detail.timezone) : 'In effect'}: ${String(event.title || 'Weather alert').split(' issued ')[0]}${event.ends_at ? ` · until ${siteTime(event.ends_at, detail.timezone)}` : ''}`));
     const link = sourceLink(event, 'Event source');
     if (link) row.append(link);
     container.append(row);
@@ -403,7 +403,7 @@ function renderReports(detail) {
     container.append(note('Sign in again to view crew reports and private photos.', true));
     return container;
   }
-  container.append(note('Open high-severity reports create warnings. Resolving a report clears its warning, not an independent lightning alert.'));
+  container.append(note('A high-severity report creates a warning for the crew. Resolving the report clears that warning (not a lightning stop-work).'));
   for (const report of state.reports) {
     const card = el('article', null, 'report-card');
     const meta = el('div', null, 'site-meta');
@@ -575,7 +575,7 @@ async function start() {
     $('connection').textContent = 'Sample data · no live connection';
     api = await createSampleAPI();
   } else if (config.mode === 'live') {
-    $('mode-banner').textContent = 'LIVE API MODE · Screening values are prototypes, not injury probabilities or work authorization. Lightning and NWS status are shown only when their watches confirm a recent check.';
+    $('mode-banner').textContent = 'Live data. Hazard scores are early-stage estimates, not permission to work. Lightning and weather warnings show only after a recent check.';
     auth = createAuth(config.auth);
     const action = $('auth-action'); action.hidden = false;
     action.disabled = true; action.textContent = 'Checking sign-in…';
@@ -639,7 +639,7 @@ async function start() {
       onInvalidate: refresh, onSessionExpired: showError, onStatus(connected) {
         if (sessionExpired) return;
         $('connection').dataset.connected = String(connected);
-        $('connection').textContent = connected ? 'Live events connected' : 'Polling · live events unavailable';
+        $('connection').textContent = connected ? 'Live updates on' : 'Live updates paused · refreshing every 30 seconds';
       }});
     // Polling also recovers missed events. A successful fetch is never presented as a live socket.
     poll = setInterval(() => void refresh().catch(showError), config.pollMs);

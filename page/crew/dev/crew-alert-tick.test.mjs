@@ -44,7 +44,7 @@ test('expired sign-in retains the current lightning hold while marking live upda
   assert.doesNotThrow(h.tick);
   assert.equal(h.nodes.get('#crew-alert').dataset.tone,'hold');
   assert.equal(h.nodes.get('#crew-countdown').textContent,'30:00');
-  assert.match(h.nodes.get('#crew-stream').textContent,/Sign-in expired.*paused/);
+  assert.match(h.nodes.get('#crew-stream').textContent,/Signed out.*sign in again/);
   h.state.site=null;
   assert.doesNotThrow(h.tick);
 });

@@ -22,17 +22,17 @@ export function alertView(alert, connected, now = Date.now(), watch = null) {
   if (watched?.status === 'stop_work' && alert?.status !== 'hold') {
     return {title:'Stop work · Lightning', detail:'The API reports a stop-work condition. The countdown is unavailable; confirm with your supervisor.', tone:'hold', seconds:null};
   }
-  if (!alert) return {title:'Status unavailable', detail:'Waiting for the alert service. Confirm conditions with your supervisor.', tone:'unknown', seconds:null};
+  if (!alert) return {title:'Checking lightning…', detail:'Waiting for the alert service. Check with your supervisor before working outside.', tone:'unknown', seconds:null};
   if (alert.status === 'hold') {
     const seconds = remainingSeconds(alert.all_clear_at, now);
     const replay = alert.is_replay === true;
     return {title:replay?'REPLAY · Stop work · Lightning':'Stop work · Lightning',
-      detail:replay ? 'Recorded storm replay for the demo, not a current lightning observation. Wait for the server to clear this simulated hold.'
-        : seconds === 0 ? 'Timer elapsed. Waiting for server confirmation; do not resume from the timer alone.'
-        : 'Follow your site lightning procedure. Every new nearby strike resets this hold.', tone:'hold', seconds};
+      detail:replay ? 'This is a recorded storm played back for the demo, not real lightning. It clears on its own.'
+        : seconds === 0 ? 'Timer is done. Wait for the all-clear before going back to work.'
+        : 'Get to shelter and follow your lightning procedure. Each new strike nearby restarts the timer.', tone:'hold', seconds};
   }
-  if (!connected || alert.status !== 'cleared' || (watched && watched.status !== 'clear')) return {title:'Status unavailable', detail:connected?'The lightning watch has not confirmed a fresh clear status. Check with your supervisor.':'Live updates are unavailable. The screen cannot confirm that work may resume.', tone:'unknown', seconds:null};
-  return {title:'No active lightning hold reported', detail:'This describes the lightning alert only. Check all hazards and follow site procedures.', tone:'clear', seconds:null};
+  if (!connected || alert.status !== 'cleared' || (watched && watched.status !== 'clear')) return {title:'Can’t confirm lightning status', detail:connected?'The lightning check is out of date. Check with your supervisor before working outside.':'Live updates are off, so this screen can’t confirm it’s safe. Check with your supervisor.', tone:'unknown', seconds:null};
+  return {title:'No lightning stop-work right now', detail:'Check the other conditions below and follow your site procedures.', tone:'clear', seconds:null};
 }
 
 export function contributionLabel(factor) {

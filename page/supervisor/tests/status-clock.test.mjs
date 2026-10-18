@@ -18,10 +18,10 @@ test('clock changes a clear lightning chip to unavailable without a new fetch', 
   const root = {querySelectorAll: () => [node]};
   const row = {...first, active_alert: null, lightning_status: {status: 'clear', checked_at: new Date(now).toISOString()}};
   updateWatchChips(root, [row], null, now);
-  assert.equal(node.textContent, 'Lightning watch clear');
+  assert.equal(node.textContent, 'No lightning within 10 miles');
   assert.equal(node.dataset.tone, 'low');
   updateWatchChips(root, [row], null, now + 5 * 60000 + 1);
-  assert.equal(node.textContent, 'Lightning data unavailable');
+  assert.equal(node.textContent, 'Can’t confirm lightning right now');
   assert.equal(node.dataset.tone, 'unknown');
 });
 
@@ -33,10 +33,10 @@ test('clock expires NWS no-active status but never clears an active stop-work al
     lightning_status: {status: 'clear', checked_at: new Date(now).toISOString()},
     warnings_status: {status: 'ok', checked_at: new Date(now).toISOString()}, environmental_events: []};
   updateWatchChips(root, [first], detail, now);
-  assert.equal(warnings.textContent, 'No active NWS alerts');
+  assert.equal(warnings.textContent, 'No weather warnings right now');
   assert.equal(lightning.textContent, 'Lightning · STOP WORK');
   updateWatchChips(root, [first], detail, now + 16 * 60000);
-  assert.equal(warnings.textContent, 'NWS warning status unavailable');
+  assert.equal(warnings.textContent, 'Can’t check weather warnings right now');
   assert.equal(warnings.dataset.tone, 'unknown');
   assert.equal(lightning.textContent, 'Lightning · STOP WORK');
 });

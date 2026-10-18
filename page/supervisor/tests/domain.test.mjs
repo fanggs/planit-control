@@ -17,8 +17,8 @@ test('all shipped sample prototype screenings reconcile and retain signed featur
     assert.ok(Math.abs(score.total - detail.screening.score) < 1e-8);
     assert.equal(detail.screening.clears_stop_work, false);
   }
-  assert.equal(featureLabel('rain_total_24h_in'), '24-hour rain');
-  assert.equal(featureLabel('month_cos'), 'Season (cosine)');
+  assert.equal(featureLabel('rain_total_24h_in'), 'Rain over 24 hours');
+  assert.equal(featureLabel('month_cos'), 'Time of year (2)');
   assert.equal(featureLabel('heat_index_max_f_missing'), 'Heat index not available');
 });
 test('screening uses exact feature reconciliation and rejects missing safety metadata', () => {
@@ -79,21 +79,21 @@ test('only fresh explicit lightning clear and NWS ok may produce clear/no-active
   assert.equal(lightningDisplay({status: 'clear', checked_at}, sampleNow, true).status, 'stop_work');
   assert.equal(warningsDisplay(null, [], sampleNow).status, 'unknown');
   assert.equal(warningsDisplay({status: 'unknown', checked_at}, [], sampleNow).status, 'unknown');
-  assert.equal(warningsDisplay({status: 'ok', checked_at}, [], sampleNow).text, 'No active NWS alerts');
+  assert.equal(warningsDisplay({status: 'ok', checked_at}, [], sampleNow).text, 'No weather warnings right now');
   assert.equal(warningsDisplay({status: 'ok', checked_at}, [], sampleNow + 16 * 60000).status, 'unknown');
   const active = {event_kind: 'nws_warning', starts_at: '2026-10-17T18:00:00Z', ends_at: '2026-10-17T19:00:00Z',
     title: 'Rip Current Statement issued October 17 at 7:32PM EDT by NWS Miami FL'};
   const upcoming = {...active, starts_at: '2026-10-17T19:00:00Z'};
   assert.equal(warningsDisplay({status: 'ok', checked_at}, [active], sampleNow).text,
-    '1 active NWS alert: Rip Current Statement');
+    '1 weather alert: Rip Current Statement');
   assert.equal(warningsDisplay({status: 'ok', checked_at}, [active, {...active, title: 'Rip Current Statement issued later'}],
-    sampleNow).text, '2 active NWS alerts: Rip Current Statement');  // an NWS update is named once
-  assert.equal(warningsDisplay({status: 'ok', checked_at}, [upcoming], sampleNow).text, 'No active NWS alerts');
+    sampleNow).text, '2 weather alerts: Rip Current Statement');  // an NWS update is named once
+  assert.equal(warningsDisplay({status: 'ok', checked_at}, [upcoming], sampleNow).text, 'No weather warnings right now');
 });
 test('wildlife sightings remain evidence with no inferred encounter probability', () => {
-  assert.match(wildlifeSummary(details[9001].wildlife_context), /evidence, not encounter probability/);
-  assert.match(wildlifeSummary(details[9002].wildlife_context), /does not mean wildlife is absent/);
-  assert.match(wildlifeSummary(details[9003].wildlife_context), /unavailable/);
+  assert.match(wildlifeSummary(details[9001].wildlife_context), /past sightings? nearby \(not live\)/);
+  assert.match(wildlifeSummary(details[9002].wildlife_context), /doesn’t mean there are no animals/);
+  assert.match(wildlifeSummary(details[9003].wildlife_context), /aren’t available/);
   assert.equal(details[9001].wildlife_context.numeric_score_contribution, null);
 });
 test('only open reports with coordinates become active map pins', () => {

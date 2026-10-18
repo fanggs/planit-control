@@ -6,15 +6,15 @@ const stamp=value=>typeof value==='string'&&Number.isFinite(Date.parse(value))?v
 const twoHours=2*60*60*1000;
 // Same wording as the supervisor dashboard (page/supervisor/domain.js).
 export const FEATURE_LABELS=Object.freeze({
-  temperature_max_f:'Maximum temperature',temperature_min_f:'Minimum temperature',
-  humidity_mean_pct:'Average humidity',humidity_min_pct:'Minimum humidity',wind_max_mph:'Maximum wind',
-  rain_max_1h_in:'Peak hourly rain',rain_total_24h_in:'24-hour rain',heat_index_max_f:'Maximum heat index',
+  temperature_max_f:'High temperature',temperature_min_f:'Low temperature',
+  humidity_mean_pct:'Average humidity',humidity_min_pct:'Lowest humidity',wind_max_mph:'Strongest wind',
+  rain_max_1h_in:'Heaviest hourly rain',rain_total_24h_in:'Rain over 24 hours',heat_index_max_f:'Highest heat index',
   heat_index_max_f_missing:'Heat index not available',
-  antecedent_forecast_rain_24h_in:'Previous 24-hour forecast rain',
-  antecedent_forecast_rain_72h_in:'Previous 72-hour forecast rain',
-  antecedent_forecast_rain_168h_in:'Previous 7-day forecast rain',
-  latitude:'Latitude',longitude:'Longitude',elevation_m:'Elevation',
-  month_sin:'Season (sine)',month_cos:'Season (cosine)',hour_sin:'Hour (sine)',hour_cos:'Hour (cosine)',
+  antecedent_forecast_rain_24h_in:'Rain in the past day',
+  antecedent_forecast_rain_72h_in:'Rain in the past 3 days',
+  antecedent_forecast_rain_168h_in:'Rain in the past week',
+  latitude:'Location (north–south)',longitude:'Location (east–west)',elevation_m:'Elevation',
+  month_sin:'Time of year',month_cos:'Time of year (2)',hour_sin:'Time of day',hour_cos:'Time of day (2)',
   soil_moisture:'Soil moisture'
 });
 export function featureLabel(feature){

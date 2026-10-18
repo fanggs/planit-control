@@ -5,7 +5,7 @@ const finite = value => typeof value === 'number' && Number.isFinite(value);
 export function heatIndexDisplay(weather) {
   if (finite(weather?.heat_index_f)) return `Heat index ${weather.heat_index_f} °F`;
   const air = weather?.temperature_f;
-  if (finite(air) && air < 80) return `Not calculated below 80 °F · air temperature ${air} °F`;
-  if (finite(air) && air > 112) return `Outside supported range above 112 °F · air temperature ${air} °F`;
+  if (finite(air) && air < 80) return `Heat index only applies above 80 °F · it’s ${air} °F now`;
+  if (finite(air) && air > 112) return `Too hot for the heat index formula (above 112 °F) · it’s ${air} °F. Treat as extreme heat.`;
   return `Unavailable${finite(air) ? ` · air temperature ${air} °F` : ''}`;
 }

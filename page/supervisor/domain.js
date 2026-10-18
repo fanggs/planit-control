@@ -10,15 +10,16 @@ export const validFactors = rows => Array.isArray(rows) && rows.every(row =>
   && row.feature.length <= 100 && finite(row.contribution));
 export const label = hazard => HAZARDS[hazard] || 'Unknown hazard';
 export const points = value => `${value > 0 ? '+' : ''}${value.toFixed(1)}`;
-const FEATURE_LABELS = Object.freeze({temperature_max_f: 'Maximum temperature', temperature_min_f: 'Minimum temperature',
-  humidity_mean_pct: 'Average humidity', humidity_min_pct: 'Minimum humidity', wind_max_mph: 'Maximum wind',
-  rain_max_1h_in: 'Peak hourly rain', rain_total_24h_in: '24-hour rain', heat_index_max_f: 'Maximum heat index',
+const FEATURE_LABELS = Object.freeze({temperature_max_f: 'High temperature',temperature_min_f: 'Low temperature',
+  humidity_mean_pct: 'Average humidity',humidity_min_pct: 'Lowest humidity',wind_max_mph: 'Strongest wind',
+  rain_max_1h_in: 'Heaviest hourly rain',rain_total_24h_in: 'Rain over 24 hours',heat_index_max_f: 'Highest heat index',
   heat_index_max_f_missing: 'Heat index not available',
-  antecedent_forecast_rain_24h_in: 'Previous 24-hour forecast rain',
-  antecedent_forecast_rain_72h_in: 'Previous 72-hour forecast rain',
-  antecedent_forecast_rain_168h_in: 'Previous 7-day forecast rain', latitude: 'Latitude', longitude: 'Longitude',
-  elevation_m: 'Elevation', month_sin: 'Season (sine)', month_cos: 'Season (cosine)',
-  hour_sin: 'Hour (sine)', hour_cos: 'Hour (cosine)'});
+  antecedent_forecast_rain_24h_in: 'Rain in the past day',
+  antecedent_forecast_rain_72h_in: 'Rain in the past 3 days',
+  antecedent_forecast_rain_168h_in: 'Rain in the past week',
+  latitude: 'Location (north–south)',longitude: 'Location (east–west)',elevation_m: 'Elevation',
+  month_sin: 'Time of year',month_cos: 'Time of year (2)',hour_sin: 'Time of day',hour_cos: 'Time of day (2)',
+  soil_moisture: 'Soil moisture'});
 export const featureLabel = feature => Object.hasOwn(FEATURE_LABELS, feature)
   ? FEATURE_LABELS[feature] : String(feature).replaceAll('_', ' ');
 export const shownScoreStatus = status => status === 'research' || status === 'validated_prototype';
@@ -120,25 +121,25 @@ export function lightningDisplay(watch, now = Date.now(), activeStopWork = false
   if (activeStopWork || watch?.status === 'stop_work') return {status: 'stop_work', text: 'Lightning · STOP WORK'};
   const checked = validTime(watch?.checked_at) ? Date.parse(watch.checked_at) : null;
   if (watch?.status === 'clear' && checked !== null && checked <= now && now - checked <= 5 * 60000) {
-    return {status: 'clear', text: 'Lightning watch clear'};
+    return {status: 'clear', text: 'No lightning within 10 miles'};
   }
-  return {status: 'unknown', text: 'Lightning data unavailable'};
+  return {status: 'unknown', text: 'Can’t confirm lightning right now'};
 }
 export function warningsDisplay(watch, events, now = Date.now()) {
   const checked = validTime(watch?.checked_at) ? Date.parse(watch.checked_at) : null;
   if (watch?.status !== 'ok' || checked === null || checked > now || now - checked > 15 * 60000) {
-    return {status: 'unknown', text: 'NWS warning status unavailable'};
+    return {status: 'unknown', text: 'Can’t check weather warnings right now'};
   }
-  if (!Array.isArray(events)) return {status: 'unknown', text: 'NWS warning status unavailable'};
+  if (!Array.isArray(events)) return {status: 'unknown', text: 'Can’t check weather warnings right now'};
   if (events.some(event => String(event?.event_kind || '').startsWith('nws_') && !validTime(event.starts_at))) {
-    return {status: 'unknown', text: 'NWS warning status unavailable'};
+    return {status: 'unknown', text: 'Can’t check weather warnings right now'};
   }
   const active = events.filter(event => String(event?.event_kind || '').startsWith('nws_')
     && validTime(event.starts_at) && Date.parse(event.starts_at) <= now
     && (!validTime(event.ends_at) || Date.parse(event.ends_at) > now));
   return {status: 'ok', text: active.length
-    ? `${active.length} active NWS alert${active.length === 1 ? '' : 's'}: ${nwsNames(active)}`
-    : 'No active NWS alerts'};
+    ? `${active.length} weather alert${active.length === 1 ? '' : 's'}: ${nwsNames(active)}`
+    : 'No weather warnings right now'};
 }
 // "Rip Current Statement issued October 17 at ..." -> "Rip Current Statement", each event once.
 export function nwsNames(events) {
@@ -147,10 +148,10 @@ export function nwsNames(events) {
 }
 export function wildlifeSummary(context) {
   if (!context || !Array.isArray(context.sightings) || context.status === 'unavailable') {
-    return 'Wildlife evidence unavailable. This does not mean wildlife is absent.';
+    return 'Sighting records aren’t available right now. That doesn’t mean there are no animals.';
   }
-  if (context.sightings.length === 0) return 'No sightings in this limited sample. This does not mean wildlife is absent.';
-  return `${context.sightings.length} nearby recorded sighting${context.sightings.length === 1 ? '' : 's'} shown · evidence, not encounter probability.`;
+  if (context.sightings.length === 0) return 'No past sightings recorded nearby. That doesn’t mean there are no animals.';
+  return `${context.sightings.length} past sighting${context.sightings.length === 1 ? '' : 's'} nearby (not live)`;
 }
 export function freshness(value, now = Date.now(), staleMinutes = 60) {
   if (!validTime(value)) return {text: 'No timestamp', stale: true};
@@ -189,4 +190,12 @@ export function hasSupervisorRole(user, claim) {
 }
 export function safeSourceURL(value) {
   try { const url = new URL(value); return url.protocol === 'https:' && !url.username && !url.password ? url.href : null; } catch { return null; }
+}
+// Common names first; the scientific name stays for anyone looking it up.
+const SPECIES = {'Sistrurus miliarius': 'Pygmy rattlesnake', 'Agkistrodon piscivorus': 'Cottonmouth (water moccasin)',
+  'Agkistrodon conanti': 'Florida cottonmouth', 'Alligator mississippiensis': 'American alligator',
+  'Agkistrodon contortrix': 'Copperhead'};
+export function speciesName(species) {
+  if (typeof species !== 'string' || !species.trim()) return 'Animal not identified';
+  return SPECIES[species] ? `${SPECIES[species]} (${species})` : species;
 }

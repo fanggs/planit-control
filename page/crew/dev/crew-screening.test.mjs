@@ -31,7 +31,7 @@ function detail(now=epoch){return {...structuredClone(legacy.details['9001']),sc
 test('v1.2 screening takes priority over legacy scores and retains signed feature explanations and evidence',()=>{
   const site=createContractMapper({now:()=>epoch}).site(detail());
   assert.equal(site.score,6.4);assert.equal(site.baseline,2.1);assert.equal(site.score_status,'research');
-  assert.equal(site.score_reconciles,true);assert.equal(site.factors[0].name,'24-hour rain');
+  assert.equal(site.score_reconciles,true);assert.equal(site.factors[0].name,'Rain over 24 hours');
   assert.equal(site.factors[3].contribution,-.4);assert.equal(site.factors[0].hazard_type,undefined);
   assert.equal(site.valid_until,iso(epoch+86400000));assert.equal(site.alert.status,'hold');
   assert.equal(site.alert.all_clear_at,'2026-10-17T18:34:00Z');
@@ -71,7 +71,7 @@ test('summary metadata supports the contract list without inventing a forecast w
   delete raw.status;delete raw.captured_at;delete raw.valid_from;delete raw.valid_until;
   const summary=mapSiteSummary(raw,{now:epoch});
   assert.equal(summary.score,6.4);assert.equal(summary.valid_from,null);assert.equal(summary.score_status,'research');
-  assert.equal(summary.top_factors[0].name,'24-hour rain');
+  assert.equal(summary.top_factors[0].name,'Rain over 24 hours');
   assert.match(scoreWindowHTML(summary),/Next 24 hours.*exact window available in site details/);
   assert.equal(screeningSummary({...raw,score_status:'stale'},epoch).score,null);
   assert.equal(mapSiteSummary({...raw,top_factors:[]},{now:epoch}).score,null);
@@ -87,12 +87,12 @@ test('HTTP adapter accepts v1.2 detail from the authorized endpoint',async()=>{
 test('UI shows Prototype, the target window, signed contributions and a reconciled waterfall',()=>{
   const site=createContractMapper().site(detail(Date.now())),html=scorePanel(site),wildlife=wildlifeHTML(site);
   assert.match(html,/>Prototype</);assert.match(html,/Forecast window:/);assert.doesNotMatch(html,/Forecast window: not supplied/);
-  assert.match(html,/24-hour rain/);assert.match(html,/-0.40 points/);assert.match(html,/Not an injury|not an established probability/);
+  assert.match(html,/Rain over 24 hours/);assert.match(html,/-0.40 points/);assert.match(html,/doesn’t predict injuries/);
   assert.match(html,/crew-waterfall/);assert.match(html,/Baseline/);assert.match(html,/Final index/);
   assert.doesNotMatch(html,/<svg/);assert.match(wildlife,/2025-09-11/);assert.match(wildlife,/GBIF/);assert.match(wildlife,/19.2 km/);
-  assert.match(wildlife,/Coordinate uncertainty: 5 m/);assert.match(wildlife,/do not.*contribute points/);
-  assert.match(wildlifeHTML({}),/unavailable.*does not mean wildlife is absent/);
-  assert.match(wildlifeHTML({wildlife_context:{status:'no_records_in_sample',sightings:[]}}),/No sightings.*does not mean wildlife is absent/);
+  assert.match(wildlife,/location accurate to about 5 m/);assert.match(wildlife,/not what’s here today/);
+  assert.match(wildlifeHTML({}),/aren’t available.*doesn’t mean there are no animals/);
+  assert.match(wildlifeHTML({wildlife_context:{status:'no_records_in_sample',sightings:[]}}),/No past sightings.*doesn’t mean there are no animals/);
   assert.match(scoreBadgeHTML({demo:true,score:4}),/Sample score/);
   assert.equal(scoreWaterfall({...site,score_reconciles:false}),'');
 });
@@ -102,7 +102,7 @@ test('map merges retain prototype metadata and prevent stale or null scores from
   raw.lightning_status={status:'clear',checked_at:new Date().toISOString()};
   const [site]=atlasSummaries([roster.find(s=>s.id==='621')],[raw]);
   assert.equal(site.score,6.4);assert.equal(site.score_status,'research');assert.equal(site.valid_until,raw.valid_until);
-  assert.equal(site.top_factors[0].name,'24-hour rain');assert.equal(site.lightning_status.status,'clear');
+  assert.equal(site.top_factors[0].name,'Rain over 24 hours');assert.equal(site.lightning_status.status,'clear');
   assert.equal(site.name,'Turkey Point');
   assert.equal(atlasSummaries([site],[{...raw,score_status:'stale'}])[0].score,null);
   assert.equal(atlasSummaries([site],[{...raw,score:null}])[0].score,null);

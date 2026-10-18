@@ -10,6 +10,6 @@ export async function loadDashboardFeeds(api) {
 
 export function alertFeedDisplay(alerts) {
   if (alerts === null) return {count: 'No data', status: 'Alert feed unavailable · do not infer safety'};
-  if (alerts.length === 0) return {count: '0', status: 'No active alerts returned · feed health unconfirmed'};
+  if (alerts.length === 0) return {count: '0', status: 'No alerts right now'};
   return {count: String(alerts.length), status: 'Warnings and stop-work alerts'};
 }

@@ -8,7 +8,7 @@ test('a healthy alert feed keeps its count distinct from unavailable alerts', as
   assert.deepEqual(await loadDashboardFeeds({sites: async () => sites, alerts: async () => alerts}),
     {sites, alerts, alertError: null});
   assert.deepEqual(alertFeedDisplay(alerts), {count: '1', status: 'Warnings and stop-work alerts'});
-  assert.deepEqual(alertFeedDisplay([]), {count: '0', status: 'No active alerts returned · feed health unconfirmed'});
+  assert.deepEqual(alertFeedDisplay([]), {count: '0', status: 'No alerts right now'});
 });
 
 test('an alert failure preserves healthy sites and never displays zero alerts', async () => {

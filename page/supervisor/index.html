@@ -27,7 +27,7 @@
         <div class="planit-eyebrow">Operations overview</div>
         <div class="program-subtitle">PlanIT Control for Sperry Tech</div>
         <h1>Know where attention is needed.</h1>
-        <p>Prototype warning-exposure screening, live alerts and crew observations in one place.</p>
+        <p>Early-stage hazard scores, live alerts and crew observations in one place.</p>
       </div>
       <div class="hero-actions"><span id="connection" class="connection">Connecting…</span><button id="refresh" class="planit-button" disabled>↻ Refresh</button></div>
     </div>
@@ -36,12 +36,12 @@
     <div id="metrics" class="metrics" aria-label="Network overview">
       <div class="metric"><span>Sites in network</span><strong id="site-count">—</strong><small id="site-subtitle">Awaiting data</small></div>
       <div class="metric"><span>Active alerts</span><strong id="alert-count">—</strong><small id="alert-status" role="status">Warnings and stop-work alerts</small></div>
-      <div class="metric"><span>Open crew reports</span><strong id="report-count">—</strong><small>Reports do not change model scores</small></div>
-      <div class="metric"><span>Sites without screening</span><strong id="missing-count">—</strong><small>Unknown never means safe</small></div>
+      <div class="metric"><span>Open crew reports</span><strong id="report-count">—</strong><small>Crew reports don’t change the score</small></div>
+      <div class="metric"><span>Sites without screening</span><strong id="missing-count">—</strong><small>No score doesn’t mean safe</small></div>
     </div>
     <section id="ask-panel" class="ask-panel panel" aria-labelledby="ask-title" aria-busy="false">
       <div class="ask-heading"><div><div class="planit-eyebrow">Explore the evidence</div><h2 id="ask-title">Ask about site data</h2></div><span class="planit-chip">Gemini · read-only SQL</span></div>
-      <p id="ask-help" class="ask-help">Ask about monitored plants, weather, forecasts, alerts or prototype screening. Answers use available database records; they are not work-clearance advice.</p>
+      <p id="ask-help" class="ask-help">Ask about monitored plants, weather, forecasts, alerts or prototype screening. Answers use available database records; they are not permission to work.</p>
       <form id="ask-form" novalidate>
         <label for="ask-question">Your question</label>
         <div class="ask-controls"><input id="ask-question" name="question" type="text" minlength="3" maxlength="500" autocomplete="off" aria-describedby="ask-help" placeholder="Which plants have the strongest forecast wind?" disabled required><button id="ask-submit" class="planit-button primary" type="submit" disabled>Ask data</button></div>
@@ -61,7 +61,7 @@
     <div class="work-grid">
       <section class="site-panel panel" aria-labelledby="rank-title">
         <div class="panel-head"><div><div class="planit-eyebrow">Screening queue</div><h2 id="rank-title">Sites by prototype index</h2></div><span id="visible-count" class="planit-chip">—</span></div>
-        <p class="panel-caption">Highest warning-exposure index first. Not injury risk or permission to work; safety alerts are independent.</p>
+        <p class="panel-caption">Highest hazard score first. A low score isn’t permission to work; always follow active alerts.</p>
         <div id="site-list" class="site-list"><p class="empty">Loading sites…</p></div>
       </section>
       <section class="map-panel panel" aria-label="Site and crew-report map">
@@ -69,11 +69,11 @@
         <div id="map" tabindex="0" aria-label="Interactive map; all sites also appear in the ranked list"></div>
         <div id="map-status" class="map-status" role="status" hidden></div>
         <div class="map-key"><span><i class="dot high"></i>Prototype 7–10</span><span><i class="dot medium"></i>Prototype 4–&lt;7</span><span><i class="dot low"></i>Prototype 0–&lt;4</span><span><i class="dot unknown"></i>No screening</span><span><i class="report-dot"></i>Open crew report</span></div>
-        <p class="map-footnote">Colors show the prototype NWS-warning / heat-advisory screening index, not injury probability or work clearance.</p>
+        <p class="map-footnote">Colors show each plant’s hazard score: the chance of a weather warning or heat advisory in the next 24 hours.</p>
       </section>
       <aside id="detail" class="detail-panel panel" aria-label="Selected site details" aria-busy="false"><p class="empty">Select a site to see prototype feature contributions, safety alerts, wildlife evidence and crew reports.</p></aside>
     </div>
-    <footer><span>ForeSite <b>·</b> Supervisor workspace</span><span>Prototype warning-exposure screening + on-the-ground observations</span></footer>
+    <footer><span>ForeSite <b>·</b> Supervisor workspace</span><span>Early-stage hazard scores + on-the-ground observations</span></footer>
   </main>
   <noscript><div class="notice">JavaScript is required to load sites and validate sign-in.</div></noscript>
 </body>

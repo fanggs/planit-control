@@ -11,6 +11,6 @@ test('bad deadlines and unknown status do not manufacture a valid countdown',()=
 test('explanations round display values but retain signs and units',()=>{assert.equal(contributionLabel({contribution:-.8,unit:'score_points'}),'-0.80 points');assert.equal(contributionLabel({contribution:.17327775285409275,unit:'score_points'}),'+0.17 points');assert.equal(contributionLabel({contribution:.4,unit:'log_odds'}),'+0.40 log_odds');assert.equal(contributionLabel({contribution:null}),'Unavailable');});
 test('recorded lightning replay is visibly labeled without presenting it as a current strike',()=>{
   const view=alertView({...hold(1),is_replay:true},true,now);
-  assert.match(view.title,/REPLAY/);assert.match(view.detail,/not a current lightning observation/);
+  assert.match(view.title,/REPLAY/);assert.match(view.detail,/not real lightning/);
   assert.equal(view.tone,'hold');
 });
