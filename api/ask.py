@@ -68,11 +68,17 @@ Rules:
   date_part, now, greatest, least, coalesce. No JSON operators.
 - For "latest"/"current" values (scores, readings), take the newest row per site with
   DISTINCT ON (site_id) ... ORDER BY site_id, <time> DESC inside a subquery.
-- For forecast peaks or totals over a period ("tomorrow", "next 24 hours"), use the newest
-  run: WHERE issued_at = (SELECT max(issued_at) FROM public.weather_forecasts), filter
-  valid_at relative to now(), then max()/sum() GROUP BY the site.
+- For forecasts over a period ("tomorrow", "next 24 hours"), use the newest run, written
+  flat like this example (no derived tables):
+    SELECT s.name, max(f.wind_mph) AS max_wind_mph
+    FROM public.weather_forecasts f JOIN public.sites s ON s.site_id = f.site_id
+    WHERE f.issued_at = (SELECT max(issued_at) FROM public.weather_forecasts)
+      AND f.valid_at >= now() AND f.valid_at < now() + interval '24 hours'
+    GROUP BY s.name ORDER BY max_wind_mph DESC NULLS LAST LIMIT 5
 - Join to public.sites for plant names. Include source_name and source_url columns when
   the table has them and the query is not an aggregate.
+- Keep the query flat (the safety check rejects deep nesting): join tables directly in the
+  main FROM, use at most one subquery, and never put a subquery inside another subquery.
 - Keep results small: ORDER BY the most relevant column and LIMIT 20 or fewer.
 - Measurements can be NULL (no data; heat_index_f is only set when it's hot). When ranking
   by a measurement, filter "<column> IS NOT NULL" and sort with NULLS LAST, including
@@ -219,7 +225,7 @@ def answer(question: str) -> dict:
     """Contract response: {answer, sql, sources} or {answer: null, reason: cannot_answer}."""
     try:
         sql, problem = None, None
-        for _ in (1, 2):  # one retry if the guard or database rejects the query
+        for _ in (1, 2, 3):  # retries if the guard or database rejects the query
             sql = write_sql(question, problem)
             if not sql:
                 return {"answer": None, "reason": "cannot_answer"}

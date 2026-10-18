@@ -52,10 +52,10 @@ class AskTest(unittest.TestCase):
             self.assertEqual(ask.answer("What's the CEO's favorite color?"),
                              {"answer": None, "reason": "cannot_answer"})
 
-    def test_rejected_twice_means_cannot_answer(self):
+    def test_rejected_three_times_means_cannot_answer(self):
         with fake_llm(), patch.object(ask, "run", side_effect=ValueError("Relation is not allowlisted")) as run:
             self.assertEqual(ask.answer("Show me crew reports")["reason"], "cannot_answer")
-        self.assertEqual(run.call_count, 2)  # one retry with the guard's message
+        self.assertEqual(run.call_count, 3)  # retries with the guard's message
 
     def test_guard_blocks_writes_and_private_tables(self):
         for bad in ("DELETE FROM public.alerts",
