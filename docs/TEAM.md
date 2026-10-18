@@ -35,12 +35,13 @@ own part.
 | --- | --- | --- | --- |
 | Sid | `SidVal123` | Data + ML models | `get_data/`, `model/`, `db/` (except `db/hazard_report.sql`) |
 | Alan | `fanggs` | API, Gemini, real-time alerts, deploy | `api/` (except Aryan's files below), `jobs/`, `page/realtime/`, the DeepSpace bridge (`planit-realtime`) |
-| Aryan | `nimma-aryan` | Crew-report backend, crew and supervisor frontends, demo readiness | `api/schemas/hazard_report.py`, `api/services/hazard_report_service.py`, report and photo routes, `db/hazard_report.sql`, `page/crew/`, supervisor files in `page/`, shared styles |
+| Aryan | `nimma-aryan` | Hazard-report and photo backend, Auth0 API role checks | `api/schemas/hazard_report.py`, `api/services/hazard_report_service.py`, report and photo routes/services, `db/hazard_report.sql` |
+| Isaiah | `IsaiahCN` | Frontend and demo readiness | `page/` (except Alan's `page/realtime/`), including crew and supervisor screens and shared styles |
 
-For now, Aryan is the single owner of both his original work and Isaiah's
-former crew-screen and demo-readiness work. Isaiah has no separate active
-deliverable under this temporary ownership arrangement. This does not change
-the app's `crew` and `supervisor` Auth0 permissions.
+Isaiah owns frontend changes throughout `page/`; Alan continues to own the
+real-time bridge in `page/realtime/`. Aryan owns the report/photo API and its
+authorization boundary. File ownership does not change the app's `crew` and
+`supervisor` Auth0 permissions.
 
 What each role delivers:
 
@@ -50,12 +51,15 @@ What each role delivers:
 - **Alan:** the API and its contract, the Gemini layer (ask, briefings, photo
   tagging), the lightning rule and real-time events, and the deploy. Done when
   a judge can open the domain on their phone and watch a lightning alert fire.
-- **Aryan:** report and photo endpoints, report storage, Auth0 role checks on
-  the API, the shared design system, the supervisor dashboard, and the crew
-  screens (login, alerts with countdown, report form, score breakdown,
-  briefing). He also owns phone testing, link checks, and the Devpost draft.
-  Done when a stranger can use the crew side without help and a report
-  submitted from a phone shows up on the supervisor map.
+- **Aryan:** report and photo endpoints, report storage, private photo access,
+  and Auth0 role checks on the API. Done when an authorized crew report and
+  photo can be saved, retrieved, and resolved through the API, while an
+  unauthorized request is rejected.
+- **Isaiah:** the shared design system, supervisor dashboard, and crew screens
+  (login, alerts with countdown, report form, score breakdown, briefing).
+  He owns phone testing, link checks, and the Devpost draft. Done when a
+  stranger can use the crew side without help and a phone-submitted report
+  appears on the supervisor map.
 
 Stick to your own files. If you need a small change in someone else's, tell
 them first, keep it small, and pull right before and push right after.
