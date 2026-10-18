@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta name="description" content="ForeSite supervisor workspace: ranked environmental risks, explainable site scores, and crew reports.">
+  <meta name="description" content="ForeSite supervisor workspace: prototype warning-exposure screening, live safety alerts, and crew reports.">
   <title>Supervisor · ForeSite</title>
   <link rel="stylesheet" href="../shared/planit.css">
   <link rel="stylesheet" href="../crew/crew-vendor/leaflet.css">
@@ -27,7 +27,7 @@
         <div class="planit-eyebrow">Operations overview</div>
         <div class="program-subtitle">PlanIT Control for Sperry Tech</div>
         <h1>Know where attention is needed.</h1>
-        <p>Environmental risk, live alerts and crew observations in one place.</p>
+        <p>Prototype warning-exposure screening, live alerts and crew observations in one place.</p>
       </div>
       <div class="hero-actions"><span id="connection" class="connection">Connecting…</span><button id="refresh" class="planit-button" disabled>↻ Refresh</button></div>
     </div>
@@ -37,31 +37,43 @@
       <div class="metric"><span>Sites in network</span><strong id="site-count">—</strong><small id="site-subtitle">Awaiting data</small></div>
       <div class="metric"><span>Active alerts</span><strong id="alert-count">—</strong><small id="alert-status" role="status">Warnings and stop-work alerts</small></div>
       <div class="metric"><span>Open crew reports</span><strong id="report-count">—</strong><small>Reports do not change model scores</small></div>
-      <div class="metric"><span>Sites without scores</span><strong id="missing-count">—</strong><small>Unknown never means safe</small></div>
+      <div class="metric"><span>Sites without screening</span><strong id="missing-count">—</strong><small>Unknown never means safe</small></div>
     </div>
+    <section id="ask-panel" class="ask-panel panel" aria-labelledby="ask-title" aria-busy="false">
+      <div class="ask-heading"><div><div class="planit-eyebrow">Explore the evidence</div><h2 id="ask-title">Ask about site data</h2></div><span class="planit-chip">Gemini · read-only SQL</span></div>
+      <p id="ask-help" class="ask-help">Ask about monitored plants, weather, forecasts, alerts or prototype screening. Answers use available database records; they are not work-clearance advice.</p>
+      <form id="ask-form" novalidate>
+        <label for="ask-question">Your question</label>
+        <div class="ask-controls"><input id="ask-question" name="question" type="text" minlength="3" maxlength="500" autocomplete="off" aria-describedby="ask-help" placeholder="Which plants have the strongest forecast wind?" disabled required><button id="ask-submit" class="planit-button primary" type="submit" disabled>Ask data</button></div>
+      </form>
+      <div class="ask-examples" aria-label="Example questions"><span>Try:</span><button type="button" data-ask-example="How many monitored plants are in Florida?" disabled>Plants in Florida</button><button type="button" data-ask-example="Which plants have the strongest forecast wind in the next 24 hours?" disabled>Strongest forecast wind</button></div>
+      <p id="ask-status" class="ask-status" role="status" aria-live="polite">Sign in as a supervisor to ask about live data.</p>
+      <p id="ask-error" class="ask-error" role="alert" hidden></p>
+      <div id="ask-result" class="ask-result" role="region" aria-label="Question answer" hidden></div>
+    </section>
     <div class="toolbar">
       <label class="search"><span class="planit-sr-only">Search sites by name, state, region or plant code</span><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Find a site, state or plant code…" autocomplete="off"></label>
       <div class="filters" role="group" aria-label="Filter sites">
-        <button data-filter="all" aria-pressed="true">All sites</button><button data-filter="alerts" aria-pressed="false">With alerts</button><button data-filter="reports" aria-pressed="false">Crew reports</button><button data-filter="no-data" aria-pressed="false">No score</button>
+        <button data-filter="all" aria-pressed="true">All sites</button><button data-filter="alerts" aria-pressed="false">With alerts</button><button data-filter="reports" aria-pressed="false">Crew reports</button><button data-filter="no-data" aria-pressed="false">No screening</button>
       </div>
       <span id="updated" class="updated">No fetch yet</span>
     </div>
     <div class="work-grid">
       <section class="site-panel panel" aria-labelledby="rank-title">
-        <div class="panel-head"><div><div class="planit-eyebrow">Priority queue</div><h2 id="rank-title">Sites by risk</h2></div><span id="visible-count" class="planit-chip">—</span></div>
-        <p class="panel-caption">Highest model score first. Alerts are independent of the score.</p>
+        <div class="panel-head"><div><div class="planit-eyebrow">Screening queue</div><h2 id="rank-title">Sites by prototype index</h2></div><span id="visible-count" class="planit-chip">—</span></div>
+        <p class="panel-caption">Highest warning-exposure index first. Not injury risk or permission to work; safety alerts are independent.</p>
         <div id="site-list" class="site-list"><p class="empty">Loading sites…</p></div>
       </section>
       <section class="map-panel panel" aria-label="Site and crew-report map">
         <div class="map-heading"><span class="planit-eyebrow">Geographic view</span><button id="fit-map" class="map-fit" aria-label="Fit all filtered sites on map">Fit sites</button></div>
         <div id="map" tabindex="0" aria-label="Interactive map; all sites also appear in the ranked list"></div>
         <div id="map-status" class="map-status" role="status" hidden></div>
-        <div class="map-key"><span><i class="dot high"></i>7–10</span><span><i class="dot medium"></i>4–&lt;7</span><span><i class="dot low"></i>0–&lt;4</span><span><i class="dot unknown"></i>No score</span><span><i class="report-dot"></i>Open crew report</span></div>
-        <p class="map-footnote">Color bands aid scanning. They do not authorize work.</p>
+        <div class="map-key"><span><i class="dot high"></i>Prototype 7–10</span><span><i class="dot medium"></i>Prototype 4–&lt;7</span><span><i class="dot low"></i>Prototype 0–&lt;4</span><span><i class="dot unknown"></i>No screening</span><span><i class="report-dot"></i>Open crew report</span></div>
+        <p class="map-footnote">Colors show the prototype NWS-warning / heat-advisory screening index, not injury probability or work clearance.</p>
       </section>
-      <aside id="detail" class="detail-panel panel" aria-label="Selected site details" aria-busy="false"><p class="empty">Select a site to see its score explanation, alerts and crew reports.</p></aside>
+      <aside id="detail" class="detail-panel panel" aria-label="Selected site details" aria-busy="false"><p class="empty">Select a site to see prototype feature contributions, safety alerts, wildlife evidence and crew reports.</p></aside>
     </div>
-    <footer><span>ForeSite <b>·</b> Supervisor workspace</span><span>24-hour forecast risk + on-the-ground observations</span></footer>
+    <footer><span>ForeSite <b>·</b> Supervisor workspace</span><span>Prototype warning-exposure screening + on-the-ground observations</span></footer>
   </main>
   <noscript><div class="notice">JavaScript is required to load sites and validate sign-in.</div></noscript>
 </body>

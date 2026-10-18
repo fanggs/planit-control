@@ -22,6 +22,9 @@ test('preview serves direct and trailing-slash entries, modules, shared styles a
   }
   const dashboard = await (await fetch(base + '/supervisor/')).text();
   assert.match(dashboard, /PlanIT Control for Sperry Tech/);
+  assert.match(dashboard, /<form id="ask-form"/);
+  assert.match(dashboard, /id="ask-question"[^>]*disabled required/);
+  assert.match(dashboard, /id="ask-result"[^>]*hidden/);
   const redirect = await fetch(base + '/supervisor', {redirect: 'manual'});
   assert.equal(redirect.status, 308); assert.equal(redirect.headers.get('location'), '/supervisor/');
   assert.equal((await fetch(base + '/.env')).status, 404);
