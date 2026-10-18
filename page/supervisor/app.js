@@ -462,8 +462,13 @@ function renderDetail() {
   if (sample) header.append(chip('SAMPLE DATA', 'medium'));
   const scorePanel = renderScore(detail);
   $('detail').dataset.screeningStatus = scorePanel.dataset.screeningStatus;
-  $('detail').replaceChildren(...(state.detailStale ? [staleDetailNotice()] : []),
+  const next = document.createElement('div');
+  next.append(...(state.detailStale ? [staleDetailNotice()] : []),
     header, scorePanel, renderAlerts(detail), renderWeather(detail), renderWildlife(detail), renderReports(detail));
+  // Refreshes arrive every 30 s and on every live notice. Swapping in identical
+  // markup would replace the buttons under the supervisor's pointer, so only
+  // replace the panel when what it shows actually changed.
+  if (next.innerHTML !== $('detail').innerHTML) $('detail').replaceChildren(...next.childNodes);
   renderReportPins();
 }
 async function loadDetail(id) {

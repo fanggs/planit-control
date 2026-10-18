@@ -20,6 +20,8 @@ test('lightning is clear only while its explicit check is fresh; stop-work wins'
 test('NWS absence is meaningful only after a recent successful check',()=>{
   assert.equal(warningsWatch({status:'ok',checked_at:iso(-60000)},[],now).text,'No active NWS alerts');
   assert.equal(warningsWatch({status:'ok',checked_at:iso(-60000)},[event],now).count,1);
+  assert.match(warningsWatch({status:'ok',checked_at:iso(-60000)},[{...event,title:'Flood Warning issued October 18 at 1:00AM EDT'}],now).text,
+    /^1 active NWS alert: Flood Warning$/);
   assert.equal(warningsWatch({status:'ok',checked_at:iso(-900001)},[],now).status,'unknown');
   assert.equal(warningsWatch({status:'unknown',checked_at:iso(-60000)},[],now).status,'unknown');
   assert.equal(warningsWatch({status:'ok',checked_at:iso(-60000)},[{...event,starts_at:'broken'}],now).status,'unknown');

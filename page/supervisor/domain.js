@@ -136,8 +136,14 @@ export function warningsDisplay(watch, events, now = Date.now()) {
   const active = events.filter(event => String(event?.event_kind || '').startsWith('nws_')
     && validTime(event.starts_at) && Date.parse(event.starts_at) <= now
     && (!validTime(event.ends_at) || Date.parse(event.ends_at) > now));
-  return {status: 'ok', text: active.length ? `${active.length} active NWS alert${active.length === 1 ? '' : 's'}`
+  return {status: 'ok', text: active.length
+    ? `${active.length} active NWS alert${active.length === 1 ? '' : 's'}: ${nwsNames(active)}`
     : 'No active NWS alerts'};
+}
+// "Rip Current Statement issued October 17 at ..." -> "Rip Current Statement", each event once.
+export function nwsNames(events) {
+  const names = events.map(event => String(event?.title || '').split(' issued ')[0].trim()).filter(Boolean);
+  return [...new Set(names)].join(', ') || 'details below';
 }
 export function wildlifeSummary(context) {
   if (!context || !Array.isArray(context.sightings) || context.status === 'unavailable') {

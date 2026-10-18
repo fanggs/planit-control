@@ -4,12 +4,18 @@ const unavailableStatuses=new Set(['no_data','stale','invalid','research_unappro
 const number=value=>typeof value==='number'&&Number.isFinite(value);
 const stamp=value=>typeof value==='string'&&Number.isFinite(Date.parse(value))?value:null;
 const twoHours=2*60*60*1000;
+// Same wording as the supervisor dashboard (page/supervisor/domain.js).
 export const FEATURE_LABELS=Object.freeze({
-  rain_total_24h_in:'24-hour rain',wind_max_mph:'Max wind',heat_index_max_f:'Max heat index',
+  temperature_max_f:'Maximum temperature',temperature_min_f:'Minimum temperature',
+  humidity_mean_pct:'Average humidity',humidity_min_pct:'Minimum humidity',wind_max_mph:'Maximum wind',
+  rain_max_1h_in:'Peak hourly rain',rain_total_24h_in:'24-hour rain',heat_index_max_f:'Maximum heat index',
   heat_index_max_f_missing:'Heat index not available',
-  temperature_max_f:'Max temperature',temperature_min_f:'Min temperature',
-  month_cos:'Season · month cosine',month_sin:'Season · month sine',
-  latitude:'Latitude',longitude:'Longitude',soil_moisture:'Soil moisture'
+  antecedent_forecast_rain_24h_in:'Previous 24-hour forecast rain',
+  antecedent_forecast_rain_72h_in:'Previous 72-hour forecast rain',
+  antecedent_forecast_rain_168h_in:'Previous 7-day forecast rain',
+  latitude:'Latitude',longitude:'Longitude',elevation_m:'Elevation',
+  month_sin:'Season (sine)',month_cos:'Season (cosine)',hour_sin:'Hour (sine)',hour_cos:'Hour (cosine)',
+  soil_moisture:'Soil moisture'
 });
 export function featureLabel(feature){
   if(typeof feature!=='string'||!feature.trim()||feature.length>100)throw new Error('Invalid model feature.');

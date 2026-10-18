@@ -100,7 +100,12 @@ export function displayHazards(raw, activeAlerts, now = Date.now()) {
     reading: wildlife?.status === 'recorded_sightings' ? `${sightings.length} recorded sighting${sightings.length === 1 ? '' : 's'} nearby · details below`
       : wildlife?.status === 'no_records_in_sample' ? 'No sightings in this limited sample · details below'
       : 'Wildlife evidence unavailable · details below',
-    advice: 'Historical sightings are not a live encounter assessment; crew observations appear separately.'};
+    advice: 'Historical sightings are not a live encounter assessment; crew observations appear separately.',
+    // Cite the evidence itself: GBIF, dated by the newest recorded sighting.
+    ...(sightings.length ? {source_name: 'GBIF recorded sightings',
+      source_url: sightings.find(row => typeof row?.source_url === 'string')?.source_url ?? 'https://www.gbif.org/',
+      observed_at: time(sightings.map(row => row?.observed_at).filter(t => time(t)).sort().pop()),
+      time_label: 'Newest sighting'} : {})};
   for (const event of raw.environmental_events || []) {
     if (!activeEvent(event, now)) continue;
     const key = displayKeys[event.hazard_type];
@@ -194,7 +199,9 @@ export function createContractMapper({now = () => Date.now()} = {}) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(raw.for_date) || typeof raw.text !== 'string') throw new Error('Invalid briefing returned by the API.');
     return {...raw, id: `latest:${raw.site_id}:${raw.for_date}:${raw.generated_at}`, site_id: String(raw.site_id),
       title: 'Next-day safety briefing', valid_date: raw.for_date, body: raw.text,
-      timezone: snapshots.get(String(siteId))?.timezone ?? null, forecast: [], sources: [], delivery_status: null};
+      timezone: snapshots.get(String(siteId))?.timezone ?? null, forecast: [],
+      sources: (Array.isArray(raw.sources) ? raw.sources : []).filter(s => typeof s?.source_name === 'string' && typeof s?.source_url === 'string'),
+      delivery_status: null};
   }
   return {nextRevision, site, briefing};
 }

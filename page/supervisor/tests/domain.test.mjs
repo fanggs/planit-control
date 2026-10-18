@@ -81,9 +81,13 @@ test('only fresh explicit lightning clear and NWS ok may produce clear/no-active
   assert.equal(warningsDisplay({status: 'unknown', checked_at}, [], sampleNow).status, 'unknown');
   assert.equal(warningsDisplay({status: 'ok', checked_at}, [], sampleNow).text, 'No active NWS alerts');
   assert.equal(warningsDisplay({status: 'ok', checked_at}, [], sampleNow + 16 * 60000).status, 'unknown');
-  const active = {event_kind: 'nws_warning', starts_at: '2026-10-17T18:00:00Z', ends_at: '2026-10-17T19:00:00Z'};
+  const active = {event_kind: 'nws_warning', starts_at: '2026-10-17T18:00:00Z', ends_at: '2026-10-17T19:00:00Z',
+    title: 'Rip Current Statement issued October 17 at 7:32PM EDT by NWS Miami FL'};
   const upcoming = {...active, starts_at: '2026-10-17T19:00:00Z'};
-  assert.equal(warningsDisplay({status: 'ok', checked_at}, [active], sampleNow).text, '1 active NWS alert');
+  assert.equal(warningsDisplay({status: 'ok', checked_at}, [active], sampleNow).text,
+    '1 active NWS alert: Rip Current Statement');
+  assert.equal(warningsDisplay({status: 'ok', checked_at}, [active, {...active, title: 'Rip Current Statement issued later'}],
+    sampleNow).text, '2 active NWS alerts: Rip Current Statement');  // an NWS update is named once
   assert.equal(warningsDisplay({status: 'ok', checked_at}, [upcoming], sampleNow).text, 'No active NWS alerts');
 });
 test('wildlife sightings remain evidence with no inferred encounter probability', () => {

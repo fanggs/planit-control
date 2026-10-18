@@ -22,7 +22,15 @@ export function warningsWatch(watch, events = [], now = Date.now()) {
     (event.ends_at != null && !validTime(event.ends_at)))) {
     return {status: 'unknown', text: 'NWS warning status unavailable', count: null};
   }
-  const count = nws.filter(event => Date.parse(event.starts_at) <= now &&
-    (event.ends_at == null || Date.parse(event.ends_at) > now)).length;
-  return {status: 'ok', text: count ? `${count} active NWS alert${count === 1 ? '' : 's'}` : 'No active NWS alerts', count};
+  const active = nws.filter(event => Date.parse(event.starts_at) <= now &&
+    (event.ends_at == null || Date.parse(event.ends_at) > now));
+  const count = active.length;
+  return {status: 'ok', text: count ? `${count} active NWS alert${count === 1 ? '' : 's'}: ${nwsNames(active)}`
+    : 'No active NWS alerts', count};
+}
+
+// "Rip Current Statement issued October 17 at ..." -> "Rip Current Statement", each event once.
+export function nwsNames(events) {
+  const names = events.map(event => String(event?.title || '').split(' issued ')[0].trim()).filter(Boolean);
+  return [...new Set(names)].join(', ') || 'details below';
 }
