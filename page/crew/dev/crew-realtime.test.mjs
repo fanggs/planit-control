@@ -83,6 +83,30 @@ test('expired authentication stops the crew reconnect loop',async()=>{
   stop();
 });
 
+test('a 401 on a live notice closes the crew socket and ignores later recovery callbacks',async()=>{
+  const timers=clock(),connections=[],events=[],listeners=new Map();
+  const browser={navigator:{onLine:true},addEventListener(type,fn){listeners.set(type,fn);},removeEventListener(type){listeners.delete(type);}};
+  let callbacks,reads=0,closes=0,expired=false;
+  const stop=subscribeContractEvents({siteId:'621',timers,browser,
+    getSource:()=>({subscribe(value){callbacks=value;return()=>closes++;}}),getToken:async()=>'test-token',
+    readSite:async()=>{reads++;if(expired)throw Object.assign(new Error('Sign-in expired'),{status:401});return {id:'621',revision:reads};},
+    listSites:async()=>[],onEvent:value=>events.push(value),onConnection:value=>connections.push(value)});
+  try{
+    await flush();callbacks.onConnection(true);await flush();
+    assert.equal(connections.at(-1),true);assert.equal(timers.intervals.size,1);
+    expired=true;callbacks.onEvent({type:'alert.started',site_id:621,alert_id:101});await flush();
+    assert.equal(reads,2);assert.equal(closes,1);assert.equal(connections.at(-1),false);
+    assert.equal(timers.intervals.size,0);assert.equal(timers.timeouts.size,0);
+    const delivered=events.length;
+    callbacks.onConnection(true);callbacks.onError();
+    callbacks.onEvent({type:'alert.cleared',site_id:621,alert_id:101});
+    listeners.get('online')();await flush();
+    assert.equal(reads,2);assert.equal(events.length,delivered);
+    assert.equal(connections.at(-1),false);assert.equal(timers.timeouts.size,0);
+  }finally{stop();}
+  assert.equal(listeners.size,0);
+});
+
 test('offline pauses crew retries and online refetches before connected',async()=>{
   const timers=clock(),listeners=new Map(),browser={navigator:{onLine:false},
     addEventListener(type,handler){listeners.set(type,handler);},removeEventListener(type){listeners.delete(type);}};

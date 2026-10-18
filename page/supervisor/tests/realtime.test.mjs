@@ -54,6 +54,27 @@ test('expired authentication stops retrying and asks the page for sign-in', asyn
   stop();
 });
 
+test('a 401 after a connected notice pauses supervisor updates and requires a new sign-in', async () => {
+  const statuses=[],pending=new Map(),listeners=new Map();
+  let next=0,callbacks,reads=0,closes=0,expired=false,signIns=0;
+  const timers={setTimeout(fn){pending.set(++next,fn);return next;},clearTimeout(id){pending.delete(id);}};
+  const browser={navigator:{onLine:true},addEventListener(type,fn){listeners.set(type,fn);},removeEventListener(type){listeners.delete(type);}};
+  const stop=connectRealtime({timers,browser,getToken:async()=>'test-token',
+    getSource:()=>({subscribe(value){callbacks=value;return()=>closes++;}}),
+    onInvalidate:async()=>{reads++;if(expired)throw Object.assign(new Error('Sign-in expired'),{status:401});},
+    onStatus:value=>statuses.push(value),onSessionExpired:()=>signIns++});
+  try{
+    await settle();callbacks.onConnection(true);await settle();assert.equal(statuses.at(-1),true);
+    expired=true;callbacks.onEvent({type:'report.created',site_id:621,report_id:'private-test-id'});await settle();
+    assert.equal(reads,2);assert.equal(closes,1);assert.equal(signIns,1);
+    assert.equal(statuses.at(-1),false);assert.equal(pending.size,0);
+    callbacks.onConnection(true);callbacks.onError();
+    callbacks.onEvent({type:'scores.updated',site_ids:[621]});listeners.get('online')();await settle();
+    assert.equal(reads,2);assert.equal(signIns,1);assert.equal(statuses.at(-1),false);assert.equal(pending.size,0);
+  }finally{stop();}
+  assert.equal(listeners.size,0);
+});
+
 test('a burst during an in-flight refresh is coalesced into one follow-up', async () => {
   let callbacks, calls = 0;
   const finishes = [], statuses = [];
