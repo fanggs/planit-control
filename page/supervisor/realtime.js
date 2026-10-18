@@ -6,6 +6,7 @@ import {isSessionExpired} from '../shared/auth-session.mjs';
 export function connectRealtime({getSource, getToken, onInvalidate, onStatus, onSessionExpired = () => {},
   timers = globalThis, browser = globalThis}) {
   let stopped = false, cleanup, retry, opening, generation = 0, connected = false, attempt = 0;
+  let lastHidden = browser.document?.hidden === true;
   const active = gen => !stopped && gen === generation;
   const invalidate = createRefreshQueue(async () => {
     const gen = generation;
@@ -23,7 +24,7 @@ export function connectRealtime({getSource, getToken, onInvalidate, onStatus, on
     if (!active(gen)) return;
     generation++; connected = false; disconnect(); onStatus(false);
     timers.clearTimeout(retry);
-    if (browser.navigator?.onLine === false) return;
+    if (browser.navigator?.onLine === false || browser.document?.hidden) return;
     retry = timers.setTimeout(connect, Math.min(30000, 1000 * 2 ** Math.min(attempt++, 5)));
     retry?.unref?.();
   }
@@ -39,7 +40,7 @@ export function connectRealtime({getSource, getToken, onInvalidate, onStatus, on
     const gen = ++generation;
     connected = false;
     onStatus(false);
-    if (browser.navigator?.onLine === false) return;
+    if (browser.navigator?.onLine === false || browser.document?.hidden) return;
     try {
       const source = getSource();
       if (typeof source?.subscribe !== 'function') { schedule(gen); return; }
@@ -78,9 +79,17 @@ export function connectRealtime({getSource, getToken, onInvalidate, onStatus, on
     generation++; connected = false; timers.clearTimeout(retry); disconnect();
     void connect();
   };
+  const visibility = () => {
+    const hidden = browser.document?.hidden === true;
+    if (hidden === lastHidden) return;
+    lastHidden = hidden;
+    if (hidden) offline(); else online();
+  };
   browser.addEventListener?.('offline', offline);
   browser.addEventListener?.('online', online);
+  browser.document?.addEventListener?.('visibilitychange', visibility);
   void connect();
   return () => { stopped = true; generation++; timers.clearTimeout(retry); disconnect();
-    browser.removeEventListener?.('offline', offline); browser.removeEventListener?.('online', online); };
+    browser.removeEventListener?.('offline', offline); browser.removeEventListener?.('online', online);
+    browser.document?.removeEventListener?.('visibilitychange', visibility); };
 }

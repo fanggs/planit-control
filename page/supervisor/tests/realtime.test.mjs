@@ -117,6 +117,43 @@ test('offline pauses retries and online reconnects with a fresh API snapshot', a
   stop(); assert.equal(listeners.size, 0);
 });
 
+test('hidden supervisor document disconnects and visible return refetches one authoritative snapshot', async () => {
+  const listeners = new Map(), document = {hidden: false,
+    addEventListener(type, callback) { listeners.set(`document:${type}`, callback); },
+    removeEventListener(type) { listeners.delete(`document:${type}`); }},
+    browser = {document, navigator: {onLine: true},
+    addEventListener(type, callback) { listeners.set(type, callback); },
+    removeEventListener(type) { listeners.delete(type); }};
+  const callbacks = [], statuses = [];
+  let subscriptions = 0, cleanups = 0, snapshots = 0, tokens = 0;
+  const stop = connectRealtime({browser, getToken: async () => `token-${++tokens}`,
+    getSource: () => ({subscribe(value) {
+      subscriptions++; callbacks.push(value); return () => { cleanups++; };
+    }}), onInvalidate: async () => { snapshots++; }, onStatus: value => statuses.push(value),
+    timers: {setTimeout: () => 1, clearTimeout: () => {}}});
+  try {
+    await settle(); assert.equal(subscriptions, 1);
+    callbacks[0].onConnection(true); await settle();
+    assert.equal(snapshots, 1); assert.equal(statuses.at(-1), true);
+    document.hidden = true;
+    assert.equal(typeof listeners.get('document:visibilitychange'), 'function');
+    listeners.get('document:visibilitychange')(); await settle();
+    assert.equal(cleanups, 1); assert.equal(statuses.at(-1), false);
+    callbacks[0].onEvent({type: 'report.created', site_id: 6045, report_id: 'old-report'});
+    callbacks[0].onConnection(true); await settle();
+    assert.equal(snapshots, 1);
+    document.hidden = false; listeners.get('document:visibilitychange')(); await settle();
+    assert.equal(subscriptions, 2); assert.ok(tokens >= 2);
+    callbacks[1].onConnection(true); await settle();
+    assert.equal(snapshots, 2); assert.equal(statuses.at(-1), true);
+    listeners.get('document:visibilitychange')(); await settle();
+    assert.equal(subscriptions, 2, 'duplicate visible events must not open another socket');
+  } finally { stop(); }
+  assert.equal(cleanups, 2); assert.equal(listeners.size, 0);
+  callbacks[1].onEvent({type: 'scores.updated', site_ids: [6045]}); await settle();
+  assert.equal(snapshots, 2);
+});
+
 test('the configured DeepSpace bridge delivers ID notices and refreshes authorized dashboard data', async () => {
   class BridgeSocket {
     static sockets = [];
