@@ -1,5 +1,6 @@
 /* Why: Keep absolute deadlines, version ordering and missing-data handling independent of rendering so safety behavior can be tested. */
 // Pure functions: no browser, network or timers. This makes the critical alert behavior testable.
+import {lightningWatch} from './crew-watch.js';
 export function remainingSeconds(deadline, now = Date.now()) {
   const timestamp = Date.parse(deadline);
   return Number.isFinite(timestamp) ? Math.max(0, Math.ceil((timestamp - now) / 1000)) : null;
@@ -16,13 +17,17 @@ export function acceptAlert(previous, incoming, siteId) {
   return {...incoming};
 }
 
-export function alertView(alert, connected, now = Date.now()) {
+export function alertView(alert, connected, now = Date.now(), watch = null) {
+  const watched = watch ? lightningWatch(watch, [], now) : null;
+  if (watched?.status === 'stop_work' && alert?.status !== 'hold') {
+    return {title:'Stop work · Lightning', detail:'The API reports a stop-work condition. The countdown is unavailable; confirm with your supervisor.', tone:'hold', seconds:null};
+  }
   if (!alert) return {title:'Status unavailable', detail:'Waiting for the alert service. Confirm conditions with your supervisor.', tone:'unknown', seconds:null};
   if (alert.status === 'hold') {
     const seconds = remainingSeconds(alert.all_clear_at, now);
     return {title:'Stop work · Lightning', detail:seconds === 0 ? 'Timer elapsed. Waiting for server confirmation; do not resume from the timer alone.' : 'Follow your site lightning procedure. Every new nearby strike resets this hold.', tone:'hold', seconds};
   }
-  if (!connected || alert.status !== 'cleared') return {title:'Status unavailable', detail:connected?'The service has not supplied a confirmed lightning status. Check with your supervisor.':'Live updates are unavailable. The screen cannot confirm that work may resume.', tone:'unknown', seconds:null};
+  if (!connected || alert.status !== 'cleared' || (watched && watched.status !== 'clear')) return {title:'Status unavailable', detail:connected?'The lightning watch has not confirmed a fresh clear status. Check with your supervisor.':'Live updates are unavailable. The screen cannot confirm that work may resume.', tone:'unknown', seconds:null};
   return {title:'No active lightning hold reported', detail:'This describes the lightning alert only. Check all hazards and follow site procedures.', tone:'clear', seconds:null};
 }
 

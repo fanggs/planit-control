@@ -1,6 +1,7 @@
-/* API fields follow api/CONTRACT.md v1.2, with an explicit legacy API bridge.
+/* API fields follow api/CONTRACT.md v1.3, with an explicit legacy API bridge.
    Revisions below order client requests; they are not backend data or timestamps. */
 import {screeningDetail,screeningSummary,screeningFactors} from './crew-screening.js';
+import {lightningWatch,warningsWatch} from './crew-watch.js';
 export const HAZARD_LABELS = Object.freeze({
   heat: 'Extreme heat', lightning: 'Lightning', flooding: 'Flooding',
   wildfire: 'Wildfire', soil_saturation: 'Soil saturation', wildlife: 'Wildlife', other: 'Other'
@@ -29,7 +30,7 @@ function factors(rows) {
 }
 export function mapSiteSummary(raw, {now = Date.now()} = {}) {
   const modern = raw.score_status != null;
-  const screening = modern ? screeningSummary(raw,now) : {
+  const screening = modern ? screeningSummary(raw,now,{requireFactors:true}) : {
     score:scoreValue(raw.score),score_updated_at:time(raw.scored_at),score_status:'legacy',
     score_reason:'The API is still using the earlier score format.',valid_from:null,valid_until:null,captured_at:null
   };
@@ -49,7 +50,11 @@ function format(value, unit) { return finite(value) ? `${value} ${unit}` : 'No d
 function eventSeverity(value) {
   return ({minor: 'lower', moderate: 'elevated', severe: 'high', extreme: 'high', low: 'lower', medium: 'elevated', high: 'high'})[value] || 'unknown';
 }
-function displayHazards(raw, activeAlerts) {
+function activeEvent(event, now) {
+  const start=Date.parse(event?.starts_at),end=Date.parse(event?.ends_at);
+  return Number.isFinite(start) && start<=now && (!Number.isFinite(end) || end>now);
+}
+function displayHazards(raw, activeAlerts, now) {
   const weather = raw.latest_weather;
   const observed_at = time(weather?.observed_at);
   const hazards = Object.fromEntries(['weather', 'heat', 'lightning', 'flood', 'wildfire', 'soil', 'wildlife'].map(key => [key, {
@@ -62,6 +67,7 @@ function displayHazards(raw, activeAlerts) {
     hazards.soil = {...hazards.soil, ...common, reading: `Soil moisture ${format(weather.soil_moisture, 'm³/m³')}`};
   }
   for (const event of raw.environmental_events || []) {
+    if (!activeEvent(event, now)) continue;
     const key = displayKeys[event.hazard_type];
     if (key) hazards[key] = {...hazards[key], ...source(event), reading: event.title || 'Environmental warning', severity: eventSeverity(event.severity), observed_at: null};
   }
@@ -90,7 +96,9 @@ export function createContractMapper({now = () => Date.now()} = {}) {
     if (holds.some(alert => !time(alert.clear_at))) throw new Error('A lightning stop-work alert has no valid clear_at.');
     const hold = holds.sort((a, b) => Date.parse(b.clear_at) - Date.parse(a.clear_at))[0];
     const confirmedClear = clearedAlertId != null && previous?.alert?.contract_id != null && String(clearedAlertId) === String(previous.alert.contract_id);
-    const alert = {site_id: id, version: revision, status: hold ? 'hold' : confirmedClear || previous?.alert?.status === 'cleared' ? 'cleared' : 'unknown',
+    const watched = raw.lightning_status ? lightningWatch(raw.lightning_status, active, now()) : null;
+    const clear = watched ? watched.status === 'clear' : confirmedClear || previous?.alert?.status === 'cleared';
+    const alert = {site_id: id, version: revision, status: hold ? 'hold' : clear ? 'cleared' : 'unknown',
       contract_id: hold?.id ?? previous?.alert?.contract_id ?? null,
       all_clear_at: hold?.clear_at ?? null, last_strike_at: hold?.last_trigger_at ?? null,
       distance_miles: finite(hold?.trigger?.distance_mi) ? hold.trigger.distance_mi : null};
@@ -105,8 +113,9 @@ export function createContractMapper({now = () => Date.now()} = {}) {
     const value = scoreValue(model?.score);
     const reconciles = value !== null && baseline !== null && Math.abs(baseline + mappedFactors.reduce((sum, f) => sum + f.contribution, 0) - value) <= .050000001;
     const floodAlert = active.find(a => a.hazard_type === 'flooding');
-    const floodEvent = (raw.environmental_events || []).find(e => e.hazard_type === 'flooding');
+    const floodEvent = (raw.environmental_events || []).find(e => e.hazard_type === 'flooding' && activeEvent(e, now()));
     const screening = modern ? screeningDetail(raw.screening,now()) : null;
+    const warningWatch = warningsWatch(raw.warnings_status, raw.environmental_events, now());
     const mapped = {...mapSiteSummary({...raw, score: value, scored_at: model?.scored_at},{now:now()}),
       revision, server_time: null, timezone: raw.timezone ?? null, sample: model?.model_version === 'sample',
       score_method: model?.model_version === 'sample' ? 'Sample API score. Not a live trained-model result.'
@@ -118,9 +127,13 @@ export function createContractMapper({now = () => Date.now()} = {}) {
         model:{name:'Forecast screening model',version:raw.screening?.artifact_sha256},
         factors:screening.factors?.map(f=>({...f,scored_at:screening.score_updated_at}))||[],horizon_hours:24}:{}),
       wildlife_context:mapWildlife(raw.wildlife_context,id),alert, active_alerts: active,
-      warnings: active.filter(a => a.level === 'warning'), hazards: displayHazards(raw, active),
-      flood: {...source(floodEvent), status: floodAlert || floodEvent ? 'warning' : 'unknown',
-        message: floodAlert?.message || floodEvent?.title || 'Flood warning status unavailable. No hydrologic assessment was supplied.',
+      lightning_status: raw.lightning_status ?? null, warnings_status: raw.warnings_status ?? null,
+      environmental_events: raw.environmental_events ?? [],
+      warnings: active.filter(a => a.level === 'warning'), hazards: displayHazards(raw, active, now()),
+      flood: {...source(floodEvent), status: floodAlert || floodEvent ? 'warning' : warningWatch.status === 'ok' ? 'normal' : 'unknown',
+        message: floodAlert?.message || floodEvent?.title || (warningWatch.status === 'ok'
+          ? 'No active NWS flood warning was returned. This is not a hydrologic all-clear.'
+          : 'Flood warning status unavailable. No hydrologic assessment was supplied.'),
         river_name: null, river_distance_miles: null, overnight_rain_mm: null,
         rainfall_label: 'Rain · rolling 24 hours', rainfall_reading: finite(raw.latest_weather?.precip_24h_in) ? `${raw.latest_weather.precip_24h_in} in` : 'No data',
         window_label: floodEvent ? `${floodEvent.starts_at} — ${floodEvent.ends_at || 'End unavailable'}` : 'Unavailable', observed_at: null},
