@@ -3,7 +3,7 @@
 Run: .venv/bin/python -m unittest tests.test_replay -v
 """
 import unittest
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 
 from jobs import replay
@@ -40,6 +40,22 @@ class StopEarlyTest(unittest.TestCase):
              patch.object(replay, "storm_start", return_value=NOW):
             replay.replay(storm, [SITE], speed=10, publish=self.publish)
         stop.assert_called_once()
+
+
+class CountdownTest(unittest.TestCase):
+    def all_clear_used(self, **kwargs):
+        seen = {}
+        with patch.object(replay, "_play", side_effect=lambda storm, sites, pending, rule, *rest: seen.update(rule=rule)), \
+             patch.object(replay, "_tiger_store", return_value=None), \
+             patch.object(replay, "storm_start", return_value=NOW):
+            replay.replay({"name": "test", "flashes": []}, [SITE], speed=30, publish=lambda *a, **k: None, **kwargs)
+        return seen["rule"].all_clear
+
+    def test_speed_shrinks_the_countdown_by_default(self):
+        self.assertEqual(self.all_clear_used(), timedelta(minutes=1))
+
+    def test_real_countdown_keeps_30_minutes(self):
+        self.assertEqual(self.all_clear_used(real_countdown=True), timedelta(minutes=30))
 
 
 if __name__ == "__main__":

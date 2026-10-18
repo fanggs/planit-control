@@ -15,6 +15,9 @@ presented as live weather.
     # demo speed: 10x faster, so a 30-minute countdown takes 3 minutes
     .venv/bin/python -m jobs.replay --speed 10
 
+    # strikes 30x faster, but the countdown stays the real 30 minutes
+    .venv/bin/python -m jobs.replay --speed 30 --real-countdown
+
 Speed also shortens the countdown by the same factor, so the replay keeps the
 storm's real rhythm (strikes, resets, all-clear) just compressed.
 """
@@ -54,11 +57,13 @@ def storm_start(storm: dict, rule: LightningRule) -> datetime:
     return storm["flashes"][0]["_orig"]
 
 
-def replay(storm: dict, sites: list[dict], speed: float = 1.0, publish=None, tick: float = 1.0) -> None:
+def replay(storm: dict, sites: list[dict], speed: float = 1.0, publish=None, tick: float = 1.0,
+           real_countdown: bool = False) -> None:
+    """real_countdown: keep the 30-minute all-clear at real length even when strikes are sped up."""
     if publish is None:
         from api.realtime import publish
     store = _tiger_store(replay=True)
-    rule = LightningRule(sites, all_clear=ALL_CLEAR / speed, store=store)
+    rule = LightningRule(sites, all_clear=ALL_CLEAR if real_countdown else ALL_CLEAR / speed, store=store)
     t0_storm = storm_start(storm, rule)
     t0_wall = datetime.now(timezone.utc)
     if store is not None:
@@ -124,6 +129,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Play back a recorded storm, labeled as replay.")
     parser.add_argument("--speed", type=float, default=1.0, help="how many times faster than real time (default 1)")
     parser.add_argument("--storm", type=Path, default=DEFAULT_STORM)
+    parser.add_argument("--real-countdown", action="store_true",
+                        help="keep the 30-minute all-clear countdown at real length while strikes play faster")
     args = parser.parse_args()
 
     for line in (ROOT / ".env").read_text().splitlines():
@@ -135,4 +142,4 @@ if __name__ == "__main__":
     signal.signal(signal.SIGTERM, signal.default_int_handler)
     from api.site_data import load_sites
     sites = load_sites()
-    replay(load_storm(args.storm), sites, speed=args.speed)
+    replay(load_storm(args.storm), sites, speed=args.speed, real_countdown=args.real_countdown)
