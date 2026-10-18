@@ -297,6 +297,13 @@ wasn't: show "warning status unavailable", not "none".
 ```
 
 ### `GET /briefings/{site_id}`: latest briefing
+New briefings include optional `inputs.sources`, an array of
+`{source_name, source_url}` references retained from the forecast and NWS records
+for that site/local day. Older saved briefings default to an empty array; do not
+substitute current readings as their historical evidence. This is evidence
+metadata, not a delivery receipt. Site detail responses also retain optional
+`source_name`, `source_url`, and `retrieved_at` plant-catalog provenance.
+
 ```json
 {
   "site_id": 6045,

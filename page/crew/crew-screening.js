@@ -9,7 +9,13 @@ export const FEATURE_LABELS=Object.freeze({
   heat_index_max_f_missing:'Heat index not available',
   temperature_max_f:'Max temperature',temperature_min_f:'Min temperature',
   month_cos:'Season · month cosine',month_sin:'Season · month sine',
-  latitude:'Latitude',longitude:'Longitude',soil_moisture:'Soil moisture'
+  latitude:'Latitude',longitude:'Longitude',soil_moisture:'Soil moisture',
+  humidity_mean_pct:'Average humidity',humidity_min_pct:'Minimum humidity',
+  rain_max_1h_in:'Peak hourly rain',elevation_m:'Elevation',
+  antecedent_forecast_rain_24h_in:'Previous 24-hour forecast rain',
+  antecedent_forecast_rain_72h_in:'Previous 72-hour forecast rain',
+  antecedent_forecast_rain_168h_in:'Previous 7-day forecast rain',
+  hour_sin:'Time of day (sine)',hour_cos:'Time of day (cosine)'
 });
 export function featureLabel(feature){
   if(typeof feature!=='string'||!feature.trim()||feature.length>100)throw new Error('Invalid model feature.');

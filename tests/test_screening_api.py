@@ -84,6 +84,8 @@ class ScreeningTest(unittest.TestCase):
 
     def test_detail_validates_with_screening_and_wildlife(self):
         site = load([prediction(621, 6.4)])[0]
+        site.update(source_name="EIA-860M", source_url="https://www.eia.gov/electricity/data/eia860m/",
+                    retrieved_at=iso(NOW))
         with patch.object(site_data, "load_sites", return_value=[site]), \
              patch.object(main, "_alerts", return_value=[]), patch.object(main, "_reports", return_value=[]):
             detail = SiteDetail.model_validate(main.site_detail(621))
@@ -92,6 +94,9 @@ class ScreeningTest(unittest.TestCase):
         out = detail.model_dump(mode="json")
         self.assertEqual(out["screening"]["valid_until"][:4], str(NOW.year))
         self.assertNotIn("reason", out["screening"])
+        self.assertEqual(out["source_name"], site["source_name"])
+        self.assertEqual(out["source_url"], site["source_url"])
+        self.assertEqual(out["retrieved_at"], site["retrieved_at"])
 
     def test_unavailable_detail_has_only_null_form(self):
         site = load([])[0]

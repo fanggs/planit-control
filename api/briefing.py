@@ -17,6 +17,7 @@ import json
 import re
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+from urllib.parse import urlsplit
 from zoneinfo import ZoneInfo
 
 from api import llm
@@ -257,6 +258,27 @@ def write_briefing(site: dict, facts: dict, alerts: list[dict]) -> dict:
             "attempts": 2 if problems else 0, "ungrounded": problems}
 
 
+def briefing_sources(site: dict, rows: list[dict], events: list[dict], for_date: date) -> list[dict]:
+    """Retain supplied evidence for this site/day; never ask the LLM for URLs."""
+    tz = ZoneInfo(site["timezone"])
+    sources = {}
+    applicable = [r for r in rows if r["site_id"] == site["site_id"]
+                  and datetime.fromisoformat(r["valid_at"].replace("Z", "+00:00")).astimezone(tz).date() == for_date]
+    applicable += [e for e in events if nws_for_day(site, [e], for_date)]
+    for row in applicable:
+        url = row.get("source_url")
+        if not isinstance(url, str):
+            continue
+        try:
+            parsed = urlsplit(url)
+            valid = parsed.scheme in {"https", "http"} and parsed.hostname and not parsed.username and not parsed.password
+        except ValueError:
+            valid = False
+        if valid:
+            sources.setdefault(url, {"source_name": row.get("source_name") or "Source", "source_url": url})
+    return list(sources.values())
+
+
 def briefing_for(site: dict, rows: list[dict], alerts: list[dict], now: datetime | None = None,
                  events: list[dict] | None = None) -> dict | None:
     """Contract-shaped briefing for the site's next local day, or None without forecasts.
@@ -278,5 +300,6 @@ def briefing_for(site: dict, rows: list[dict], alerts: list[dict], now: datetime
         "text": result["text"],
         "inputs": {"forecast_valid_from": first,
                    "score_scored_at": (site.get("screening") or {}).get("scored_at"),
-                   "method": result["method"], "facts": facts},
+                   "method": result["method"], "facts": facts,
+                   "sources": briefing_sources(site, rows, events or [], tomorrow)},
     }
