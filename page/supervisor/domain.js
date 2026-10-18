@@ -13,6 +13,7 @@ export const points = value => `${value > 0 ? '+' : ''}${value.toFixed(1)}`;
 const FEATURE_LABELS = Object.freeze({temperature_max_f: 'Maximum temperature', temperature_min_f: 'Minimum temperature',
   humidity_mean_pct: 'Average humidity', humidity_min_pct: 'Minimum humidity', wind_max_mph: 'Maximum wind',
   rain_max_1h_in: 'Peak hourly rain', rain_total_24h_in: '24-hour rain', heat_index_max_f: 'Maximum heat index',
+  heat_index_max_f_missing: 'Heat index not available',
   antecedent_forecast_rain_24h_in: 'Previous 24-hour forecast rain',
   antecedent_forecast_rain_72h_in: 'Previous 72-hour forecast rain',
   antecedent_forecast_rain_168h_in: 'Previous 7-day forecast rain', latitude: 'Latitude', longitude: 'Longitude',

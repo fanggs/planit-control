@@ -6,6 +6,7 @@ const stamp=value=>typeof value==='string'&&Number.isFinite(Date.parse(value))?v
 const twoHours=2*60*60*1000;
 export const FEATURE_LABELS=Object.freeze({
   rain_total_24h_in:'24-hour rain',wind_max_mph:'Max wind',heat_index_max_f:'Max heat index',
+  heat_index_max_f_missing:'Heat index not available',
   temperature_max_f:'Max temperature',temperature_min_f:'Min temperature',
   month_cos:'Season · month cosine',month_sin:'Season · month sine',
   latitude:'Latitude',longitude:'Longitude',soil_moisture:'Soil moisture'

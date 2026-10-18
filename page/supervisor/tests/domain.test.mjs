@@ -19,6 +19,7 @@ test('all shipped sample prototype screenings reconcile and retain signed featur
   }
   assert.equal(featureLabel('rain_total_24h_in'), '24-hour rain');
   assert.equal(featureLabel('month_cos'), 'Season (cosine)');
+  assert.equal(featureLabel('heat_index_max_f_missing'), 'Heat index not available');
 });
 test('screening uses exact feature reconciliation and rejects missing safety metadata', () => {
   const model = {...details[9001].screening, score: 4.05, baseline: 4,

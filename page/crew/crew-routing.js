@@ -7,8 +7,9 @@ export function userRoles(user, claim) {
 }
 export function workspaceForUser(user, claim) {
   const roles = userRoles(user, claim);
-  if (roles.includes('supervisor')) return 'supervisor';
+  // This chooser serves crew entry pages. The dashboard checks its own role.
   if (roles.includes('crew')) return 'crew';
+  if (roles.includes('supervisor')) return 'supervisor';
   return null;
 }
 export function siteParameter(value) {

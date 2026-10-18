@@ -10,6 +10,15 @@ const legacy=JSON.parse(await fs.readFile(new URL('./fixtures/contract-v1.1.json
 const roster=atlasRoster(JSON.parse(await fs.readFile(new URL('../crew-data/monitored-sites.json',import.meta.url))));
 const epoch=Date.parse('2026-10-18T00:00:00Z');
 const iso=ms=>new Date(ms).toISOString();
+
+test('missing heat-index feature has a readable label without changing its contribution',()=>{
+  assert.equal(featureLabel('heat_index_max_f_missing'),'Heat index not available');
+  const raw=screening();raw.factors[0].feature='heat_index_max_f_missing';
+  const mapped=screeningDetail(raw,epoch);
+  assert.equal(mapped.factors[0].name,'Heat index not available');
+  assert.equal(mapped.factors[0].contribution,raw.factors[0].contribution);
+  assert.equal(mapped.score,raw.score);
+});
 function screening(now=epoch){return {score:6.4,baseline:2.1,status:'research',
   factors:[{feature:'rain_total_24h_in',contribution:2.6},{feature:'wind_max_mph',contribution:1.2},{feature:'heat_index_max_f',contribution:.9},{feature:'month_cos',contribution:-.4}],
   target:'NWS warning or heat advisory covering the plant within the next 24 hours',

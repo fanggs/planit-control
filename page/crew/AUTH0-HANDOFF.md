@@ -11,7 +11,8 @@ There are no Auth0 client secrets in frontend code. The namespaced roles claim
 defaults to `https://planit-control/roles`; Alan/Aryan must confirm it and add
 `crew` / `supervisor` to the validated ID token using their Auth0 configuration.
 No role is accepted from a URL, storage value or public workspace picker.
-Both roles default to the supervisor workspace when both are present.
+Crew entry pages open the crew workspace when both roles are present. The
+Supervisor link opens the separate dashboard, which verifies the supervisor role.
 An authenticated account with no supported role gets an access message.
 The API must independently validate access tokens and enforce permissions.
 

@@ -6,7 +6,8 @@ const claim = 'https://planit-control/roles';
 test('verified role claims choose the workspace; unknown roles fail closed', () => {
   assert.equal(workspaceForUser({[claim]: ['crew']}, claim), 'crew');
   assert.equal(workspaceForUser({[claim]: ['supervisor']}, claim), 'supervisor');
-  assert.equal(workspaceForUser({[claim]: ['crew', 'supervisor']}, claim), 'supervisor');
+  assert.equal(workspaceForUser({[claim]: ['crew', 'supervisor']}, claim), 'crew');
+  assert.equal(workspaceForUser({[claim]: ['supervisor', 'crew']}, claim), 'crew');
   assert.equal(workspaceForUser({role: 'supervisor'}, claim), null);
   assert.equal(workspaceForUser({[claim]: 'supervisor'}, claim), null);
   assert.equal(workspaceForUser({[claim]: ['admin']}, claim), null);
