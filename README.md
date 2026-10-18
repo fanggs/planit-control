@@ -6,6 +6,21 @@ wildlife) into one risk picture per utility job site, with alerts, a 6 PM
 next-day safety briefing, crew photo hazard reporting, a supervisor dashboard,
 and an explainable ML hazard index (0-10).
 
+## Try it
+
+Live at **https://foresite.work**. These are demo accounts for the hackathon;
+they will be turned off after judging.
+
+| Role | Opens | Email | Password           |
+| --- | --- | --- |--------------------|
+| Crew | Crew screen (phone-friendly): site conditions, alerts, reports, briefing | `crew.test@foresite.work` | `ubuntumonkeys123` |
+| Supervisor | Supervisor dashboard: all 60 sites, reports, questions | `supervisor.test@foresite.work` | `ubuntumonkeys123` |
+
+Open https://foresite.work, choose **Log in**, and sign in with one of the
+accounts. The supervisor dashboard is at https://foresite.work/supervisor/.
+Any lightning stop-work alert marked **REPLAY** is a recorded storm played back
+for the demo.
+
 ## Layout
 
 | Folder | What |
